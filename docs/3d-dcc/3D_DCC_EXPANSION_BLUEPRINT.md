@@ -32,7 +32,43 @@ flowchart LR
 
 ---
 
-## 2. Key Architecture Pillars Inspired by Kiosk Library 2.1
+## 2. In-Canvas 3D Model Viewer Object DCC Tool (`src/board/ModelViewer.tsx`)
+
+> **User Design Directive:** *"The 3D DCC things means the canvas has the ability to import 3D object and track texture but it been neglected xD so I am talking about the 3D viewer object DCC tool."*
+
+The core canvas has native support for 3D model cards (`node.kind === 'model'`). Previously, this viewer was limited to simple orbit rotation without texture management or shader diagnostics. The upgraded **In-Canvas 3D DCC Tool** upgrades each canvas model card into an interactive DCC preview station:
+
+### 2.1 PBR Texture Channel Tracking Drawer
+* **Live Material Inspection:** Scans all meshes in the scene and builds an active inventory of material slots.
+* **Five-Channel Tracking:** Tracks Albedo, Normal, Roughness, Metalness, and Ambient Occlusion (AO).
+* **Visual Status Badges:** Displays `[Active]` (green) vs `[Missing]` (warning) for every channel on every material slot.
+
+### 2.2 Kiosk-Inspired Smart Auto-Wiring
+* **One-Click Relinking:** Artists can drop a folder or batch of image textures onto the model card.
+* **Filename Suffix Detection:** Automatically matches:
+  - Diffuse/Albedo: `_diffuse`, `_albedo`, `_col`, `_basecolor`
+  - Normal Maps: `_normal`, `_nor`, `_nrm`
+  - Roughness: `_roughness`, `_rough`, `_gloss`
+  - Metalness: `_metallic`, `_metal`, `_met`
+  - Ambient Occlusion: `_ao`, `_ambient_occlusion`, `_occ`
+* Automatically creates `THREE.CanvasTexture` / `THREE.Texture`, configures correct color space (`SRGBColorSpace` for color, Linear for data maps), and wires them directly into Three.js `MeshStandardMaterial`.
+
+### 2.3 Diagnostic Shading Modes
+* **PBR (Full Lit):** Standard physically based rendering with multi-light setup (Hemisphere ambient, Key directional with shadow mapping, Rim light).
+* **Clay (Matcap):** Terracotta matte clay shading for pure silhouette, topology, and sculptural form inspection without texture distractions.
+* **Normals:** Surface normal vectors mapped directly to RGB colors for diagnostic mesh orientation analysis and flipped normal detection.
+* **UV Grid:** High-contrast procedural checkerboard grid texture to instantly detect UV distortion, seam errors, and texture stretching.
+
+### 2.4 Viewport Lighting & Camera Controls
+* **Lighting Presets:** Studio Neutral (3-point), Sunset Golden Hour, Noir High-Contrast, and Flat Diagnostic.
+* **Camera Angle Presets:** Perspective 3/4, Front Orthographic, Top Down, and Right View.
+* **Display Overlays:** Ground grid toggle, Wireframe overlay, and Turntable auto-rotation.
+* **Geometry HUD:** Live Polycount overlay displaying triangle count, vertex count, mesh count, and material count.
+* **1-Click High-Res Snapshot:** Instant PNG capture of the current 3D viewport view saved to disk.
+
+---
+
+## 3. Key Architecture Pillars Inspired by Kiosk Library 2.1
 
 ### 2.1 100% Local-First Asset Hub & Smart Material Detection
 - **Offline Indexing:** Assets reside in `projects/<project-id>/assets/originals/` with persistent UUIDs and local SQLite/JSON caches. Zero cloud lock-in.

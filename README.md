@@ -42,9 +42,16 @@ Art Equation synthesizes the strengths of four industry benchmarks:
 
 ### 4. 3D DCC Pipeline & Kiosk Library 2.1 Synergy
 Inspired by the multi-DCC digital asset architecture of **Kiosk Library 2.1**:
-- **OpenPBR & Standard Surface Auto-Wiring:** Automatically detects PBR texture maps (`_diffuse`, `_roughness`, `_normal`, `_displacement`, `_metallic`, `_ao`) and generates native shader graphs across target DCCs.
-- **Command Stacks:** Chained macro automation scripts enabling automated scene assembly, floor alignment, and UV checks upon dropping assets from Art Equation boards.
-- **Deep MCP Toolchain:** Pre-integrated with Model Context Protocol servers for **Blender**, **Cinema 4D**, **After Effects**, **DaVinci Resolve**, **Photoshop**, **Illustrator**, **Nuke**, and **Marvelous Designer**.
+- **In-Canvas 3D DCC Viewport Tool (`src/board/ModelViewer.tsx`):**
+  - **PBR Texture Tracking Drawer:** Live inspection of material slots with real-time status badges (`[Active]` vs `[Missing]`) for Albedo, Normal, Roughness, Metalness, and Ambient Occlusion.
+  - **Smart Suffix Auto-Wiring:** Drag-and-drop auto-relinking for texture packs using standard DCC filename suffixes (`_diffuse`, `_nor`, `_rough`, `_metal`, `_ao`).
+  - **Diagnostic Shading Modes:** Instant switching between PBR Lit, Clay / Terracotta Matcap (for form and silhouette sculpting checks), Surface Normal Vectors (RGB diagnostics), and Procedural UV Checkerboard (for distortion detection).
+  - **Lighting & Camera Controls:** Studio Neutral, Sunset Golden Hour, Noir, and Flat presets; Perspective (3/4), Front, Top, and Right camera angles; ground grid, wireframe overlay, turntable rotation, and live polycount HUD.
+  - **1-Click High-Res Snapshot:** Export high-resolution PNG captures directly from the canvas card.
+- **External DCC Bridge & Command Stacks:**
+  - **OpenPBR & Standard Surface Auto-Wiring:** Automatically detects PBR texture maps and generates native shader graphs across Blender, Cinema 4D, and Houdini.
+  - **Command Stacks:** Chained macro automation scripts enabling automated scene assembly, floor alignment, and UV checks upon dropping assets from Art Equation boards.
+  - **Deep MCP Toolchain:** Pre-integrated with Model Context Protocol servers for **Blender**, **Cinema 4D**, **After Effects**, **DaVinci Resolve**, **Photoshop**, **Illustrator**, **Nuke**, and **Marvelous Designer**.
 
 ---
 

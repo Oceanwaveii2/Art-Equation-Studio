@@ -161,9 +161,30 @@ The engine combines:
 
 ---
 
-## 5. Work Stream 4: 3D DCC Pipeline Expansion (Kiosk Library 2.1 Synthesis)
+### 5.1 In-Canvas 3D DCC Viewport Tool (`src/board/ModelViewer.tsx`)
+The in-canvas 3D Model Card tool has been fully upgraded from a basic orbit viewer into a complete **In-Canvas DCC Inspection & Texture Tracking Tool**:
 
-### 5.1 Architectural Blueprint
+1. **PBR Texture Channel Tracking Drawer:**
+   - Real-time tracking of Albedo, Normal, Roughness, Metalness, and Ambient Occlusion channels across all object materials.
+   - Live visual status badges (`[Active]` green vs `[Missing]` grey/warning) for instant missing-texture triage.
+2. **Kiosk-Inspired Smart Auto-Wiring:**
+   - Dropping or uploading texture packs automatically parses standard DCC filename suffixes (`_diffuse`, `_nor`, `_rough`, `_metal`, `_ao`) and binds them directly into the appropriate Three.js `MeshStandardMaterial` slots.
+3. **Diagnostic Shading Modes:**
+   - **PBR:** Full physical material shading with multi-point directional & rim lighting.
+   - **Clay (Matcap):** Terracotta clay matcap mode for surface form and silhouette inspection.
+   - **Normals:** Surface normal vectors mapped to RGB colors for diagnostic mesh orientation analysis.
+   - **UV Grid:** Procedural checkerboard grid texture to instantly detect UV stretching or distortion.
+4. **Camera & Viewport Controls:**
+   - Camera Angle Presets: Perspective (3/4), Front, Top, and Right orthographic/axial views.
+   - Viewport Overlays: Toggleable Ground Grid, Wireframe overlay, and Turntable auto-spin.
+   - Live Polycount HUD: Real-time Triangle, Vertex, Mesh, and Material count overlay.
+   - 1-Click Snapshot: Instant high-resolution PNG render export directly from the in-card viewport.
+5. **Frame Scheduler & Idle Discipline:**
+   - Strict idle frame gating: Zero GPU consumption when stationary; re-wakes on user interaction (orbit, pan, zoom, resize) and settles back to idle.
+
+---
+
+### 5.2 External DCC Bridge Architecture (Kiosk Library 2.1 Synthesis)
 Synthesize the multi-DCC asset ingestion pipeline of [Kiosk Library 2.1](https://cgpress.org/archives/kiosk-library-2-1-released.html) with Art Equation's native MCP server ecosystem:
 
 ```mermaid
@@ -182,7 +203,7 @@ sequenceDiagram
     App-->>User: Instant Ready-to-Render Viewport Asset
 ```
 
-### 5.2 Key Capabilities for Argon to Implement
+### 5.3 External Bridge Capabilities for Argon to Implement
 1. **Smart Suffix Classifier (`src/media/pbrClassifier.ts`):**
    - Automatically identify texture roles from filenames:
      - Diffuse / Albedo: `*_diffuse`, `*_albedo`, `*_col`, `*_basecolor`
@@ -196,7 +217,7 @@ sequenceDiagram
    - **Cinema 4D:** Dispatch Python script via `c4d_run_python` to generate Redshift Standard Material or Octane Universal Material.
    - **Houdini:** Generate MaterialX OpenPBR Surface shaders on Solaris USD stages.
 3. **Command Stacks:**
-   - Create a configurable macro runner enabling artists to define automated sequences upon asset drops (e.g. scale normalization, origin-to-bottom-center, automatic collision hull generation).
+    - Create a configurable macro runner enabling artists to define automated sequences upon asset drops (e.g. scale normalization, origin-to-bottom-center, automatic collision hull generation).
 4. **Poly Haven Integration:**
    - Build a lightweight canvas browser modal querying the Poly Haven public API to drag CC0 HDRIs and PBR textures directly onto board cards.
 
