@@ -15,15 +15,19 @@ export const CANVAS_THEME_COLORS = {
 
 /** Milanote Second UI canvas theme defaults with sampled gray background. */
 export const MILANOTE_CANVAS_THEME_COLORS = {
-  navy: { background: '#19202c', grid: '#2a3648', minorGrid: '#1e2736' },
+  navy: {
+    background: '#091322', // deep nautical ocean navy
+    grid: '#2563eb',       // authentic vibrant blue theme grid (not gray!)
+    minorGrid: '#1d4ed8',  // clear blue minor grid lines/dots
+  },
   dark: {
-    background: '#26232a',
-    grid: '#35353d',
-    minorGrid: '#2d2d34',
+    background: '#26232a', // authentic sampled Milanote matte dark charcoal
+    grid: '#3a3744',       // subtle dark grid
+    minorGrid: '#2f2c38',
   },
   light: {
-    background: '#f4f4f6',
-    grid: '#dfdfe3',
+    background: '#f4f4f6', // crisp clean Milanote warm off-white
+    grid: '#dedee3',
     minorGrid: '#eaebee',
   },
 } as const

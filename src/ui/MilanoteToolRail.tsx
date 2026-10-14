@@ -56,6 +56,12 @@ export function MilanoteToolRail({
     target?.focus()
   }
 
+  const handleDragStart = (kind: string) => (event: React.DragEvent<HTMLButtonElement>) => {
+    if (viewOnly) return
+    event.dataTransfer.setData('text/plain', `milanote:${kind}`)
+    event.dataTransfer.effectAllowed = 'copy'
+  }
+
   const isLineActive = interactionTool === 'connect' || (interactionTool === 'draw' && shapeKind === 'line')
   const isDrawActive = interactionTool === 'pencil' || interactionTool === 'pen'
 
@@ -66,14 +72,21 @@ export function MilanoteToolRail({
       aria-label="Milanote creation tool rail"
       onKeyDown={handleKeyDown}
     >
+      {/* Top drag/brand handle */}
+      <div className="milanote-rail-header" aria-hidden="true" title="Milanote Tool Rail">
+        <span className="milanote-rail-grip" />
+      </div>
+
       <div className="milanote-tool-group" role="group" aria-label="Creation tools">
         {/* Note */}
         <button
           type="button"
           className="milanote-tool-btn"
-          title="Note · Rich text note card"
+          title="Note · Rich text note card (click or drag to canvas)"
           aria-label="Add note card"
           disabled={viewOnly}
+          draggable={!viewOnly}
+          onDragStart={handleDragStart('note')}
           onClick={onAddNote}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="milanote-icon">
@@ -89,6 +102,8 @@ export function MilanoteToolRail({
           title="Link · Card linking to board or web address"
           aria-label="Add link card"
           disabled={viewOnly}
+          draggable={!viewOnly}
+          onDragStart={handleDragStart('link')}
           onClick={onAddLink}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="milanote-icon">
@@ -101,9 +116,11 @@ export function MilanoteToolRail({
         <button
           type="button"
           className="milanote-tool-btn"
-          title="To-do · Checklist task card"
+          title="To-do · Checklist task card (click or drag to canvas)"
           aria-label="Add to-do list card"
           disabled={viewOnly}
+          draggable={!viewOnly}
+          onDragStart={handleDragStart('todo')}
           onClick={onAddTodo}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="milanote-icon">
@@ -128,18 +145,22 @@ export function MilanoteToolRail({
           <span className="milanote-label">Line</span>
         </button>
 
-        {/* Board */}
+        {/* Board - Distinctive Milanote Royal Blue Rounded Square Badge */}
         <button
           type="button"
-          className="milanote-tool-btn"
-          title="Board · Create nested sub-board tile"
+          className="milanote-tool-btn milanote-board-tool"
+          title="Board · Create nested sub-board tile (click or drag to canvas)"
           aria-label="Add sub-board"
           disabled={viewOnly}
+          draggable={!viewOnly}
+          onDragStart={handleDragStart('board')}
           onClick={onAddSubboard}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true" className="milanote-icon">
-            <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <span className="milanote-board-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" className="milanote-icon">
+              <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
           <span className="milanote-label">Board</span>
         </button>
 
@@ -147,9 +168,11 @@ export function MilanoteToolRail({
         <button
           type="button"
           className="milanote-tool-btn"
-          title="Column · Add ordered vertical card stack"
+          title="Column · Add ordered vertical card stack (click or drag to canvas)"
           aria-label="Add card column"
           disabled={viewOnly}
+          draggable={!viewOnly}
+          onDragStart={handleDragStart('column')}
           onClick={onAddColumn}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="milanote-icon">
@@ -165,6 +188,8 @@ export function MilanoteToolRail({
           title="Comment · Add note or feedback"
           aria-label="Add comment card"
           disabled={viewOnly}
+          draggable={!viewOnly}
+          onDragStart={handleDragStart('comment')}
           onClick={onAddComment}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="milanote-icon">
@@ -181,6 +206,8 @@ export function MilanoteToolRail({
             title="Table · Structured tabular data card"
             aria-label="Add table card"
             disabled={viewOnly}
+            draggable={!viewOnly}
+            onDragStart={handleDragStart('table')}
             onClick={onAddTable}
           >
             <svg viewBox="0 0 24 24" aria-hidden="true" className="milanote-icon">
@@ -202,6 +229,8 @@ export function MilanoteToolRail({
           title="Add Image · Insert picture or reference"
           aria-label="Add image card"
           disabled={viewOnly}
+          draggable={!viewOnly}
+          onDragStart={handleDragStart('image')}
           onClick={onImportImage}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="milanote-icon">
@@ -217,6 +246,8 @@ export function MilanoteToolRail({
           title="3D DCC · Orbitable 3D mesh viewer (GLB, GLTF, OBJ)"
           aria-label="Add 3D DCC object card"
           disabled={viewOnly}
+          draggable={!viewOnly}
+          onDragStart={handleDragStart('dcc')}
           onClick={onImport3DModel}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="milanote-icon">
@@ -241,8 +272,6 @@ export function MilanoteToolRail({
           <span className="milanote-label">Draw</span>
         </button>
       </div>
-
-      <div className="milanote-tool-separator" role="separator" />
 
       {/* Bottom Trash Anchor */}
       <div className="milanote-tool-bottom">

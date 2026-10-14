@@ -4887,9 +4887,9 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
   const darkCanvasGrid = activeCanvasThemeColors.dark.grid
   const lightCanvasGrid = activeCanvasThemeColors.light.grid
   const navyCanvasGrid = activeCanvasThemeColors.navy.grid
-  const backgroundFollowsTheme = board.backgroundFollowsTheme === true || (board.backgroundFollowsTheme !== false && (!board.backgroundColor || board.backgroundColor === DARK_BOARD_BACKGROUND || board.backgroundColor === LIGHT_BOARD_BACKGROUND || board.backgroundColor === MILANOTE_CANVAS_THEME_COLORS.dark.background || board.backgroundColor === MILANOTE_CANVAS_THEME_COLORS.light.background))
+  const backgroundFollowsTheme = board.backgroundFollowsTheme === true || (board.backgroundFollowsTheme !== false && (!board.backgroundColor || board.backgroundColor === DARK_BOARD_BACKGROUND || board.backgroundColor === LIGHT_BOARD_BACKGROUND || board.backgroundColor === CANVAS_THEME_COLORS.navy.background || board.backgroundColor === MILANOTE_CANVAS_THEME_COLORS.dark.background || board.backgroundColor === MILANOTE_CANVAS_THEME_COLORS.light.background || board.backgroundColor === MILANOTE_CANVAS_THEME_COLORS.navy.background))
   const effectiveBoardBackground = backgroundFollowsTheme ? (theme === 'navy' ? navyCanvasBg : theme === 'light' ? lightCanvasBg : darkCanvasBg) : board.backgroundColor!
-  const gridFollowsTheme = !board.gridColor || board.gridColor === DARK_GRID_COLOR || board.gridColor === LIGHT_GRID_COLOR || board.gridColor === MILANOTE_CANVAS_THEME_COLORS.dark.grid || board.gridColor === MILANOTE_CANVAS_THEME_COLORS.light.grid
+  const gridFollowsTheme = !board.gridColor || board.gridColor === DARK_GRID_COLOR || board.gridColor === LIGHT_GRID_COLOR || board.gridColor === CANVAS_THEME_COLORS.navy.grid || board.gridColor === MILANOTE_CANVAS_THEME_COLORS.dark.grid || board.gridColor === MILANOTE_CANVAS_THEME_COLORS.light.grid || board.gridColor === MILANOTE_CANVAS_THEME_COLORS.navy.grid
   const effectiveGridColor = gridFollowsTheme ? (theme === 'navy' ? navyCanvasGrid : theme === 'light' ? lightCanvasGrid : darkCanvasGrid) : board.gridColor!
   
 
@@ -6530,9 +6530,17 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
     commitViewport(previous)
   }
 
-  function addNestedBoardPortal() {
-    const center = eventToWorld((stageBoundsRef.current?.left || 0) + stageSize.width / 2, (stageBoundsRef.current?.top || 0) + stageSize.height / 2)
-    onCreateNestedBoard({ x: center.x - 90, y: center.y - 92 })
+  function resolvePlacementPoint(position?: unknown): BoardPoint | undefined {
+    if (position && typeof position === 'object' && 'x' in position && 'y' in position && typeof (position as BoardPoint).x === 'number' && typeof (position as BoardPoint).y === 'number' && !('nativeEvent' in position)) {
+      return position as BoardPoint
+    }
+    return undefined
+  }
+
+  function addNestedBoardPortal(position?: unknown) {
+    const pt = resolvePlacementPoint(position)
+    const center = pt || eventToWorld((stageBoundsRef.current?.left || 0) + stageSize.width / 2, (stageBoundsRef.current?.top || 0) + stageSize.height / 2)
+    onCreateNestedBoard({ x: Math.round(center.x - 90), y: Math.round(center.y - 92) })
   }
 
   async function addBoardLink() {
@@ -6637,13 +6645,18 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
     setSelectedIds([node.id])
   }
 
-  function addNoteNode() {
+  function addNoteNode(position?: unknown) {
+    const pt = resolvePlacementPoint(position)
     const count = board.nodes.length
+    const pos = pt || {
+      x: Math.round((100 - board.viewport.x) / board.viewport.scale + (count % 4) * 28),
+      y: Math.round((100 - board.viewport.y) / board.viewport.scale + (count % 4) * 28),
+    }
     const node: BoardNode = {
       id: `note-${crypto.randomUUID()}`,
       kind: 'note',
-      x: Math.round((100 - board.viewport.x) / board.viewport.scale + (count % 4) * 28),
-      y: Math.round((100 - board.viewport.y) / board.viewport.scale + (count % 4) * 28),
+      x: Math.round(pos.x - (pt ? 130 : 0)),
+      y: Math.round(pos.y - (pt ? 75 : 0)),
       width: 260,
       height: 150,
       title: 'New note',
@@ -6654,8 +6667,9 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
     setSelectedIds([node.id])
   }
 
-  function addTodoNode() {
-    const center = eventToWorld((stageBoundsRef.current?.left || 0) + stageSize.width / 2, (stageBoundsRef.current?.top || 0) + stageSize.height / 2)
+  function addTodoNode(position?: unknown) {
+    const pt = resolvePlacementPoint(position)
+    const center = pt || eventToWorld((stageBoundsRef.current?.left || 0) + stageSize.width / 2, (stageBoundsRef.current?.top || 0) + stageSize.height / 2)
     const node: BoardNode = {
       id: `todo-${crypto.randomUUID()}`,
       kind: 'note',
@@ -6671,8 +6685,9 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
     setSelectedIds([node.id])
   }
 
-  function addCommentNode() {
-    const center = eventToWorld((stageBoundsRef.current?.left || 0) + stageSize.width / 2, (stageBoundsRef.current?.top || 0) + stageSize.height / 2)
+  function addCommentNode(position?: unknown) {
+    const pt = resolvePlacementPoint(position)
+    const center = pt || eventToWorld((stageBoundsRef.current?.left || 0) + stageSize.width / 2, (stageBoundsRef.current?.top || 0) + stageSize.height / 2)
     const node: BoardNode = {
       id: `comment-${crypto.randomUUID()}`,
       kind: 'note',
@@ -7194,13 +7209,18 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
     } catch (error) { appAlert(`Could not bake the transform: ${String(error)}`) }
   }
 
-  function addColumnNode() {
+  function addColumnNode(position?: unknown) {
+    const pt = resolvePlacementPoint(position)
     const count = board.nodes.filter((node) => node.kind === 'column').length
+    const pos = pt || {
+      x: Math.round((120 - board.viewport.x) / board.viewport.scale + (count % 5) * 34),
+      y: Math.round((110 - board.viewport.y) / board.viewport.scale + (count % 5) * 24),
+    }
     const node: BoardNode = {
       id: `column-${crypto.randomUUID()}`,
       kind: 'column',
-      x: Math.round((120 - board.viewport.x) / board.viewport.scale + (count % 5) * 34),
-      y: Math.round((110 - board.viewport.y) / board.viewport.scale + (count % 5) * 24),
+      x: Math.round(pos.x - (pt ? 145 : 0)),
+      y: Math.round(pos.y - (pt ? 75 : 0)),
       width: 290,
       height: 150,
       title: 'New column',
@@ -7808,11 +7828,49 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
   })
 
   return (
-    <section className={`canvas-pane ${showFilmstrip ? 'filmstrip-open' : ''} ${viewOnly ? 'view-only' : ''} ${viewOnly && !presentationOnly ? 'read-only' : ''}`} aria-label="Visual board">
+    <section className={`canvas-pane ${showFilmstrip ? 'filmstrip-open' : ''} ${viewOnly ? 'view-only' : ''} ${viewOnly && !presentationOnly ? 'read-only' : ''} ${isMilanote ? 'milanote-canvas-pane' : ''}`} aria-label="Visual board">
       {diagramPalette && <DiagramPalette mode={diagramPalette.mode} onChoose={chooseDiagramShape} onClose={(reason) => { setDiagramPalette(null); if (reason !== 'outside') restoreDiagramFocus() }} disabled={viewOnly} disabledReason={viewOnly ? 'This workspace is read-only.' : undefined} style={{ left: diagramPalette.left, top: diagramPalette.top }} />}
       {showTransferDialog && <BoardTransferDialog board={board} boards={boards} selectedIds={selectedIds} onClose={() => { setShowTransferDialog(false); transferButtonRef.current?.focus() }} onMove={(destinationId) => { const moved = onMoveSelection(board.id, destinationId, selectedIds); if (moved) { setSelectedIds([]); setSelectedConnectorId(null) }; return moved }} />}
-      <div className="pane-toolbar canvas-toolbar" role="toolbar" aria-label="Canvas controls">
-        <div className="canvas-navigation-row">{navigation || <strong className="canvas-board-title" title={board.title}>{board.title}</strong>}</div>
+      <div className={`pane-toolbar canvas-toolbar ${isMilanote ? 'milanote-canvas-header' : ''}`} role="toolbar" aria-label="Canvas controls">
+        <div className="canvas-navigation-row">
+          {isMilanote ? (
+            <div className="milanote-breadcrumb-header" aria-label="Board hierarchy">
+              <button
+                type="button"
+                className="milanote-home-btn"
+                title="Home board"
+                onClick={() => {
+                  const rootBoard = boards.find((b) => !b.parentBoardId) || boards[0]
+                  if (rootBoard && rootBoard.id !== board.id) switchFilmstripBoard(rootBoard.id)
+                }}
+              >
+                <span className="milanote-home-icon" aria-hidden="true">🏠</span>
+                <span>Home</span>
+              </button>
+              <span className="milanote-breadcrumb-separator" aria-hidden="true">/</span>
+              {board.parentBoardId && (() => {
+                const parent = boards.find((b) => b.id === board.parentBoardId)
+                return parent ? (
+                  <>
+                    <button
+                      type="button"
+                      className="milanote-parent-breadcrumb-btn"
+                      onClick={() => switchFilmstripBoard(parent.id)}
+                    >
+                      {parent.title}
+                    </button>
+                    <span className="milanote-breadcrumb-separator" aria-hidden="true">/</span>
+                  </>
+                ) : null
+              })()}
+              <strong className="milanote-active-board-title" title={board.title}>
+                {board.title}
+              </strong>
+            </div>
+          ) : (
+            navigation || <strong className="canvas-board-title" title={board.title}>{board.title}</strong>
+          )}
+        </div>
         <div className="canvas-object-controls" role="group" aria-label="Object and canvas actions">
         <div className="canvas-context-controls">
         
@@ -7828,7 +7886,9 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
           <button className="tool-button danger-tool" type="button" title="Remove connection (Undo restores it)" aria-label="Delete connection" disabled={viewOnly} onClick={() => { onBoardChange({ ...board, connectors: board.connectors.filter((connector) => connector.id !== selectedConnector.id) }); setSelectedConnectorId(null) }}>⌫</button>
           <span className="toolbar-spacer" /><span className="connector-hint">Drag either endpoint to reconnect it</span>
         </> : <>
-          <button className={`tool-button ${interactionTool === 'select' ? 'active' : ''}`} type="button" title="Select and move cards" aria-label="Select and move cards" onClick={() => { setInteractionTool('select'); setConnectorSourceId(null) }}>↖</button><button className="tool-button" type="button" title="Add a scrollable rich-text card" aria-label="Add rich-text card" onClick={addTextNode}>T</button>{selectedNode?.kind === 'clip' && <button className="quiet-button compact" type="button" title="Edit source information, article text, comments, and transcript" onClick={() => editCaptureNode(selectedNode)}>Edit capture</button>}<button className={`tool-button ${interactionTool === 'draw' ? 'active' : ''}`} type="button" title="Drag to draw a shape; Shift constrains it" aria-label="Draw shape" onClick={() => { setInteractionTool(interactionTool === 'draw' ? 'select' : 'draw'); setSelectedConnectorId(null) }}>◇</button>{interactionTool === 'draw' && <select aria-label="Shape type" value={shapeKind} onChange={(event) => setShapeKind(event.target.value as ShapeType)}><option value="rectangle">Rectangle</option><option value="ellipse">Ellipse</option><option value="line">Line</option><option value="arrow">Arrow</option></select>}<button className="tool-button column-tool" type="button" title="Add an ordered card column" aria-label="Add card column" onClick={addColumnNode}>▥</button><button className="tool-button node-column-tool" type="button" title="Add a Node Column with typed graph sockets" aria-label="Add Node Column" onClick={addNodeColumnNode}>◇▥</button><button className="tool-button" type="button" title="Import images from disk" aria-label="Import images" onClick={() => onImport('image')}>▧</button><button className="tool-button" type="button" title="Import videos from disk" aria-label="Import videos" onClick={() => onImport('video')}>▶</button><button className="tool-button model-tool" type="button" title="Import GLB, GLTF, or OBJ for an orbitable 3D canvas card" aria-label="Import 3D model" onClick={() => onImport('model')}>◈</button><button className="tool-button" type="button" title="Import documents from disk" aria-label="Import documents" onClick={() => onImport('document')}>¶</button><button className="tool-button" type="button" title="Create a card that opens another board in this project" aria-label="Link to another board" disabled={boards.length <= 1} onClick={addBoardLink}>↗</button><button className={`tool-button ${interactionTool === 'connect' ? 'active' : ''}`} type="button" title="Draw connections between cards or directly on the grid" aria-label="Draw connections" aria-pressed={interactionTool === 'connect'} onClick={() => { setInteractionTool((current) => current === 'connect' ? 'select' : 'connect'); setConnectorSourceId(null); setSelectedConnectorId(null) }}>⌁</button>
+          {!isMilanote && <>
+            <button className={`tool-button ${interactionTool === 'select' ? 'active' : ''}`} type="button" title="Select and move cards" aria-label="Select and move cards" onClick={() => { setInteractionTool('select'); setConnectorSourceId(null) }}>↖</button><button className="tool-button" type="button" title="Add a scrollable rich-text card" aria-label="Add rich-text card" onClick={addTextNode}>T</button>{selectedNode?.kind === 'clip' && <button className="quiet-button compact" type="button" title="Edit source information, article text, comments, and transcript" onClick={() => editCaptureNode(selectedNode)}>Edit capture</button>}<button className={`tool-button ${interactionTool === 'draw' ? 'active' : ''}`} type="button" title="Drag to draw a shape; Shift constrains it" aria-label="Draw shape" onClick={() => { setInteractionTool(interactionTool === 'draw' ? 'select' : 'draw'); setSelectedConnectorId(null) }}>◇</button>{interactionTool === 'draw' && <select aria-label="Shape type" value={shapeKind} onChange={(event) => setShapeKind(event.target.value as ShapeType)}><option value="rectangle">Rectangle</option><option value="ellipse">Ellipse</option><option value="line">Line</option><option value="arrow">Arrow</option></select>}<button className="tool-button column-tool" type="button" title="Add an ordered card column" aria-label="Add card column" onClick={addColumnNode}>▥</button><button className="tool-button node-column-tool" type="button" title="Add a Node Column with typed graph sockets" aria-label="Add Node Column" onClick={addNodeColumnNode}>◇▥</button><button className="tool-button" type="button" title="Import images from disk" aria-label="Import images" onClick={() => onImport('image')}>▧</button><button className="tool-button" type="button" title="Import videos from disk" aria-label="Import videos" onClick={() => onImport('video')}>▶</button><button className="tool-button model-tool" type="button" title="Import GLB, GLTF, or OBJ for an orbitable 3D canvas card" aria-label="Import 3D model" onClick={() => onImport('model')}>◈</button><button className="tool-button" type="button" title="Import documents from disk" aria-label="Import documents" onClick={() => onImport('document')}>¶</button><button className="tool-button" type="button" title="Create a card that opens another board in this project" aria-label="Link to another board" disabled={boards.length <= 1} onClick={addBoardLink}>↗</button><button className={`tool-button ${interactionTool === 'connect' ? 'active' : ''}`} type="button" title="Draw connections between cards or directly on the grid" aria-label="Draw connections" aria-pressed={interactionTool === 'connect'} onClick={() => { setInteractionTool((current) => current === 'connect' ? 'select' : 'connect'); setConnectorSourceId(null); setSelectedConnectorId(null) }}>⌁</button>
+          </>}
           {selectedNode?.kind === 'shape' && <>
             <label className="connector-color-control" title="Shape stroke color"><input aria-label="Shape stroke color" type="color" value={selectedNode.strokeColor || '#b9d4e7'} onChange={(event) => updateNode(selectedNode.id, { strokeColor: event.target.value })} /></label>
             <select aria-label="Shape stroke width" title="Stroke width" value={selectedNode.strokeWidth || 2} onChange={(event) => updateNode(selectedNode.id, { strokeWidth: Number(event.target.value) })}>
@@ -7867,14 +7927,38 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
           <span className="toolbar-spacer" />
           {interactionTool === 'connect' && <span className="connector-hint">{connectorSourceId ? 'Choose destination' : 'Click cards or drag on empty grid'}</span>}
           {interactionTool === 'draw' && <span className="connector-hint">Drag to draw · Shift constrains</span>}
-          <button className="quiet-button compact toolbar-icon-button" type="button" title="Show board assets" aria-label="Show board assets" onClick={() => setShowAssets((visible) => !visible)}><CanvasToolIcon name="assets" />Assets</button>
+          {!isMilanote && <button className="quiet-button compact toolbar-icon-button" type="button" title="Show board assets" aria-label="Show board assets" onClick={() => setShowAssets((visible) => !visible)}><CanvasToolIcon name="assets" />Assets</button>}
           {board.nodes.length > 50 && <span className="render-count">{visibleNodes.length}/{board.nodes.length} visible</span>}
         </>}
         </div>
-        <div className="canvas-primary-actions">
-          <button className={`quiet-button compact toolbar-icon-button ${showColor || showGridSettings || showHierarchy || showAppearance || showStudioObject ? 'active' : ''}`} type="button" title="Open the floating Color and Layers utility" aria-label="Show Color and Layers" aria-expanded={showColor || showGridSettings || showHierarchy || showAppearance || showStudioObject} onClick={() => selectStudioTab('color')}><CanvasToolIcon name="appearance" />Color &amp; Layers</button>
-          <button className={`quiet-button compact toolbar-icon-button ${showBoardExport ? 'active' : ''}`} type="button" aria-label="Open board export" aria-expanded={showBoardExport} onClick={() => { setBoardExportTarget(selectedNode && isFrameNode(selectedNode) ? 'frame' : selectedIds.length ? 'selection' : 'viewport'); setShowDiagramStructure(false); setShowBoardExport((visible) => !visible); setShowAppearance(false); setShowMoreCanvasTools(false) }}><CanvasToolIcon name="export" />Export</button>
-        </div>
+        {isMilanote ? (
+          <div className="canvas-primary-actions milanote-actions-group">
+            <button
+              className={`quiet-button compact toolbar-icon-button ${showFilmstrip ? 'active' : ''}`}
+              type="button"
+              aria-label="Toggle board filmstrip"
+              disabled={viewOnly}
+              aria-expanded={showFilmstrip}
+              onClick={() => setShowFilmstrip((visible) => !visible)}
+            >
+              <CanvasToolIcon name="boards" />Boards ({boards.length})
+            </button>
+            <button className="quiet-button compact" type="button" title="Zoom out" aria-label="Zoom out" onClick={() => stepZoom(-1)}>-</button>
+            <button className="quiet-button compact milanote-zoom-badge" type="button" title="Zoom to 100%" aria-label="Zoom 100%" onClick={setZoom100}>{Math.round(presentedViewport.scale * 100)}%</button>
+            <button className="quiet-button compact" type="button" title="Zoom in" aria-label="Zoom in" onClick={() => stepZoom(1)}>+</button>
+            <button className="quiet-button compact" type="button" title="Fit board" aria-label="Fit board" onClick={fitBoard}>Fit</button>
+            <button className={`quiet-button compact toolbar-icon-button ${showMinimap ? 'active' : ''}`} type="button" title="Minimap" aria-label="Toggle minimap" aria-pressed={showMinimap} onClick={() => setShowMinimap((m) => !m)}>🗺</button>
+            <button className="quiet-button compact" type="button" title="Undo (Ctrl+Z)" aria-label="Undo board change" disabled={viewOnly} onClick={onUndo}><CanvasToolIcon name="undo" /></button>
+            <button className="quiet-button compact" type="button" title="Redo (Ctrl+Shift+Z)" aria-label="Redo board change" disabled={viewOnly} onClick={onRedo}><CanvasToolIcon name="redo" /></button>
+            <button className={`quiet-button compact toolbar-icon-button ${showColor || showGridSettings || showHierarchy || showAppearance || showStudioObject ? 'active' : ''}`} type="button" title="Open Color and Layers utility" aria-label="Show Color and Layers" aria-expanded={showColor || showGridSettings || showHierarchy || showAppearance || showStudioObject} onClick={() => selectStudioTab('color')}><CanvasToolIcon name="appearance" />Color &amp; Layers</button>
+            <button className={`quiet-button compact toolbar-icon-button ${showBoardExport ? 'active' : ''}`} type="button" aria-label="Open board export" aria-expanded={showBoardExport} onClick={() => { setBoardExportTarget(selectedNode && isFrameNode(selectedNode) ? 'frame' : selectedIds.length ? 'selection' : 'viewport'); setShowDiagramStructure(false); setShowBoardExport((visible) => !visible); setShowAppearance(false); setShowMoreCanvasTools(false) }}><CanvasToolIcon name="export" />Export</button>
+          </div>
+        ) : (
+          <div className="canvas-primary-actions">
+            <button className={`quiet-button compact toolbar-icon-button ${showColor || showGridSettings || showHierarchy || showAppearance || showStudioObject ? 'active' : ''}`} type="button" title="Open the floating Color and Layers utility" aria-label="Show Color and Layers" aria-expanded={showColor || showGridSettings || showHierarchy || showAppearance || showStudioObject} onClick={() => selectStudioTab('color')}><CanvasToolIcon name="appearance" />Color &amp; Layers</button>
+            <button className={`quiet-button compact toolbar-icon-button ${showBoardExport ? 'active' : ''}`} type="button" aria-label="Open board export" aria-expanded={showBoardExport} onClick={() => { setBoardExportTarget(selectedNode && isFrameNode(selectedNode) ? 'frame' : selectedIds.length ? 'selection' : 'viewport'); setShowDiagramStructure(false); setShowBoardExport((visible) => !visible); setShowAppearance(false); setShowMoreCanvasTools(false) }}><CanvasToolIcon name="export" />Export</button>
+          </div>
+        )}
       </div>
       </div>
       {objectOptions === 'connection' && selectedConnector && <aside ref={objectOptionsPanelRef} className="appearance-panel object-options-panel" aria-label="Connection options">
@@ -7931,7 +8015,29 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
         // including image bodies and portal buttons. They never edit objects.
         event.stopPropagation()
         handleStagePointerDown(event)
-      }} onPointerDown={handleStagePointerDown} onClickCapture={(event) => { if (!transformClickSuppressRef.current) return; event.preventDefault(); event.stopPropagation(); clearPostTransformClickSuppression() }} onContextMenu={(event) => { event.preventDefault(); event.currentTarget.focus(); marqueeCancelRef.current?.(); setSelectedIds([]); setSelectedConnectorId(null); setContextMenu({ x: event.clientX, y: event.clientY }) }}>
+      }} onPointerDown={handleStagePointerDown} onClickCapture={(event) => { if (!transformClickSuppressRef.current) return; event.preventDefault(); event.stopPropagation(); clearPostTransformClickSuppression() }} onContextMenu={(event) => { event.preventDefault(); event.currentTarget.focus(); marqueeCancelRef.current?.(); setSelectedIds([]); setSelectedConnectorId(null); setContextMenu({ x: event.clientX, y: event.clientY }) }} onDragOver={(event) => {
+        if (event.dataTransfer.types.includes('text/plain') || event.dataTransfer.types.includes('Files')) {
+          event.preventDefault()
+        }
+      }} onDrop={(event) => {
+        const customKind = event.dataTransfer.getData('text/plain')
+        if (customKind && customKind.startsWith('milanote:')) {
+          event.preventDefault()
+          event.stopPropagation()
+          const kind = customKind.replace('milanote:', '')
+          const point = eventToWorld(event.clientX, event.clientY)
+          if (kind === 'note') addNoteNode(point)
+          else if (kind === 'todo') addTodoNode(point)
+          else if (kind === 'comment') addCommentNode(point)
+          else if (kind === 'board') addNestedBoardPortal(point)
+          else if (kind === 'column') addColumnNode(point)
+          else if (kind === 'table') addColumnNode(point)
+          else if (kind === 'link') void addBoardLink()
+          else if (kind === 'image') onImport('image')
+          else if (kind === 'dcc') onImport('model')
+          else if (kind === 'draw') toggleMilanoteDraw()
+        }
+      }}>
         
         {!presentationOnly && (showToolRail ? (isMilanote ? (
           <MilanoteToolRail
@@ -7939,14 +8045,14 @@ function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, nav
             viewportTool={viewportTool}
             shapeKind={shapeKind}
             viewOnly={viewOnly}
-            onAddNote={addNoteNode}
+            onAddNote={() => addNoteNode()}
             onAddLink={addBoardLink}
-            onAddTodo={addTodoNode}
+            onAddTodo={() => addTodoNode()}
             onToggleLine={toggleMilanoteLine}
-            onAddSubboard={addNestedBoardPortal}
-            onAddColumn={addColumnNode}
-            onAddComment={addCommentNode}
-            onAddTable={addColumnNode}
+            onAddSubboard={() => addNestedBoardPortal()}
+            onAddColumn={() => addColumnNode()}
+            onAddComment={() => addCommentNode()}
+            onAddTable={() => addColumnNode()}
             onImportImage={() => onImport('image')}
             onImport3DModel={() => onImport('model')}
             onToggleDraw={toggleMilanoteDraw}

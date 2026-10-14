@@ -1,26 +1,29 @@
-/* Milanote Vertical Creation Tool Rail */
+/* Milanote Vertical Creation Tool Rail & Canvas Chrome */
+
+/* Left Rail - Docked flush to the window/pane left edge */
 .milanote-tool-rail {
   position: absolute;
-  left: 10px;
-  top: 12px;
-  bottom: 12px;
-  width: 54px;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 58px;
   z-index: 25;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 6px 4px;
-  border-radius: 8px;
+  padding: 6px 4px 10px 4px;
+  border-radius: 0;
   box-sizing: border-box;
   overflow-y: auto;
   overflow-x: visible;
   scrollbar-width: none;
   user-select: none;
   
-  /* Default Milanote Dark Theme */
-  background: #202022f2;
-  border: 1px solid #38383e;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  /* Milanote Dark Theme: Sampled matte dark charcoal seamlessly blending with canvas */
+  background: #26232a;
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.25);
   color: #d1d5db;
 }
 
@@ -28,22 +31,47 @@
   display: none;
 }
 
-/* Navy Theme Adaptations */
+/* Navy Theme: Deep nautical ocean navy with vibrant blue accents */
 .studio-shell.workspace-navy .milanote-tool-rail,
 .workspace-navy .milanote-tool-rail {
-  background: #141822f2;
-  border-color: #2d3748;
+  background: #091322;
+  border-right: 1px solid rgba(37, 99, 235, 0.25);
   color: #cbd5e1;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.4);
 }
 
-/* Light Theme Adaptations */
+/* Light Theme: Crisp clean Milanote warm off-white */
 .studio-shell.workspace-light .milanote-tool-rail,
 .workspace-light .milanote-tool-rail {
-  background: #fffffffa;
-  border-color: #e5e7eb;
+  background: #f4f4f6;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
   color: #374151;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Top rail header handle */
+.milanote-rail-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 14px;
+  margin-bottom: 4px;
+}
+
+.milanote-rail-grip {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.workspace-navy .milanote-rail-grip {
+  background: rgba(37, 99, 235, 0.4);
+}
+
+.workspace-light .milanote-rail-grip {
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .milanote-tool-group {
@@ -59,22 +87,27 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 44px;
-  padding: 3px 2px;
+  width: 50px;
+  height: 48px;
+  padding: 4px 2px;
   margin: 1px 0;
   border-radius: 6px;
   border: 1px solid transparent;
   background: transparent;
   color: inherit;
-  cursor: pointer;
+  cursor: grab;
   outline: none;
-  transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  transition: background-color 0.12s ease, color 0.12s ease, transform 0.1s ease;
+}
+
+.milanote-tool-btn:active:not(:disabled) {
+  cursor: grabbing;
+  transform: scale(0.96);
 }
 
 .milanote-icon {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
 }
 
@@ -82,7 +115,7 @@
   font-size: 9.5px;
   font-weight: 500;
   line-height: 1.1;
-  margin-top: 2px;
+  margin-top: 3px;
   text-align: center;
   white-space: nowrap;
 }
@@ -93,7 +126,7 @@
 }
 
 .workspace-light .milanote-tool-btn:hover:not(:disabled) {
-  background: #f3f4f6;
+  background: #e9eaec;
   color: #111827;
 }
 
@@ -105,6 +138,38 @@
 .milanote-tool-btn:disabled {
   opacity: 0.35;
   cursor: default;
+}
+
+/* Board Button - Authentic Milanote Royal Blue Rounded Square */
+.milanote-board-tool {
+  color: #ffffff !important;
+}
+
+.milanote-board-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  background: #4763b7;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(71, 99, 183, 0.4);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.workspace-navy .milanote-board-badge {
+  background: #2563eb;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.5);
+}
+
+.workspace-light .milanote-board-badge {
+  background: #3b82f6;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.35);
+}
+
+.milanote-board-tool:hover .milanote-board-badge {
+  transform: scale(1.05);
 }
 
 /* Active Highlight */
@@ -137,17 +202,17 @@
 .milanote-tool-separator {
   width: 28px;
   height: 1px;
-  background: #38383e;
+  background: rgba(255, 255, 255, 0.1);
   margin: 4px 0;
   flex-shrink: 0;
 }
 
 .workspace-navy .milanote-tool-separator {
-  background: #2d3748;
+  background: rgba(37, 99, 235, 0.25);
 }
 
 .workspace-light .milanote-tool-separator {
-  background: #e5e7eb;
+  background: rgba(0, 0, 0, 0.08);
 }
 
 /* Bottom Trash Button */
@@ -162,10 +227,211 @@
 
 .milanote-trash-btn:hover:not(:disabled) {
   color: #ef4444;
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(239, 68, 68, 0.14);
 }
 
-/* Responsive Handling in Split or Narrow Panes */
+/* ---------------------------------------------------- */
+/* Milanote Canvas Header (Breadcrumbs + Streamlined UI) */
+/* ---------------------------------------------------- */
+.milanote-canvas-header {
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 14px 0 10px;
+  background: #222026 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.workspace-navy .milanote-canvas-header {
+  background: #08101d !important;
+  border-bottom: 1px solid rgba(37, 99, 235, 0.2) !important;
+}
+
+.workspace-light .milanote-canvas-header {
+  background: #f7f7f9 !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.milanote-breadcrumb-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.milanote-home-btn,
+.milanote-parent-breadcrumb-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  color: #9ca3af;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.milanote-home-btn:hover,
+.milanote-parent-breadcrumb-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.workspace-light .milanote-home-btn:hover,
+.workspace-light .milanote-parent-breadcrumb-btn:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.milanote-home-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.milanote-breadcrumb-separator {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 13px;
+  font-weight: 300;
+}
+
+.workspace-light .milanote-breadcrumb-separator {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.milanote-active-board-title {
+  color: #f3f4f6;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 2px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
+}
+
+.workspace-navy .milanote-active-board-title {
+  color: #ffffff;
+}
+
+.workspace-light .milanote-active-board-title {
+  color: #111827;
+}
+
+/* Minimal utility actions in Milanote top bar */
+.milanote-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.milanote-zoom-badge {
+  font-size: 11px;
+  font-weight: 500;
+  min-width: 42px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------- */
+/* Preserved Bottom Boards Filmstrip in Milanote Mode   */
+/* ---------------------------------------------------- */
+.milanote-canvas-pane .board-filmstrip {
+  background: #201e25 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.workspace-navy .milanote-canvas-pane .board-filmstrip {
+  background: #08101d !important;
+  border-top: 1px solid rgba(37, 99, 235, 0.22) !important;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.workspace-light .milanote-canvas-pane .board-filmstrip {
+  background: #f4f4f7 !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.milanote-canvas-pane .filmstrip-board {
+  border-radius: 8px !important;
+  background: #28252f !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.milanote-canvas-pane .filmstrip-board:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.milanote-canvas-pane .filmstrip-board.active {
+  border-color: #4763b7 !important;
+  background: #2e2b36 !important;
+  box-shadow: 0 0 0 1px #4763b7, 0 4px 12px rgba(71, 99, 183, 0.25) !important;
+}
+
+.workspace-navy .milanote-canvas-pane .filmstrip-board {
+  background: #0d1728 !important;
+  border: 1px solid rgba(37, 99, 235, 0.25) !important;
+}
+
+.workspace-navy .milanote-canvas-pane .filmstrip-board.active {
+  border-color: #2563eb !important;
+  background: #111f36 !important;
+  box-shadow: 0 0 0 1px #2563eb, 0 4px 12px rgba(37, 99, 235, 0.35) !important;
+}
+
+.workspace-light .milanote-canvas-pane .filmstrip-board {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.workspace-light .milanote-canvas-pane .filmstrip-board.active {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 1px #2563eb, 0 2px 8px rgba(37, 99, 235, 0.2) !important;
+}
+
+/* Subboard Cards on Canvas */
+.milanote-canvas-pane .board-link-card {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif !important;
+  border-radius: 8px !important;
+  background: #2b2832 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.milanote-canvas-pane .board-link-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+.milanote-canvas-pane .board-link-card > strong {
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+.workspace-navy .milanote-canvas-pane .board-link-card {
+  background: #0d1728 !important;
+  border-color: rgba(37, 99, 235, 0.25) !important;
+}
+
+.workspace-light .milanote-canvas-pane .board-link-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Responsive Handling */
 @media (max-width: 640px) {
   .milanote-tool-rail {
     width: 44px;
@@ -182,4 +448,128 @@
     width: 18px;
     height: 18px;
   }
+}
+
+/* ---------------------------------------------------- */
+/* Milanote Canvas Stage & Grid Display                 */
+/* ---------------------------------------------------- */
+.milanote-canvas-pane .canvas-stage,
+.milanote-canvas-active {
+  background-image: none !important; /* Neutralize default studio radial sheen */
+}
+
+/* ---------------------------------------------------- */
+/* Milanote Board Nodes & Cards                         */
+/* ---------------------------------------------------- */
+.milanote-canvas-pane .board-node {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22) !important;
+  transition: box-shadow 0.12s ease, transform 0.1s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif !important;
+}
+
+.milanote-canvas-pane .board-node:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32) !important;
+}
+
+.milanote-canvas-pane .board-node.selected {
+  outline: 2px solid #4763b7 !important;
+  outline-offset: 1px !important;
+}
+
+.workspace-navy .milanote-canvas-pane .board-node.selected {
+  outline: 2px solid #2563eb !important;
+}
+
+.workspace-light .milanote-canvas-pane .board-node.selected {
+  outline: 2px solid #2563eb !important;
+}
+
+/* Milanote minimal card header */
+.milanote-canvas-pane .node-drag-handle {
+  height: 22px !important;
+  padding: 2px 8px !important;
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  opacity: 0.65;
+  transition: opacity 0.12s ease;
+}
+
+.milanote-canvas-pane .board-node:hover .node-drag-handle {
+  opacity: 1;
+}
+
+/* Hide redundant uppercase tags like 'TEXT', 'NOTE', 'IMAGE', 'FRAME' in Milanote mode */
+.milanote-canvas-pane .node-drag-handle > span {
+  display: none !important;
+}
+
+.milanote-canvas-pane .node-drag-handle > strong {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
+}
+
+/* Notes & Text Cards */
+.milanote-canvas-pane .board-node[data-kind="note"],
+.milanote-canvas-pane .board-node[data-kind="text"] {
+  background: #2b2833 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f3f4f6 !important;
+}
+
+.workspace-navy .milanote-canvas-pane .board-node[data-kind="note"],
+.workspace-navy .milanote-canvas-pane .board-node[data-kind="text"] {
+  background: #0d1a2d !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
+  color: #f8fafc !important;
+}
+
+.workspace-light .milanote-canvas-pane .board-node[data-kind="note"],
+.workspace-light .milanote-canvas-pane .board-node[data-kind="text"] {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.09) !important;
+  color: #111827 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Columns */
+.milanote-canvas-pane .board-node[data-kind="column"] {
+  background: rgba(38, 35, 42, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+  backdrop-filter: blur(12px);
+}
+
+.workspace-navy .milanote-canvas-pane .board-node[data-kind="column"] {
+  background: rgba(13, 26, 45, 0.9) !important;
+  border: 1px solid rgba(37, 99, 235, 0.28) !important;
+}
+
+.workspace-light .milanote-canvas-pane .board-node[data-kind="column"] {
+  background: rgba(244, 244, 246, 0.94) !important;
+  border: 1px solid rgba(0, 0, 0, 0.09) !important;
+}
+
+.milanote-canvas-pane .column-header {
+  border-top-left-radius: 9px !important;
+  border-top-right-radius: 9px !important;
+  padding: 6px 10px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+/* Image Cards in Milanote */
+.milanote-canvas-pane .board-node[data-kind="image"] {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.workspace-navy .milanote-canvas-pane .board-node[data-kind="image"] {
+  border-color: rgba(37, 99, 235, 0.25) !important;
+}
+
+.workspace-light .milanote-canvas-pane .board-node[data-kind="image"] {
+  border-color: rgba(0, 0, 0, 0.08) !important;
 }
