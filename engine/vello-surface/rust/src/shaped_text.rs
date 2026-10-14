@@ -41,6 +41,22 @@ impl OutlinePen for Pen {
     fn curve_to(&mut self,a:f32,b:f32,c:f32,d:f32,x:f32,y:f32) { self.push(Command::C(a,-b,c,-d,x,-y)); }
     fn close(&mut self) { self.push(Command::Z); }
 }
+pub const OP_MOVE_TO: f32 = 1.0;
+pub const OP_LINE_TO: f32 = 2.0;
+pub const OP_QUAD_TO: f32 = 3.0;
+pub const OP_CUBIC_TO: f32 = 4.0;
+pub const OP_CLOSE: f32 = 5.0;
+
+fn push_binary_command(command: &Command, x: f32, y: f32, out: &mut Vec<f32>) {
+    match *command {
+        Command::M(a, b) => out.extend_from_slice(&[OP_MOVE_TO, a + x, b + y]),
+        Command::L(a, b) => out.extend_from_slice(&[OP_LINE_TO, a + x, b + y]),
+        Command::Q(a, b, c, d) => out.extend_from_slice(&[OP_QUAD_TO, a + x, b + y, c + x, d + y]),
+        Command::C(a, b, c, d, e, f) => out.extend_from_slice(&[OP_CUBIC_TO, a + x, b + y, c + x, d + y, e + x, f + y]),
+        Command::Z => out.push(OP_CLOSE),
+    }
+}
+
 fn translated(command:&Command,x:f32,y:f32)->Value {
     match *command {
         Command::M(a,b)=>json!(["M",a+x,b+y]), Command::L(a,b)=>json!(["L",a+x,b+y]),
@@ -269,7 +285,7 @@ impl TextEngine {
                 let style_index=glyph_run.style().brush;if !checked[style_index].10.contains(&key){return Err(error("FONT_NOT_READY","fallback not in declared ordered list"));}
                 let font=FontRef::new(face.blob.as_ref()).map_err(|e|error("FONT_INVALID",e))?;
                 let coords:Vec<_>=run.normalized_coords().iter().map(|c|NormalizedCoord::from_bits(*c)).collect();
-                let font_size=run.font_size();let mut commands=Vec::new();
+                let font_size=run.font_size();let mut commands=Vec::new();let mut binary_commands=Vec::new();
                 let outlines=font.outline_glyphs();
                 let hinting=if let Some(scale)=outline_scale{Some(HintingInstance::new(&outlines,Size::new(font_size*scale),coords.as_slice(),Target::Smooth{mode:SmoothMode::Lcd,symmetric_rendering:false,preserve_linear_metrics:true}).map_err(|e|error("FONT_HINTING_INVALID",e))?)}else{None};
                 for glyph in glyph_run.positioned_glyphs() {
@@ -286,6 +302,7 @@ impl TextEngine {
                         self.cache_commands+=pen.commands.len();let outline=Arc::new(pen.commands);self.cache.insert(cache_key,outline.clone());outline
                     };
                     total_commands+=outline.len();if total_commands>command_limit {return Err(error("TEXT_RESOURCE_LIMIT","outline command request limit"));}
+                    for c in outline.iter() { push_binary_command(c, glyph.x, glyph.y, &mut binary_commands); }
                     commands.extend(outline.iter().map(|c|translated(c,glyph.x,glyph.y)));
                     if commands.len()>65_536 {return Err(error("TEXT_RESOURCE_LIMIT","run outline commands"));}
                     glyphs.push(json!({"fontKey":key,"glyphId":glyph.id,"x":glyph.x,"y":glyph.y,"advance":glyph.advance,"line":line_index,"emptyOutline":outline.is_empty()}));
@@ -302,7 +319,7 @@ impl TextEngine {
                 // component semantics instead of inventing atomic clusters.
                 let cluster_info:Vec<_>=run.clusters().map(|c|json!({"textRange":[c.text_range().start,c.text_range().end],"ligatureStart":c.is_ligature_start(),"ligatureContinuation":c.is_ligature_continuation(),"glyphCount":c.glyphs().count(),"advance":c.advance()})).collect();
                 let painted_range=run.text_range().start.max(checked[style_index].0.start)..run.text_range().end.min(checked[style_index].0.end);
-                runs.push(json!({"font":self.face_receipt(&key),"fontSize":font_size,"normalizedCoords":run.normalized_coords(),"textRange":[painted_range.start,painted_range.end],"fontRunTextRange":[run.text_range().start,run.text_range().end],"clusters":run.clusters().filter(|c|c.text_range().start<painted_range.end&&c.text_range().end>painted_range.start).map(|c|json!([c.text_range().start,c.text_range().end])).collect::<Vec<_>>(),"clusterComponents":cluster_info,"rtl":run.is_rtl(),"line":line_index,"offset":glyph_run.offset(),"baseline":glyph_run.baseline(),"advance":glyph_run.advance()}));
+                runs.push(json!({"font":self.face_receipt(&key),"fontSize":font_size,"normalizedCoords":run.normalized_coords(),"textRange":[painted_range.start,painted_range.end],"fontRunTextRange":[run.text_range().start,run.text_range().end],"clusters":run.clusters().filter(|c|c.text_range().start<painted_range.end&&c.text_range().end>painted_range.start).map(|c|json!([c.text_range().start,c.text_range().end])).collect::<Vec<_>>(),"clusterComponents":cluster_info,"rtl":run.is_rtl(),"line":line_index,"offset":glyph_run.offset(),"baseline":glyph_run.baseline(),"advance":glyph_run.advance(),"binaryCommandFloats":binary_commands.len()}));
             }
         }
         let boundaries:Vec<_>=icu_segmenter::GraphemeClusterSegmenter::new().segment_str(text).collect();

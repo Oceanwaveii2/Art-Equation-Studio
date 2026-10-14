@@ -1,73 +1,198 @@
 import { requestAppFrame, cancelAppFrame } from '../canvas-engine/appFrameClock'
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, type DragEvent, type ChangeEvent } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js'
+import {
+  buildPbrTextureSet,
+  classifyPbrFilename,
+  CORE_PBR_CHANNELS,
+  type PbrChannelKind,
+  type PbrTextureSet,
+} from '../media/pbrClassifier'
+import {
+  generateBlenderPrincipledBsdfScript,
+  generateCinema4DShaderScript,
+  generateHoudiniMaterialXScript,
+  type TargetDccApp,
+} from '../media/dccBridge'
 import './ModelViewer.css'
 
-export type ModelViewerProps = {
+type ModelViewerProps = {
   source: string
   extension: string
   title: string
 }
 
-export type ShadingMode = 'pbr' | 'clay' | 'normals' | 'uv'
+export type ShadingMode = 'pbr' | 'clay' | 'normals' | 'uv-grid'
 export type LightingPreset = 'studio' | 'sunset' | 'noir' | 'flat'
 export type CameraPreset = 'perspective' | 'front' | 'top' | 'right'
 
-export type TrackedMaterialSlot = {
-  materialName: string
-  hasAlbedo: boolean
-  hasNormal: boolean
-  hasRoughness: boolean
-  hasMetalness: boolean
-  hasAo: boolean
-}
-
-export type ModelMeshStats = {
+export interface ModelGeometryStats {
   triangles: number
   vertices: number
   meshes: number
   materials: number
 }
 
-function createUvGridTexture(): THREE.CanvasTexture {
-  const size = 512
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')
-  if (ctx) {
-    ctx.fillStyle = '#1e242d'
-    ctx.fillRect(0, 0, size, size)
-    const cells = 16
-    const step = size / cells
-    for (let i = 0; i < cells; i++) {
-      for (let j = 0; j < cells; j++) {
-        if ((i + j) % 2 === 0) {
-          ctx.fillStyle = '#323c4a'
-          ctx.fillRect(i * step, j * step, step, step)
-        }
+const LIGHTING_PRESETS: Record<
+  LightingPreset,
+  {
+    label: string
+    bg: string
+    hemiSky: string
+    hemiGround: string
+    hemiIntensity: number
+    keyColor: string
+    keyIntensity: number
+    keyPos: [number, number, number]
+    rimColor: string
+    rimIntensity: number
+    rimPos: [number, number, number]
+  }
+> = {
+  studio: {
+    label: 'Studio',
+    bg: '#10141a',
+    hemiSky: '#d8e8ff',
+    hemiGround: '#1a202b',
+    hemiIntensity: 2.2,
+    keyColor: '#fff0df',
+    keyIntensity: 2.3,
+    keyPos: [4, 6, 5],
+    rimColor: '#75d8ff',
+    rimIntensity: 1.2,
+    rimPos: [-5, 2, -4],
+  },
+  sunset: {
+    label: 'Sunset',
+    bg: '#181118',
+    hemiSky: '#ff9e6d',
+    hemiGround: '#241528',
+    hemiIntensity: 1.8,
+    keyColor: '#ff7b3d',
+    keyIntensity: 2.8,
+    keyPos: [6, 3, 4],
+    rimColor: '#7c5cff',
+    rimIntensity: 1.5,
+    rimPos: [-4, 4, -5],
+  },
+  noir: {
+    label: 'Noir',
+    bg: '#08090c',
+    hemiSky: '#8fa4b8',
+    hemiGround: '#050608',
+    hemiIntensity: 0.65,
+    keyColor: '#ffffff',
+    keyIntensity: 3.1,
+    keyPos: [2, 7, 2],
+    rimColor: '#38bdf8',
+    rimIntensity: 2.0,
+    rimPos: [-6, 1, -3],
+  },
+  flat: {
+    label: 'Flat',
+    bg: '#161b22',
+    hemiSky: '#ffffff',
+    hemiGround: '#d0d7de',
+    hemiIntensity: 3.2,
+    keyColor: '#ffffff',
+    keyIntensity: 0.4,
+    keyPos: [0, 5, 5],
+    rimColor: '#ffffff',
+    rimIntensity: 0.2,
+    rimPos: [0, -5, -5],
+  },
+}
+
+function createProceduralUvCheckerTexture(): THREE.DataTexture {
+  const size = 64
+  const data = new Uint8Array(size * size * 4)
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const cellX = Math.floor(x / 8)
+      const cellY = Math.floor(y / 8)
+      const isEven = (cellX + cellY) % 2 === 0
+      const idx = (y * size + x) * 4
+      if (isEven) {
+        data[idx] = 228
+        data[idx + 1] = 234
+        data[idx + 2] = 242
+        data[idx + 3] = 255
+      } else {
+        data[idx] = 42
+        data[idx + 1] = 56
+        data[idx + 2] = 74
+        data[idx + 3] = 255
       }
     }
-    ctx.strokeStyle = '#38bdf8'
-    ctx.lineWidth = 1
-    ctx.strokeRect(0, 0, size, size)
   }
-  const texture = new THREE.CanvasTexture(canvas)
-  texture.wrapS = THREE.RepeatWrapping
-  texture.wrapT = THREE.RepeatWrapping
-  texture.repeat.set(4, 4)
-  return texture
+  const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat)
+  tex.wrapS = THREE.RepeatWrapping
+  tex.wrapT = THREE.RepeatWrapping
+  tex.repeat.set(4, 4)
+  tex.colorSpace = THREE.SRGBColorSpace
+  tex.needsUpdate = true
+  return tex
+}
+
+function computeGeometryStats(object: THREE.Object3D): ModelGeometryStats {
+  let triangles = 0
+  let vertices = 0
+  let meshes = 0
+  const materialSet = new Set<THREE.Material>()
+
+  object.traverse((child) => {
+    const mesh = child as THREE.Mesh
+    if (!mesh.isMesh || !mesh.geometry) return
+    meshes += 1
+    const pos = mesh.geometry.attributes.position
+    if (pos) vertices += pos.count
+    if (mesh.geometry.index) {
+      triangles += Math.floor(mesh.geometry.index.count / 3)
+    } else if (pos) {
+      triangles += Math.floor(pos.count / 3)
+    }
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+    mats.forEach((m) => {
+      if (m) materialSet.add(m)
+    })
+  })
+
+  return {
+    triangles,
+    vertices,
+    meshes,
+    materials: materialSet.size,
+  }
+}
+
+function inspectObjectPbrChannels(object: THREE.Object3D): Partial<Record<PbrChannelKind, string>> {
+  const detected: Partial<Record<PbrChannelKind, string>> = {}
+  object.traverse((child) => {
+    const mesh = child as THREE.Mesh
+    if (!mesh.isMesh) return
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+    for (const mat of mats) {
+      const std = mat as THREE.MeshStandardMaterial
+      if (!std) continue
+      if (std.map && !detected.albedo) detected.albedo = std.map.name || 'Embedded Albedo'
+      if (std.normalMap && !detected.normal) detected.normal = std.normalMap.name || 'Embedded Normal'
+      if (std.roughnessMap && !detected.roughness) detected.roughness = std.roughnessMap.name || 'Embedded Roughness'
+      if (std.metalnessMap && !detected.metalness) detected.metalness = std.metalnessMap.name || 'Embedded Metalness'
+      if (std.aoMap && !detected.ao) detected.ao = std.aoMap.name || 'Embedded AO'
+    }
+  })
+  return detected
 }
 
 function disposeObject(object: THREE.Object3D) {
   object.traverse((child) => {
     const mesh = child as THREE.Mesh
     if (!mesh.isMesh) return
-    mesh.geometry?.dispose()
+    mesh.geometry.dispose()
     const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
     materials.forEach((material) => {
       if (!material) return
@@ -79,33 +204,29 @@ function disposeObject(object: THREE.Object3D) {
   })
 }
 
-function frameObject(object: THREE.Object3D, camera: THREE.PerspectiveCamera, controls: OrbitControls, preset: CameraPreset = 'perspective') {
+function frameObject(
+  object: THREE.Object3D,
+  camera: THREE.PerspectiveCamera,
+  controls: OrbitControls,
+  preset: CameraPreset = 'perspective'
+) {
   const bounds = new THREE.Box3().setFromObject(object)
   const size = bounds.getSize(new THREE.Vector3())
   const center = bounds.getCenter(new THREE.Vector3())
   const largestSide = Math.max(size.x, size.y, size.z, 0.1)
   object.position.sub(center)
-
-  const distance = largestSide * 1.85
-  camera.near = Math.max(largestSide / 200, 0.005)
-  camera.far = Math.max(largestSide * 200, 200)
-
-  switch (preset) {
-    case 'front':
-      camera.position.set(0, 0, distance * 1.4)
-      break
-    case 'top':
-      camera.position.set(0, distance * 1.5, 0.0001)
-      break
-    case 'right':
-      camera.position.set(distance * 1.4, 0, 0)
-      break
-    case 'perspective':
-    default:
-      camera.position.set(distance, distance * 0.72, distance)
-      break
+  const distance = largestSide * 1.75
+  if (preset === 'front') {
+    camera.position.set(0, 0, distance * 1.25)
+  } else if (preset === 'top') {
+    camera.position.set(0, distance * 1.35, 0.001)
+  } else if (preset === 'right') {
+    camera.position.set(distance * 1.25, 0, 0)
+  } else {
+    camera.position.set(distance, distance * 0.7, distance)
   }
-
+  camera.near = Math.max(largestSide / 100, 0.01)
+  camera.far = Math.max(largestSide * 100, 100)
   camera.updateProjectionMatrix()
   controls.target.set(0, 0, 0)
   controls.update()
@@ -113,62 +234,134 @@ function frameObject(object: THREE.Object3D, camera: THREE.PerspectiveCamera, co
 
 export function ModelViewer({ source, extension, title }: ModelViewerProps) {
   const hostRef = useRef<HTMLDivElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
+  const textureInputRef = useRef<HTMLInputElement>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [error, setError] = useState('')
   const [turntable, setTurntable] = useState(false)
   const [wireframe, setWireframe] = useState(false)
   const [showGrid, setShowGrid] = useState(true)
   const [shadingMode, setShadingMode] = useState<ShadingMode>('pbr')
-  const [lighting, setLighting] = useState<LightingPreset>('studio')
-  const [showTexturesDrawer, setShowTexturesDrawer] = useState(false)
-  const [showStats, setShowStats] = useState(false)
-  const [stats, setStats] = useState<ModelMeshStats>({ triangles: 0, vertices: 0, meshes: 0, materials: 0 })
-  const [trackedMaterials, setTrackedMaterials] = useState<TrackedMaterialSlot[]>([])
-  const [statusMessage, setStatusMessage] = useState<string | null>(null)
+  const [lightingPreset, setLightingPreset] = useState<LightingPreset>('studio')
+  const [cameraPreset, setCameraPreset] = useState<CameraPreset>('perspective')
+  const [showPbrDrawer, setShowPbrDrawer] = useState(false)
+  const [stats, setStats] = useState<ModelGeometryStats>({
+    triangles: 0,
+    vertices: 0,
+    meshes: 0,
+    materials: 0,
+  })
+  const [pbrSet, setPbrSet] = useState<PbrTextureSet>(() => buildPbrTextureSet([]))
+  const [bridgeMessage, setBridgeMessage] = useState('')
 
   const turntableRef = useRef(false)
   const wireframeRef = useRef(false)
   const showGridRef = useRef(true)
-  const shadingModeRef = useRef<ShadingMode>('pbr')
-  const originalMaterialsMap = useRef<Map<THREE.Mesh, THREE.Material | THREE.Material[]>>(new Map())
 
   const stateRefs = useRef<{
-    renderer?: THREE.WebGLRenderer
-    scene?: THREE.Scene
     loadedObject?: THREE.Object3D
+    scene?: THREE.Scene
     camera?: THREE.PerspectiveCamera
+    renderer?: THREE.WebGLRenderer
     controls?: OrbitControls
     grid?: THREE.GridHelper
+    hemiLight?: THREE.HemisphereLight
     keyLight?: THREE.DirectionalLight
     rimLight?: THREE.DirectionalLight
-    hemiLight?: THREE.HemisphereLight
-    uvTexture?: THREE.CanvasTexture
+    originalMaterials?: Map<THREE.Mesh, THREE.Material | THREE.Material[]>
+    clayMaterial?: THREE.MeshStandardMaterial
+    normalMaterial?: THREE.MeshNormalMaterial
+    uvGridMaterial?: THREE.MeshBasicMaterial
+    uvTexture?: THREE.DataTexture
+    existingChannels?: Partial<Record<PbrChannelKind, string>>
+    customFiles?: Array<{ name: string; url?: string }>
     invalidate?: () => void
   }>({})
 
-  const showToast = useCallback((msg: string) => {
-    setStatusMessage(msg)
-    setTimeout(() => setStatusMessage(null), 3200)
+  const applyShadingToLoadedObject = useCallback((mode: ShadingMode, wire: boolean) => {
+    const {
+      loadedObject,
+      originalMaterials,
+      clayMaterial,
+      normalMaterial,
+      uvGridMaterial,
+      invalidate,
+    } = stateRefs.current
+    if (!loadedObject || !originalMaterials) return
+
+    loadedObject.traverse((child) => {
+      const mesh = child as THREE.Mesh
+      if (!mesh.isMesh) return
+      if (mode === 'clay' && clayMaterial) {
+        clayMaterial.wireframe = wire
+        mesh.material = clayMaterial
+      } else if (mode === 'normals' && normalMaterial) {
+        normalMaterial.wireframe = wire
+        mesh.material = normalMaterial
+      } else if (mode === 'uv-grid' && uvGridMaterial) {
+        uvGridMaterial.wireframe = wire
+        mesh.material = uvGridMaterial
+      } else {
+        const orig = originalMaterials.get(mesh)
+        if (orig) {
+          mesh.material = orig
+          const mats = Array.isArray(orig) ? orig : [orig]
+          mats.forEach((m) => {
+            if (m && 'wireframe' in m) (m as unknown as { wireframe: boolean }).wireframe = wire
+          })
+        }
+      }
+    })
+    invalidate?.()
   }, [])
 
   const handleResetView = useCallback(() => {
     const { loadedObject, camera, controls, invalidate } = stateRefs.current
     if (loadedObject && camera && controls) {
+      setCameraPreset('perspective')
       frameObject(loadedObject, camera, controls, 'perspective')
       invalidate?.()
     }
   }, [])
 
-  const handleSetCameraPreset = useCallback((preset: CameraPreset) => {
+  const handleSelectCameraPreset = useCallback((preset: CameraPreset) => {
     const { loadedObject, camera, controls, invalidate } = stateRefs.current
+    setCameraPreset(preset)
     if (loadedObject && camera && controls) {
       frameObject(loadedObject, camera, controls, preset)
       invalidate?.()
-      showToast(`Camera: ${preset.toUpperCase()}`)
     }
-  }, [showToast])
+  }, [])
+
+  const handleSelectShadingMode = useCallback(
+    (mode: ShadingMode) => {
+      setShadingMode(mode)
+      applyShadingToLoadedObject(mode, wireframeRef.current)
+    },
+    [applyShadingToLoadedObject]
+  )
+
+  const handleSelectLighting = useCallback((preset: LightingPreset) => {
+    setLightingPreset(preset)
+    const cfg = LIGHTING_PRESETS[preset]
+    const { scene, hemiLight, keyLight, rimLight, invalidate } = stateRefs.current
+    if (scene) scene.background = new THREE.Color(cfg.bg)
+    if (hemiLight) {
+      hemiLight.color.set(cfg.hemiSky)
+      hemiLight.groundColor.set(cfg.hemiGround)
+      hemiLight.intensity = cfg.hemiIntensity
+    }
+    if (keyLight) {
+      keyLight.color.set(cfg.keyColor)
+      keyLight.intensity = cfg.keyIntensity
+      keyLight.position.set(...cfg.keyPos)
+    }
+    if (rimLight) {
+      rimLight.color.set(cfg.rimColor)
+      rimLight.intensity = cfg.rimIntensity
+      rimLight.position.set(...cfg.rimPos)
+    }
+    invalidate?.()
+  }, [])
 
   const handleToggleTurntable = useCallback(() => {
     const next = !turntableRef.current
@@ -181,16 +374,8 @@ export function ModelViewer({ source, extension, title }: ModelViewerProps) {
     const next = !wireframeRef.current
     wireframeRef.current = next
     setWireframe(next)
-    stateRefs.current.loadedObject?.traverse((child) => {
-      const mesh = child as THREE.Mesh
-      if (!mesh.isMesh) return
-      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-      materials.forEach((m) => {
-        if (m && 'wireframe' in m) (m as unknown as { wireframe: boolean }).wireframe = next
-      })
-    })
-    stateRefs.current.invalidate?.()
-  }, [])
+    applyShadingToLoadedObject(shadingMode, next)
+  }, [applyShadingToLoadedObject, shadingMode])
 
   const handleToggleGrid = useCallback(() => {
     const next = !showGridRef.current
@@ -202,158 +387,119 @@ export function ModelViewer({ source, extension, title }: ModelViewerProps) {
     }
   }, [])
 
-  const applyShadingMode = useCallback((mode: ShadingMode) => {
-    shadingModeRef.current = mode
-    setShadingMode(mode)
-    const { loadedObject, uvTexture, invalidate } = stateRefs.current
-    if (!loadedObject) return
-
-    loadedObject.traverse((child) => {
-      const mesh = child as THREE.Mesh
-      if (!mesh.isMesh) return
-
-      if (mode === 'pbr') {
-        const orig = originalMaterialsMap.current.get(mesh)
-        if (orig) mesh.material = orig
-      } else if (mode === 'clay') {
-        mesh.material = new THREE.MeshStandardMaterial({
-          color: '#c99b82',
-          roughness: 0.88,
-          metalness: 0.02,
-          wireframe: wireframeRef.current
-        })
-      } else if (mode === 'normals') {
-        mesh.material = new THREE.MeshNormalMaterial({
-          wireframe: wireframeRef.current
-        })
-      } else if (mode === 'uv') {
-        mesh.material = new THREE.MeshBasicMaterial({
-          map: uvTexture,
-          wireframe: wireframeRef.current
-        })
-      }
-    })
-    invalidate?.()
-  }, [])
-
-  const applyLightingPreset = useCallback((preset: LightingPreset) => {
-    setLighting(preset)
-    const { hemiLight, keyLight, rimLight, invalidate } = stateRefs.current
-    if (!hemiLight || !keyLight || !rimLight) return
-
-    switch (preset) {
-      case 'sunset':
-        hemiLight.color.set('#ffe5c4')
-        hemiLight.groundColor.set('#24334a')
-        hemiLight.intensity = 1.6
-        keyLight.color.set('#ff9f43')
-        keyLight.intensity = 3.0
-        keyLight.position.set(6, 4, 3)
-        rimLight.color.set('#74b9ff')
-        rimLight.intensity = 1.5
-        break
-      case 'noir':
-        hemiLight.color.set('#3a4750')
-        hemiLight.groundColor.set('#0b0e14')
-        hemiLight.intensity = 0.5
-        keyLight.color.set('#ffffff')
-        keyLight.intensity = 3.8
-        keyLight.position.set(5, 7, 3)
-        rimLight.color.set('#00d2d3')
-        rimLight.intensity = 2.4
-        break
-      case 'flat':
-        hemiLight.color.set('#ffffff')
-        hemiLight.groundColor.set('#888888')
-        hemiLight.intensity = 3.2
-        keyLight.color.set('#ffffff')
-        keyLight.intensity = 0.6
-        rimLight.color.set('#ffffff')
-        rimLight.intensity = 0.4
-        break
-      case 'studio':
-      default:
-        hemiLight.color.set('#d8e8ff')
-        hemiLight.groundColor.set('#1a202b')
-        hemiLight.intensity = 2.2
-        keyLight.color.set('#fff0df')
-        keyLight.intensity = 2.3
-        keyLight.position.set(4, 6, 5)
-        rimLight.color.set('#75d8ff')
-        rimLight.intensity = 1.2
-        break
-    }
-    invalidate?.()
-    showToast(`Lighting: ${preset.toUpperCase()}`)
-  }, [showToast])
-
-  const handleTakeSnapshot = useCallback(() => {
+  const handleExportSnapshot = useCallback(() => {
     const { renderer, scene, camera } = stateRefs.current
     if (!renderer || !scene || !camera) return
     renderer.render(scene, camera)
     const dataUrl = renderer.domElement.toDataURL('image/png')
     const link = document.createElement('a')
-    link.download = `3D_Snapshot_${title.replace(/[^a-zA-Z0-9_-]/g, '_')}.png`
     link.href = dataUrl
+    link.download = `${(title || 'model').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-viewport.png`
     link.click()
-    showToast('Snapshot exported as high-res PNG!')
-  }, [title, showToast])
+    setBridgeMessage('Viewport PNG snapshot exported')
+  }, [title])
 
-  const handleTextureUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    if (!files || files.length === 0) return
-    const { loadedObject, invalidate } = stateRefs.current
-    if (!loadedObject) return
+  const wireTextureFiles = useCallback(
+    (fileList: FileList | File[]) => {
+      const { loadedObject, originalMaterials, invalidate } = stateRefs.current
+      if (!loadedObject || !originalMaterials) return
 
-    let assignedCount = 0
-    const loader = new THREE.TextureLoader()
+      const loader = new THREE.TextureLoader()
+      const incoming: Array<{ name: string; url: string }> = []
 
-    Array.from(files).forEach((file) => {
-      const name = file.name.toLowerCase()
-      const url = URL.createObjectURL(file)
-      const texture = loader.load(url, () => {
-        invalidate?.()
-      })
+      Array.from(fileList).forEach((file) => {
+        const classified = classifyPbrFilename(file.name)
+        if (!classified) return
+        const objectUrl = URL.createObjectURL(file)
+        incoming.push({ name: file.name, url: objectUrl })
 
-      let targetChannel: 'map' | 'normalMap' | 'roughnessMap' | 'metalnessMap' | 'aoMap' = 'map'
-      if (name.includes('normal') || name.includes('_nor') || name.includes('_nrm')) {
-        targetChannel = 'normalMap'
-        texture.colorSpace = THREE.NoColorSpace
-      } else if (name.includes('rough') || name.includes('_rgh') || name.includes('gloss')) {
-        targetChannel = 'roughnessMap'
-        texture.colorSpace = THREE.NoColorSpace
-      } else if (name.includes('metal') || name.includes('_met')) {
-        targetChannel = 'metalnessMap'
-        texture.colorSpace = THREE.NoColorSpace
-      } else if (name.includes('ao') || name.includes('ambient') || name.includes('occ')) {
-        targetChannel = 'aoMap'
-        texture.colorSpace = THREE.NoColorSpace
-      } else {
-        targetChannel = 'map'
-        texture.colorSpace = THREE.SRGBColorSpace
-      }
-
-      loadedObject.traverse((child) => {
-        const mesh = child as THREE.Mesh
-        if (!mesh.isMesh) return
-        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-        materials.forEach((mat) => {
-          if (mat instanceof THREE.MeshStandardMaterial) {
-            mat[targetChannel] = texture
-            if (targetChannel === 'normalMap') mat.normalScale = new THREE.Vector2(1, 1)
-            if (targetChannel === 'roughnessMap') mat.roughness = 1.0
-            if (targetChannel === 'metalnessMap') mat.metalness = 1.0
-            mat.needsUpdate = true
-            assignedCount++
+        loader.load(objectUrl, (texture) => {
+          texture.name = file.name
+          texture.colorSpace =
+            classified.colorSpace === 'sRGB' ? THREE.SRGBColorSpace : THREE.NoColorSpace
+          if (classified.channel === 'normal' && classified.normalConvention === 'directx') {
+            texture.repeat.y = -1
           }
+          texture.needsUpdate = true
+
+          for (const orig of originalMaterials.values()) {
+            const mats = Array.isArray(orig) ? orig : [orig]
+            for (const m of mats) {
+              const std = m as THREE.MeshStandardMaterial
+              if (!std || !('roughness' in std)) continue
+              if (classified.channel === 'albedo') {
+                std.map = texture
+                std.color.set('#ffffff')
+              } else if (classified.channel === 'normal') {
+                std.normalMap = texture
+              } else if (classified.channel === 'roughness') {
+                std.roughnessMap = texture
+                std.roughness = 1.0
+              } else if (classified.channel === 'metalness') {
+                std.metalnessMap = texture
+                std.metalness = 1.0
+              } else if (classified.channel === 'ao') {
+                std.aoMap = texture
+              } else if (classified.channel === 'emissive') {
+                std.emissiveMap = texture
+                std.emissive.set('#ffffff')
+              } else if (classified.channel === 'displacement') {
+                std.displacementMap = texture
+              }
+              std.needsUpdate = true
+            }
+          }
+          invalidate?.()
         })
       })
-    })
 
-    invalidate?.()
-    showToast(`Smart Texture Wiring: ${files.length} texture(s) linked to materials!`)
-    event.target.value = ''
-  }, [showToast])
+      if (incoming.length > 0) {
+        const merged = [...(stateRefs.current.customFiles || []), ...incoming]
+        stateRefs.current.customFiles = merged
+        const nextSet = buildPbrTextureSet(merged, stateRefs.current.existingChannels)
+        setPbrSet(nextSet)
+        setShadingMode('pbr')
+        applyShadingToLoadedObject('pbr', wireframeRef.current)
+        setBridgeMessage(`Auto-wired ${incoming.length} PBR texture map${incoming.length === 1 ? '' : 's'}`)
+      }
+    },
+    [applyShadingToLoadedObject]
+  )
+
+  const handleDropTextures = useCallback(
+    (event: DragEvent<HTMLDivElement>) => {
+      if (!event.dataTransfer?.files?.length) return
+      event.preventDefault()
+      event.stopPropagation()
+      wireTextureFiles(event.dataTransfer.files)
+    },
+    [wireTextureFiles]
+  )
+
+  const handleTextureInputChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files?.length) {
+        wireTextureFiles(event.target.files)
+        event.target.value = ''
+      }
+    },
+    [wireTextureFiles]
+  )
+
+  const handleCopyDccScript = useCallback(
+    (dcc: TargetDccApp) => {
+      const matName = title || pbrSet.materialName || 'AE_Asset'
+      const script =
+        dcc === 'blender'
+          ? generateBlenderPrincipledBsdfScript(matName, pbrSet)
+          : dcc === 'cinema4d'
+            ? generateCinema4DShaderScript(matName, pbrSet)
+            : generateHoudiniMaterialXScript(matName, pbrSet)
+      void navigator.clipboard?.writeText(script)
+      setBridgeMessage(`Copied ${dcc.toUpperCase()} OpenPBR shader script to clipboard`)
+    },
+    [pbrSet, title]
+  )
 
   useEffect(() => {
     const host = hostRef.current
@@ -362,16 +508,18 @@ export function ModelViewer({ source, extension, title }: ModelViewerProps) {
     let frameId = 0
     let loadedObject: THREE.Object3D | undefined
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color('#10141a')
+    const presetCfg = LIGHTING_PRESETS.studio
+    scene.background = new THREE.Color(presetCfg.bg)
     const camera = new THREE.PerspectiveCamera(42, 1, 0.01, 10_000)
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true, powerPreference: 'high-performance' })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0))
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: false,
+      powerPreference: 'low-power',
+    })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.shadowMap.enabled = true
-    renderer.shadowMap.type = THREE.PCFShadowMap
     host.appendChild(renderer.domElement)
-
-    const uvTexture = createUvGridTexture()
 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
@@ -380,38 +528,65 @@ export function ModelViewer({ source, extension, title }: ModelViewerProps) {
     controls.minDistance = 0.05
     controls.maxDistance = 100_000
 
-    const hemiLight = new THREE.HemisphereLight('#d8e8ff', '#1a202b', 2.2)
+    const hemiLight = new THREE.HemisphereLight(
+      presetCfg.hemiSky,
+      presetCfg.hemiGround,
+      presetCfg.hemiIntensity
+    )
     scene.add(hemiLight)
-    const keyLight = new THREE.DirectionalLight('#fff0df', 2.3)
-    keyLight.position.set(4, 6, 5)
-    keyLight.castShadow = true
-    keyLight.shadow.mapSize.width = 1024
-    keyLight.shadow.mapSize.height = 1024
-    scene.add(keyLight)
-    const rimLight = new THREE.DirectionalLight('#75d8ff', 1.2)
-    rimLight.position.set(-5, 2, -4)
-    scene.add(rimLight)
-
-    const grid = new THREE.GridHelper(24, 24, '#40515e', '#26313b')
+    const key = new THREE.DirectionalLight(presetCfg.keyColor, presetCfg.keyIntensity)
+    key.position.set(...presetCfg.keyPos)
+    key.castShadow = true
+    scene.add(key)
+    const rim = new THREE.DirectionalLight(presetCfg.rimColor, presetCfg.rimIntensity)
+    rim.position.set(...presetCfg.rimPos)
+    scene.add(rim)
+    const grid = new THREE.GridHelper(20, 20, '#40515e', '#26313b')
     grid.position.y = -0.001
     grid.visible = showGridRef.current
     scene.add(grid)
 
-    stateRefs.current = { renderer, scene, camera, controls, grid, keyLight, rimLight, hemiLight, uvTexture }
+    const uvTexture = createProceduralUvCheckerTexture()
+    const clayMaterial = new THREE.MeshStandardMaterial({
+      color: '#c87d65',
+      roughness: 0.42,
+      metalness: 0.04,
+    })
+    const normalMaterial = new THREE.MeshNormalMaterial()
+    const uvGridMaterial = new THREE.MeshBasicMaterial({ map: uvTexture })
+    const originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>()
 
+    stateRefs.current = {
+      scene,
+      camera,
+      renderer,
+      controls,
+      grid,
+      hemiLight,
+      keyLight: key,
+      rimLight: rim,
+      originalMaterials,
+      clayMaterial,
+      normalMaterial,
+      uvGridMaterial,
+      uvTexture,
+      customFiles: [],
+    }
+
+    // One queued frame at a time. OrbitControls emits change while damping;
+    // once it settles there is no idle animation loop or GPU redraw.
     const render = () => {
       frameId = 0
       if (cancelled) return
       let needsNextFrame = false
       if (turntableRef.current && loadedObject) {
-        loadedObject.rotation.y += 0.012
+        loadedObject.rotation.y += 0.015
         needsNextFrame = true
       }
       const changed = controls.update()
       renderer.render(scene, camera)
       if (changed || needsNextFrame) invalidate()
     }
-
     const invalidate = () => {
       if (!cancelled && !frameId) frameId = requestAppFrame(render)
     }
@@ -435,74 +610,44 @@ export function ModelViewer({ source, extension, title }: ModelViewerProps) {
         disposeObject(object)
         return
       }
-
-      let triCount = 0
-      let vertCount = 0
-      let meshCount = 0
-      const matMap = new Map<string, TrackedMaterialSlot>()
-
       object.traverse((child) => {
         const mesh = child as THREE.Mesh
         if (!mesh.isMesh) return
-        meshCount++
         mesh.castShadow = true
         mesh.receiveShadow = true
-
-        if (mesh.geometry) {
-          triCount += mesh.geometry.index ? mesh.geometry.index.count / 3 : mesh.geometry.attributes.position.count / 3
-          vertCount += mesh.geometry.attributes.position.count
-        }
-
         if (!mesh.material) {
-          mesh.material = new THREE.MeshStandardMaterial({ color: '#b7c9d8', roughness: 0.72, metalness: 0.05 })
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: '#b7c9d8',
+            roughness: 0.72,
+            metalness: 0.05,
+          })
         }
-
-        originalMaterialsMap.current.set(mesh, mesh.material)
-
-        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-        materials.forEach((mat) => {
-          if (!mat) return
-          const stdMat = mat as THREE.MeshStandardMaterial
-          const matName = mat.name || `Material_${matMap.size + 1}`
-          if (!matMap.has(matName)) {
-            matMap.set(matName, {
-              materialName: matName,
-              hasAlbedo: !!stdMat.map,
-              hasNormal: !!stdMat.normalMap,
-              hasRoughness: !!stdMat.roughnessMap,
-              hasMetalness: !!stdMat.metalnessMap,
-              hasAo: !!stdMat.aoMap
-            })
-          }
-          if (wireframeRef.current && 'wireframe' in mat) {
-            (mat as unknown as { wireframe: boolean }).wireframe = true
-          }
-        })
+        originalMaterials.set(mesh, mesh.material)
+        if (wireframeRef.current) {
+          const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+          materials.forEach((m) => {
+            if (m && 'wireframe' in m) (m as unknown as { wireframe: boolean }).wireframe = true
+          })
+        }
       })
-
-      setStats({
-        triangles: Math.round(triCount),
-        vertices: Math.round(vertCount),
-        meshes: meshCount,
-        materials: matMap.size
-      })
-      setTrackedMaterials(Array.from(matMap.values()))
-
       loadedObject = object
       stateRefs.current.loadedObject = object
+      const existingChannels = inspectObjectPbrChannels(object)
+      stateRefs.current.existingChannels = existingChannels
+      setStats(computeGeometryStats(object))
+      setPbrSet(buildPbrTextureSet([], existingChannels))
       scene.add(object)
       frameObject(object, camera, controls, 'perspective')
       setStatus('ready')
       invalidate()
     }
-
     const fail = (reason: unknown) => {
       if (cancelled) return
       const isGltf = extension.toLowerCase() === 'gltf'
       setError(
         isGltf
-          ? 'This GLTF references external companion textures. Use the Smart Texture drop to link missing maps, or import a self-contained GLB.'
-          : `Could not open 3D model: ${String(reason)}`
+          ? 'This GLTF needs sidecar data or textures. Import a self-contained GLB, or keep the GLTF and its companion files together for the next compatibility pass.'
+          : `Could not open this 3D file: ${String(reason)}`
       )
       setStatus('error')
     }
@@ -510,7 +655,6 @@ export function ModelViewer({ source, extension, title }: ModelViewerProps) {
     setStatus('loading')
     setError('')
     const type = extension.toLowerCase()
-
     if (type === 'obj') {
       const basePath = source.slice(0, source.lastIndexOf('/') + 1)
       void fetch(source)
@@ -526,7 +670,9 @@ export function ModelViewer({ source, extension, title }: ModelViewerProps) {
               materials.preload()
               const obj = new OBJLoader()
               obj.setMaterials(materials)
-              obj.load(source, finish, undefined, (reason) => new OBJLoader().load(source, finish, undefined, () => fail(reason)))
+              obj.load(source, finish, undefined, (reason) =>
+                new OBJLoader().load(source, finish, undefined, () => fail(reason))
+              )
             },
             undefined,
             () => new OBJLoader().load(source, finish, undefined, fail)
@@ -536,7 +682,7 @@ export function ModelViewer({ source, extension, title }: ModelViewerProps) {
     } else if (type === 'glb' || type === 'gltf') {
       new GLTFLoader().load(source, (result) => finish(result.scene), undefined, fail)
     } else {
-      fail(`Format '.${type}' requires background DCC conversion or companion pack`)
+      fail('Unsupported model type')
     }
 
     invalidate()
@@ -547,197 +693,175 @@ export function ModelViewer({ source, extension, title }: ModelViewerProps) {
       controls.removeEventListener('change', invalidate)
       controls.dispose()
       if (loadedObject) disposeObject(loadedObject)
+      clayMaterial.dispose()
+      normalMaterial.dispose()
+      uvGridMaterial.dispose()
       uvTexture.dispose()
       renderer.dispose()
       renderer.domElement.remove()
-      originalMaterialsMap.current.clear()
       stateRefs.current = {}
     }
   }, [extension, source])
 
   return (
-    <div className="model-viewer" onPointerDown={(event) => event.stopPropagation()} title="Drag to orbit · scroll to zoom · right-drag to pan">
-      <div ref={hostRef} className="model-viewer-canvas" aria-label={`${title} 3D DCC Viewport`} />
-
-      {statusMessage && <div className="model-viewer-toast">{statusMessage}</div>}
-
-      {status === 'loading' && <div className="model-viewer-status">Loading 3D Object & Shaders…</div>}
-      {status === 'error' && (
-        <div className="model-viewer-status model-viewer-error">
-          <p>{error}</p>
-          <label className="dcc-button-file-label">
-            📁 Relink Texture Pack
-            <input type="file" multiple accept="image/*" onChange={handleTextureUpload} style={{ display: 'none' }} />
-          </label>
-        </div>
-      )}
-
+    <div
+      className="model-viewer"
+      onPointerDown={(event) => event.stopPropagation()}
+      onDragOver={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+      }}
+      onDrop={handleDropTextures}
+      title="Drag to orbit · scroll to zoom · right-drag to pan · drop PBR texture maps to auto-wire"
+    >
+      <div ref={hostRef} className="model-viewer-canvas" aria-label={`${title} 3D preview`} />
+      {status === 'loading' && <div className="model-viewer-status">Loading 3D…</div>}
+      {status === 'error' && <div className="model-viewer-status model-viewer-error">{error}</div>}
       {status === 'ready' && (
         <>
-          {/* Main DCC Viewport Toolbar */}
-          <div className="model-viewer-toolbar" role="toolbar" aria-label="3D DCC Viewport Tools">
-            {/* Shading Mode Selector */}
-            <div className="dcc-tool-group">
-              <button
-                type="button"
-                className={shadingMode === 'pbr' ? 'active' : ''}
-                title="PBR Shading (Full Lit Physical Materials)"
-                onClick={() => applyShadingMode('pbr')}
-              >
-                PBR
-              </button>
-              <button
-                type="button"
-                className={shadingMode === 'clay' ? 'active' : ''}
-                title="Clay Matcap Mode (Sculpting Form Inspection)"
-                onClick={() => applyShadingMode('clay')}
-              >
-                Clay
-              </button>
-              <button
-                type="button"
-                className={shadingMode === 'normals' ? 'active' : ''}
-                title="Surface Normal Vectors (RGB Diagnostic)"
-                onClick={() => applyShadingMode('normals')}
-              >
-                Normals
-              </button>
-              <button
-                type="button"
-                className={shadingMode === 'uv' ? 'active' : ''}
-                title="UV Grid Checkerboard (Distortion Analysis)"
-                onClick={() => applyShadingMode('uv')}
-              >
-                UV
-              </button>
-            </div>
-
-            <div className="dcc-separator" />
-
-            {/* View & Lighting Toggles */}
-            <div className="dcc-tool-group">
-              <button
-                type="button"
-                className={lighting !== 'studio' ? 'active' : ''}
-                title={`Lighting: ${lighting} (Click to cycle Studio / Sunset / Noir / Flat)`}
-                onClick={() => {
-                  const cycle: LightingPreset[] = ['studio', 'sunset', 'noir', 'flat']
-                  const next = cycle[(cycle.indexOf(lighting) + 1) % cycle.length]
-                  applyLightingPreset(next)
-                }}
-              >
-                ☀ {lighting === 'studio' ? 'Light' : lighting}
-              </button>
-              <button type="button" className={wireframe ? 'active' : ''} title="Toggle Wireframe Overlay" onClick={handleToggleWireframe}>
-                ⬡ Wire
-              </button>
-              <button type="button" className={showGrid ? 'active' : ''} title="Toggle Ground Grid" onClick={handleToggleGrid}>
-                ▦ Grid
-              </button>
-              <button type="button" className={turntable ? 'active' : ''} title="Toggle Turntable Rotation" onClick={handleToggleTurntable}>
-                ⟳ Spin
-              </button>
-            </div>
-
-            <div className="dcc-separator" />
-
-            {/* Camera Presets */}
-            <div className="dcc-tool-group">
-              <button type="button" title="Perspective 3/4 Camera Angle" onClick={() => handleSetCameraPreset('perspective')}>
-                3/4
-              </button>
-              <button type="button" title="Front Camera Angle" onClick={() => handleSetCameraPreset('front')}>
-                Front
-              </button>
-              <button type="button" title="Top Camera Angle" onClick={() => handleSetCameraPreset('top')}>
-                Top
-              </button>
-            </div>
-
-            <div className="dcc-separator" />
-
-            {/* DCC Panels: Textures, Stats, Snapshot */}
-            <div className="dcc-tool-group">
-              <button
-                type="button"
-                className={showTexturesDrawer ? 'active' : ''}
-                title="Track Materials & Auto-Wire PBR Textures"
-                onClick={() => setShowTexturesDrawer((prev) => !prev)}
-              >
-                🎨 Textures ({trackedMaterials.length})
-              </button>
-              <button
-                type="button"
-                className={showStats ? 'active' : ''}
-                title="View Polycount & Mesh Geometry Statistics"
-                onClick={() => setShowStats((prev) => !prev)}
-              >
-                📊 Stats
-              </button>
-              <button type="button" title="Capture High-Res Viewport Snapshot to Disk" onClick={handleTakeSnapshot}>
-                📷 Snapshot
-              </button>
-              <button type="button" title="Reset Viewport Camera" onClick={handleResetView}>
-                ⟲
-              </button>
-            </div>
+          <div className="model-viewer-hud" aria-label="3D geometry statistics">
+            <span>
+              <strong>{stats.triangles.toLocaleString()}</strong> tris
+            </span>
+            <span>
+              <strong>{stats.vertices.toLocaleString()}</strong> verts
+            </span>
+            <span>
+              <strong>{stats.meshes}</strong> mesh{stats.meshes === 1 ? '' : 'es'}
+            </span>
+            <span>
+              <strong>{stats.materials}</strong> mat{stats.materials === 1 ? '' : 's'}
+            </span>
           </div>
 
-          {/* Collapsible Materials & Texture Tracking Drawer (Kiosk Library 2.1 Pattern) */}
-          {showTexturesDrawer && (
-            <div className="dcc-drawer dcc-materials-drawer" role="region" aria-label="Texture & Material Tracking">
-              <header className="dcc-drawer-header">
-                <strong>Material & PBR Texture Tracker</strong>
-                <button type="button" className="dcc-close-btn" onClick={() => setShowTexturesDrawer(false)}>
-                  ✕
-                </button>
-              </header>
-              <div className="dcc-materials-list">
-                {trackedMaterials.map((mat) => (
-                  <div key={mat.materialName} className="dcc-material-item">
-                    <span className="dcc-mat-title">{mat.materialName}</span>
-                    <div className="dcc-channel-badges">
-                      <span className={`channel-badge ${mat.hasAlbedo ? 'active' : 'missing'}`}>Albedo</span>
-                      <span className={`channel-badge ${mat.hasNormal ? 'active' : 'missing'}`}>Normal</span>
-                      <span className={`channel-badge ${mat.hasRoughness ? 'active' : 'missing'}`}>Rough</span>
-                      <span className={`channel-badge ${mat.hasMetalness ? 'active' : 'missing'}`}>Metal</span>
-                      <span className={`channel-badge ${mat.hasAo ? 'active' : 'missing'}`}>AO</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <footer className="dcc-drawer-footer">
-                <label className="dcc-upload-label">
-                  📁 Smart Auto-Wire PBR Maps (Drop Suffixes: _nor, _col, _rough)
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleTextureUpload}
-                    style={{ display: 'none' }}
-                  />
-                </label>
-              </footer>
-            </div>
-          )}
+          <div className="model-viewer-toolbar" role="toolbar" aria-label="3D model controls">
+            <select
+              aria-label="Diagnostic shading mode"
+              title="Diagnostic shading mode (PBR, Clay Matcap, Normals, UV Checker)"
+              value={shadingMode}
+              onChange={(e) => handleSelectShadingMode(e.target.value as ShadingMode)}
+            >
+              <option value="pbr">PBR Lit</option>
+              <option value="clay">Clay Matcap</option>
+              <option value="normals">Normals RGB</option>
+              <option value="uv-grid">UV Checker</option>
+            </select>
+            <select
+              aria-label="Viewport lighting preset"
+              title="Lighting environment preset"
+              value={lightingPreset}
+              onChange={(e) => handleSelectLighting(e.target.value as LightingPreset)}
+            >
+              <option value="studio">Studio</option>
+              <option value="sunset">Sunset</option>
+              <option value="noir">Noir</option>
+              <option value="flat">Flat</option>
+            </select>
+            <select
+              aria-label="Camera angle preset"
+              title="Camera angle preset"
+              value={cameraPreset}
+              onChange={(e) => handleSelectCameraPreset(e.target.value as CameraPreset)}
+            >
+              <option value="perspective">3/4 View</option>
+              <option value="front">Front</option>
+              <option value="top">Top</option>
+              <option value="right">Right</option>
+            </select>
+            <button type="button" title="Reset camera view" onClick={handleResetView}>
+              ⟲ Reset
+            </button>
+            <button
+              type="button"
+              className={turntable ? 'active' : ''}
+              title="Toggle turntable auto-rotation"
+              onClick={handleToggleTurntable}
+            >
+              ⟳ Turntable
+            </button>
+            <button
+              type="button"
+              className={wireframe ? 'active' : ''}
+              title="Toggle wireframe display"
+              onClick={handleToggleWireframe}
+            >
+              ⬡ Wireframe
+            </button>
+            <button
+              type="button"
+              className={showGrid ? 'active' : ''}
+              title="Toggle ground grid"
+              onClick={handleToggleGrid}
+            >
+              ▦ Grid
+            </button>
+            <button
+              type="button"
+              className={showPbrDrawer ? 'active' : ''}
+              title="Toggle PBR Texture Channel Tracker & Kiosk Auto-Wiring"
+              aria-expanded={showPbrDrawer}
+              onClick={() => setShowPbrDrawer((open) => !open)}
+            >
+              ◈ PBR ({pbrSet.activeCount}/{CORE_PBR_CHANNELS.length})
+            </button>
+            <button
+              type="button"
+              title="Export 1-click PNG viewport snapshot"
+              onClick={handleExportSnapshot}
+            >
+              📷 Snapshot
+            </button>
+          </div>
 
-          {/* Polycount & Geometry Stats HUD */}
-          {showStats && (
-            <div className="dcc-stats-hud" role="region" aria-label="Mesh Statistics">
-              <div className="dcc-stat-row">
-                <span>Triangles:</span> <strong>{stats.triangles.toLocaleString()}</strong>
-              </div>
-              <div className="dcc-stat-row">
-                <span>Vertices:</span> <strong>{stats.vertices.toLocaleString()}</strong>
-              </div>
-              <div className="dcc-stat-row">
-                <span>Meshes:</span> <strong>{stats.meshes}</strong>
-              </div>
-              <div className="dcc-stat-row">
-                <span>Materials:</span> <strong>{stats.materials}</strong>
-              </div>
-            </div>
+          {showPbrDrawer && (
+            <aside className="model-viewer-pbr-drawer" aria-label="PBR Texture Channel Tracker">
+              <header className="model-viewer-pbr-header">
+                <strong>PBR Channels ({pbrSet.materialName})</strong>
+                <button
+                  type="button"
+                  onClick={() => textureInputRef.current?.click()}
+                  title="Auto-wire texture maps by suffix (_diffuse, _nor, _rough, _metal, _ao)"
+                >
+                  + Auto-Wire Maps
+                </button>
+                <input
+                  ref={textureInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleTextureInputChange}
+                />
+              </header>
+              <ul className="model-viewer-pbr-list">
+                {pbrSet.channels.map((ch) => (
+                  <li key={ch.channel} className="model-viewer-pbr-slot">
+                    <span className="pbr-slot-name">
+                      {ch.label} <small>({ch.colorSpace})</small>
+                    </span>
+                    <span
+                      className={`pbr-status-badge ${ch.active ? 'active' : 'missing'}`}
+                      title={ch.textureName || 'Drop texture map to wire'}
+                    >
+                      {ch.active ? `[Active] ${ch.textureName}` : '[Missing]'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <footer className="model-viewer-pbr-bridge">
+                <span>DCC Bridge:</span>
+                <button type="button" onClick={() => handleCopyDccScript('blender')}>
+                  Blender BSDF
+                </button>
+                <button type="button" onClick={() => handleCopyDccScript('cinema4d')}>
+                  C4D Redshift
+                </button>
+                <button type="button" onClick={() => handleCopyDccScript('houdini')}>
+                  Houdini MtlX
+                </button>
+              </footer>
+              {bridgeMessage && <div className="model-viewer-bridge-msg">{bridgeMessage}</div>}
+            </aside>
           )}
 
           <div className="model-viewer-hint">Orbit · zoom · pan</div>

@@ -22,6 +22,8 @@ pub struct ImageReference {
 
 pub struct PreparedImage {
     pub resource: ImageReference,
+    /// Precomputed O(1) index into `PreparedScene.resources` (Optimization Task 4).
+    pub resource_index: usize,
     pub source: Rect,
     pub transform: Affine,
     pub opacity: f32,

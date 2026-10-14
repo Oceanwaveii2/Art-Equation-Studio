@@ -64,9 +64,9 @@ pub(super) fn prepare_display_list(snapshot: &Value) -> Result<PreparedScene, St
         return Err("RESOURCE_BUDGET_EXCEEDED: display list exceeds 1024 image references".into());
     }
     let resources=source_resources.iter().map(parse_reference).collect::<Result<Vec<_>,_>>()?;
-    let mut resource_ids=HashSet::new();
-    for resource in &resources {
-        if !resource_ids.insert((resource.key.clone(),resource.revision)) {
+    let mut resource_indices = std::collections::HashMap::with_capacity(resources.len());
+    for (idx, resource) in resources.iter().enumerate() {
+        if resource_indices.insert((resource.key.clone(), resource.revision), idx).is_some() {
             return Err("RESOURCE_INVALID: duplicate declared image identity".into());
         }
     }
@@ -149,7 +149,10 @@ pub(super) fn prepare_display_list(snapshot: &Value) -> Result<PreparedScene, St
                 let id=identity(operation,"id").map_err(fail)?;
                 if !objects.insert(id) { return Err(fail(format!("DISPLAY_LIST_INVALID: duplicate primitive identity {id}"))); }
                 let resource=parse_reference(&operation["resource"]).map_err(fail)?;
-                if !resources.contains(&resource) { return Err(fail("RESOURCE_NOT_READY: image reference is not declared".into())); }
+                let resource_index = *resource_indices
+                    .get(&(resource.key.clone(), resource.revision))
+                    .filter(|&&idx| resources[idx] == resource)
+                    .ok_or_else(|| fail("RESOURCE_NOT_READY: image reference is not declared".into()))?;
                 fields(&operation["sourceRect"],&["x","y","width","height"]).map_err(fail)?;
                 let rect=&operation["sourceRect"];
                 let number=|key:&str|rect[key].as_f64().filter(|n|n.is_finite()).ok_or_else(||format!("IMAGE_INVALID: sourceRect.{key} required"));
@@ -167,7 +170,7 @@ pub(super) fn prepare_display_list(snapshot: &Value) -> Result<PreparedScene, St
                 if !(0.0..=1.0).contains(&opacity){return Err(fail("IMAGE_INVALID: opacity must be0..1".into()));}
                 let quality=match operation["sampling"].as_str(){Some("bilinear")=>ImageQuality::Medium,Some("nearest")=>ImageQuality::Low,_=>return Err(fail("IMAGE_INVALID: explicit nearest/bilinear sampling required".into()))};
                 operations.push(PreparedOp::Image(images.len()));
-                images.push(PreparedImage{resource,source,transform,opacity:opacity as f32,quality});
+                images.push(PreparedImage{resource,resource_index,source,transform,opacity:opacity as f32,quality});
             }
             Some("vector") => {
                 if objects.len() >= 50_000 {

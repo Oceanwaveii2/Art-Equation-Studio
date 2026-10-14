@@ -35,6 +35,7 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.7z
+*.patch
 
 # Environment & logs
 .env

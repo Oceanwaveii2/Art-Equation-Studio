@@ -33,6 +33,7 @@ struct CpuSurface {
     context: RenderContext,
     pixmap: Pixmap,
     resources: Resources,
+    output_buffer: Vec<u8>,
 }
 
 impl Default for B4CpuRenderer {
@@ -105,6 +106,7 @@ impl B4CpuRenderer {
                     level:Level::new(), num_threads:self.additional_threads,
                 }),
                 pixmap:Pixmap::new(width as u16,height as u16),resources:Resources::new(),
+                output_buffer:Vec::with_capacity(width as usize * height as usize * 4),
             });
             self.surface_allocations += 1;
         }
@@ -130,6 +132,21 @@ impl B4CpuRenderer {
     pub fn resource_stats(&self)->String {self.stats().to_string()}
     pub fn render_snapshot(&mut self,width:u32,height:u32,snapshot_json:String,scale:f64,pan_x:f64,pan_y:f64)->Result<Vec<u8>,crate::EngineError> {
         self.render(width,height,&snapshot_json,scale,pan_x,pan_y).map_err(crate::engine_error)
+    }
+    /// Zero-copy Wasm rendering entry point: rasterizes into `surface.output_buffer`
+    /// and returns byte length so JS can construct a typed view via `surface_buffer_ptr()`.
+    pub fn render_into_surface(&mut self,width:u32,height:u32,snapshot_json:String,scale:f64,pan_x:f64,pan_y:f64)->Result<usize,crate::EngineError> {
+        if self.disposed {return Err(crate::engine_error("CPU_RENDERER_DISPOSED"));}
+        let result = self.render_inner(width,height,&snapshot_json,scale,pan_x,pan_y);
+        if result.is_ok() {self.registry.present();} else {self.registry.discard();}
+        self.prune_pixmaps();
+        result.map(|bytes| bytes.len()).map_err(crate::engine_error)
+    }
+    pub fn surface_buffer_ptr(&self) -> *const u8 {
+        self.surface.as_ref().map_or(std::ptr::null(), |s| s.output_buffer.as_ptr())
+    }
+    pub fn surface_buffer_len(&self) -> usize {
+        self.surface.as_ref().map_or(0, |s| s.output_buffer.len())
     }
     pub fn dispose(&mut self) {self.registry=ImageRegistry::default();self.images.clear();self.surface=None;self.disposed=true;}
 }
@@ -235,17 +252,21 @@ fn rasterize(width:u32,height:u32,prepared:&crate::prepared_scene::PreparedScene
             ..Default::default()
         },
     );
-    let mut pixels = Vec::with_capacity(width as usize * height as usize * 4);
-    // Preserve vello_common's rounding without consuming the retained pixmap.
-    // The returned frame is independently owned for WASM/worker transfer.
+    let byte_len = width as usize * height as usize * 4;
+    surface.output_buffer.clear();
+    if surface.output_buffer.capacity() < byte_len {
+        surface.output_buffer.reserve(byte_len - surface.output_buffer.capacity());
+    }
+    // Preserve vello_common's rounding into the retained output_buffer so
+    // zero-copy callers read `surface_buffer_ptr()` directly without reallocation.
     for pixel in surface.pixmap.data() {
-        if pixel.a == 0 { pixels.extend_from_slice(&[0;4]); } else {
+        if pixel.a == 0 { surface.output_buffer.extend_from_slice(&[0;4]); } else {
             let alpha = 255.0 / f32::from(pixel.a);
             let unpremultiply = |component| (f32::from(component) * alpha + 0.5) as u8;
-            pixels.extend_from_slice(&[unpremultiply(pixel.r),unpremultiply(pixel.g),unpremultiply(pixel.b),pixel.a]);
+            surface.output_buffer.extend_from_slice(&[unpremultiply(pixel.r),unpremultiply(pixel.g),unpremultiply(pixel.b),pixel.a]);
         }
     }
-    Ok(pixels)
+    Ok(surface.output_buffer.clone())
 }
 #[cfg(test)]
 mod image_tests {

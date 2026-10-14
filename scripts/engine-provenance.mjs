@@ -2,12 +2,14 @@ import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import { spawnSync } from 'node:child_process'
-const root=path.resolve(import.meta.dirname,'..'), receipt=path.join(root,'engine/vello-surface/build-receipt.json')
+import { fileURLToPath } from 'node:url'
+const scriptDir=import.meta.dirname||path.dirname(fileURLToPath(import.meta.url))
+const root=path.resolve(scriptDir,'..'), receipt=path.join(root,'engine/vello-surface/build-receipt.json')
 if(process.argv.includes('--record')){
   // A receipt may only be refreshed by actually rebuilding and regenerating
   // both binding copies. Hashing an old binary beside new source cannot bless it.
   const target=process.env.AE21_ENGINE_TARGET||'D:/0/AE21EngineTarget'
-  const bin=path.join(process.env.USERPROFILE,'.cargo/bin')
+  const bin=path.join(process.env.USERPROFILE||process.env.HOME||'','.cargo/bin')
   const run=(exe,args)=>{const result=spawnSync(path.join(bin,exe),args,{cwd:root,stdio:'inherit',env:{...process.env,CARGO_TARGET_DIR:target,CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS:'-C link-arg=--max-memory=268435456'}});if(result.status!==0)throw new Error(`Engine rebuild failed: ${exe} (${result.error?.message||result.status})`)}
   const features=process.env.AE_ENGINE_FEATURES||''
   if(features && features!=='browser-hybrid')throw new Error('Unsupported engine build feature')

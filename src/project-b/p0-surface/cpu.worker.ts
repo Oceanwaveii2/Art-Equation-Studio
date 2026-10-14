@@ -4,9 +4,15 @@ import { frameImageReferences, imageIdentity, imageUploads } from '../../canvas-
 import type { DecodedImageReference } from '../../canvas-engine/paintDisplayList'
 import wasmUrl from './generated/p0_engine_wasm_bg.wasm?url'
 
+type ZeroCopyCpuRenderer = InstanceType<typeof import('./generated/p0_engine_wasm.js').B4CpuRenderer> & {
+  render_into_surface?: (width: number, height: number, snapshot_json: string, scale: number, pan_x: number, pan_y: number) => number
+  surface_buffer_ptr?: () => number
+  surface_buffer_len?: () => number
+}
+
 let modulePromise: Promise<typeof import('./generated/p0_engine_wasm.js')> | undefined
 let work = Promise.resolve()
-let renderer: InstanceType<typeof import('./generated/p0_engine_wasm.js').B4CpuRenderer> | undefined
+let renderer: ZeroCopyCpuRenderer | undefined
 let memory:WebAssembly.Memory|undefined,highWaterBytes=0
 self.onmessage = (event: MessageEvent<{ id: number; frame: VelloFrame }>) => {
   const { id, frame } = event.data
@@ -19,7 +25,7 @@ self.onmessage = (event: MessageEvent<{ id: number; frame: VelloFrame }>) => {
         return module
       })().catch(error => { modulePromise = undefined; throw error })
       const module = await modulePromise
-      renderer ??= new module.B4CpuRenderer()
+      renderer ??= new module.B4CpuRenderer() as ZeroCopyCpuRenderer
       const references = frameImageReferences(frame.snapshot), uploads = imageUploads(references,frame.images)
       const retained = JSON.parse(renderer.retain_images(JSON.stringify(references))) as {decoded:{references:DecodedImageReference[]}}
       const known = new Set(retained.decoded.references.map(imageIdentity))
@@ -29,7 +35,22 @@ self.onmessage = (event: MessageEvent<{ id: number; frame: VelloFrame }>) => {
         renderer.register_image(JSON.stringify(reference),upload.pixels)
       }
       const started = performance.now()
-      const pixels = renderer.render_snapshot(frame.width, frame.height, frame.snapshot, frame.scale, frame.panX, frame.panY)
+      let pixels: Uint8Array
+      if (
+        memory &&
+        typeof renderer.render_into_surface === 'function' &&
+        typeof renderer.surface_buffer_ptr === 'function' &&
+        typeof renderer.surface_buffer_len === 'function'
+      ) {
+        renderer.render_into_surface(frame.width, frame.height, frame.snapshot, frame.scale, frame.panX, frame.panY)
+        const ptr = renderer.surface_buffer_ptr()
+        const len = renderer.surface_buffer_len()
+        const wasmView = new Uint8Array(memory.buffer, ptr, len)
+        pixels = new Uint8Array(len)
+        pixels.set(wasmView)
+      } else {
+        pixels = renderer.render_snapshot(frame.width, frame.height, frame.snapshot, frame.scale, frame.panX, frame.panY)
+      }
       const bytes=memory?.buffer.byteLength??0;highWaterBytes=Math.max(highWaterBytes,bytes)
       self.postMessage({ id, pixels, metadata: { width: frame.width, height: frame.height, backend: 'vello_cpu', cpuRenderer: 'vello_cpu 0.2.0', elapsedMs: performance.now() - started, cpuPixelReadbacks: 0, imageResources:JSON.parse(renderer.resource_stats()),wasmMemory:{bytes,highWaterBytes,scope:'worker-realm-linear-memory; overlaps managed inner allocations; worker termination releases realm'} } }, [pixels.buffer])
     } catch (error) { self.postMessage({ id, error: String(error) }) }

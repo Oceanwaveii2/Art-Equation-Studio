@@ -587,3 +587,50 @@
   outline: 2px solid #3b82f6 !important;
   outline-offset: 2px;
 }
+
+/* Selected Process Node Quick Inspector Bar */
+.process-node-inspector-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 18px;
+  background: rgba(15, 23, 42, 0.92);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.25);
+  z-index: 15;
+}
+
+.process-inspector-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.process-inspector-field span {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 10px;
+}
+
+.process-inspector-field input,
+.process-inspector-field select {
+  background: rgba(9, 13, 22, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 5px;
+  color: #f8fafc;
+  font-size: 12px;
+  padding: 4px 8px;
+  min-height: 26px;
+}
+
+.process-inspector-summary {
+  flex: 1;
+  min-width: 180px;
+}
+
+.process-inspector-summary input {
+  width: 100%;
+}

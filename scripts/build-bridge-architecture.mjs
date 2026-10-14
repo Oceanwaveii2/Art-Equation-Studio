@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises'
+import fsSync from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
 const root=process.cwd(), files=[]
@@ -17,7 +18,9 @@ for(const relative of ['index.html','package.json','package-lock.json','src-taur
 }
 files.sort((a,b)=>a.path.localeCompare(b.path))
 for (const relative of ['scripts/install-nvidia-runtime.ps1','tools/nvidia/package-receipt.json','src-tauri/build.rs','src-tauri/windows-app-manifest.xml','src-tauri/vendor/gpu-allocator/Cargo.toml','src-tauri/vendor/gpu-allocator/ART-EQUATION-PATCH.md','docs/engine-2.6/source-receipt.json','engine/native-canvas-probe/Cargo.toml','engine/native-canvas-probe/Cargo.lock']) {
-  const source=await fs.readFile(path.join(root,relative),'utf8')
+  const fullPath = path.join(root, relative)
+  if (!fsSync.existsSync(fullPath)) continue
+  const source=await fs.readFile(fullPath,'utf8')
   files.push({path:relative,sha256:crypto.createHash('sha256').update(source).digest('hex'),bytes:Buffer.byteLength(source),imports:[],source})
 }
 files.sort((a,b)=>a.path.localeCompare(b.path))
@@ -47,4 +50,3 @@ topology.nativeCommands=(native.match(/generate_handler!\[([\s\S]*?)\]/)?.[1]||'
 const identity=crypto.createHash('sha256').update(JSON.stringify(files.map(({path,sha256})=>({path,sha256})))).digest('hex')
 await fs.writeFile(path.join(root,'src-tauri/bridge-architecture.json'),JSON.stringify({schema:1,identity,topology,files}))
 console.log(JSON.stringify({architecture:'PASS',files:files.length,identity,scope:'Source snapshot; no product acceptance'}))
-

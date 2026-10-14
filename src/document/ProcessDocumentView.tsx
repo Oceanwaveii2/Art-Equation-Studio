@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react'
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import type {
   ProcessDocument,
   ProcessNode,
   ProcessSemanticRelation,
+  ProcessStatus,
 } from '../model/processDocument'
 import {
   RELATION_METADATA,
@@ -13,6 +14,7 @@ import {
   exportToJsonCanvas,
   importFromJsonCanvas,
   addProcessNode,
+  updateProcessNode,
   removeProcessNode,
   addProcessEdge,
   toggleNodeCollapsed,
@@ -43,6 +45,10 @@ export const ProcessDocumentView: React.FC<ProcessDocumentViewProps> = ({
 }) => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(doc.selectedNodeId)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setSelectedNodeId(doc.selectedNodeId)
+  }, [doc.selectedNodeId])
 
   const viewMode = doc.viewMode || 'hybrid'
 
@@ -75,6 +81,12 @@ export const ProcessDocumentView: React.FC<ProcessDocumentViewProps> = ({
   const handleSelectNode = (id: string | null) => {
     setSelectedNodeId(id)
     onUpdateDocument(selectProcessNode(doc, id))
+  }
+
+  // Update Selected Node Metadata (Title, Status, Summary, Tools)
+  const handlePatchSelectedNode = (patch: Partial<Omit<ProcessNode, 'id'>>) => {
+    if (readOnly || !selectedNodeId) return
+    onUpdateDocument(updateProcessNode(doc, selectedNodeId, patch))
   }
 
   // Auto-Layout trigger (PRC-08)
@@ -214,6 +226,10 @@ export const ProcessDocumentView: React.FC<ProcessDocumentViewProps> = ({
   // Keyboard Navigation (PRC-10)
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
+        return
+      }
       if (!selectedNodeId) {
         if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
           const first = doc.nodes[0]
@@ -237,6 +253,24 @@ export const ProcessDocumentView: React.FC<ProcessDocumentViewProps> = ({
         if (current.role === 'spine') {
           const idx = spineNodes.findIndex((n) => n.id === current.id)
           if (idx > 0) handleSelectNode(spineNodes[idx - 1].id)
+        }
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        if (current.role === 'spine') {
+          const leftEdge = doc.edges.find((ed) => ed.toNodeId === current.id)
+          if (leftEdge) handleSelectNode(leftEdge.fromNodeId)
+        } else if (current.branchSide === 'right') {
+          const parentEdge = doc.edges.find((ed) => ed.fromNodeId === current.id || ed.toNodeId === current.id)
+          if (parentEdge) handleSelectNode(parentEdge.fromNodeId === current.id ? parentEdge.toNodeId : parentEdge.fromNodeId)
+        }
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        if (current.role === 'spine') {
+          const rightEdge = doc.edges.find((ed) => ed.fromNodeId === current.id && ed.relation !== 'next')
+          if (rightEdge) handleSelectNode(rightEdge.toNodeId)
+        } else if (current.branchSide === 'left') {
+          const parentEdge = doc.edges.find((ed) => ed.fromNodeId === current.id || ed.toNodeId === current.id)
+          if (parentEdge) handleSelectNode(parentEdge.fromNodeId === current.id ? parentEdge.toNodeId : parentEdge.fromNodeId)
         }
       } else if (e.key === 'Enter') {
         e.preventDefault()
@@ -455,6 +489,72 @@ export const ProcessDocumentView: React.FC<ProcessDocumentViewProps> = ({
           )}
         </div>
       </header>
+
+      {/* Selected Process Node Quick Inspector Bar */}
+      {selectedNode && (
+        <section className="process-node-inspector-bar" aria-label="Selected process node inspector">
+          <label className="process-inspector-field">
+            <span>Node Title</span>
+            <input
+              type="text"
+              disabled={readOnly}
+              value={selectedNode.title}
+              onChange={(e) => handlePatchSelectedNode({ title: e.target.value })}
+            />
+          </label>
+          <label className="process-inspector-field">
+            <span>Status</span>
+            <select
+              disabled={readOnly}
+              value={selectedNode.status}
+              onChange={(e) => handlePatchSelectedNode({ status: e.target.value as ProcessStatus })}
+            >
+              {Object.entries(STATUS_LABELS).map(([key, cfg]) => (
+                <option key={key} value={key}>
+                  {cfg.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="process-inspector-field process-inspector-summary">
+            <span>Summary</span>
+            <input
+              type="text"
+              disabled={readOnly}
+              value={selectedNode.summary}
+              placeholder="Milestone description or deliverable scope…"
+              onChange={(e) => handlePatchSelectedNode({ summary: e.target.value })}
+            />
+          </label>
+          <label className="process-inspector-field">
+            <span>Tools</span>
+            <input
+              type="text"
+              disabled={readOnly}
+              value={selectedNode.tools.join(', ')}
+              placeholder="Blender, ZBrush…"
+              onChange={(e) =>
+                handlePatchSelectedNode({
+                  tools: e.target.value
+                    .split(',')
+                    .map((t) => t.trim())
+                    .filter(Boolean),
+                })
+              }
+            />
+          </label>
+          {!readOnly && (
+            <button
+              type="button"
+              className="process-action-btn"
+              onClick={handleDeleteSelected}
+              title="Remove selected process node"
+            >
+              Delete Node
+            </button>
+          )}
+        </section>
+      )}
 
       {/* Main View Area */}
       {viewMode === 'hybrid' && (
@@ -799,4 +899,3 @@ export const ProcessDocumentView: React.FC<ProcessDocumentViewProps> = ({
     </div>
   )
 }
-export default ProcessDocumentView

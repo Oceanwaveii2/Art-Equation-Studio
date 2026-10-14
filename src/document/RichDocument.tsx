@@ -1,4 +1,4 @@
-import { useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type Ref } from 'react'
+import { useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type Ref } from 'react'
 import { createPortal } from 'react-dom'
 import Color from '@tiptap/extension-color'
 import FontFamily from '@tiptap/extension-font-family'
@@ -17,6 +17,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { save } from '@tauri-apps/plugin-dialog'
 import type { DocumentLayout } from '../model/project'
 import { discoverFontCatalog, fontFamilyOptions, UNVERIFIED_FONT_CATALOG, type FontCatalog } from '../typography/fontCatalog'
+import { solveDocumentPagination } from './paginationEngine'
 
 const FontSize = Extension.create({
   name: 'fontSize',
@@ -57,6 +58,32 @@ const PageBreak = Node.create({
   renderHTML: () => ['div', { 'data-page-break': 'true' }],
 })
 
+const BlankPage = Node.create({
+  name: 'blankPage',
+  group: 'block',
+  atom: true,
+  parseHTML: () => [{ tag: 'div[data-blank-page]' }],
+  renderHTML: () => ['div', { 'data-blank-page': 'true', 'data-page-break': 'true' }],
+})
+
+const SectionBreakContinuous = Node.create({
+  name: 'sectionBreakContinuous',
+  group: 'block',
+  atom: true,
+  addAttributes: () => ({ title: { default: 'Section' } }),
+  parseHTML: () => [{ tag: 'div[data-section-break="continuous"]' }],
+  renderHTML: ({ node }) => ['div', { 'data-section-break': 'continuous', 'data-section-title': String(node.attrs.title || 'Section') }],
+})
+
+const SectionBreakNextPage = Node.create({
+  name: 'sectionBreakNextPage',
+  group: 'block',
+  atom: true,
+  addAttributes: () => ({ title: { default: 'New Section' } }),
+  parseHTML: () => [{ tag: 'div[data-section-break="next-page"]' }],
+  renderHTML: ({ node }) => ['div', { 'data-section-break': 'next-page', 'data-page-break': 'true', 'data-section-title': String(node.attrs.title || 'New Section') }],
+})
+
 const Footnote = Node.create({
   name: 'footnote', group: 'block', atom: true,
   addAttributes: () => ({ number: { default: 1 }, text: { default: '' } }),
@@ -66,17 +93,110 @@ const Footnote = Node.create({
 
 function LayoutImageView({ node, selected, updateAttributes, editor }: NodeViewProps) {
   const editable = useEditorState({ editor, selector: ({ editor: currentEditor }) => currentEditor.isEditable })
-  return <NodeViewWrapper as="figure" className={`layout-image ${selected ? 'selected' : ''}`} data-placement={node.attrs.placement} contentEditable={false}>
-    <img src={node.attrs.src} alt={node.attrs.alt || node.attrs.caption || ''} title={node.attrs.title || node.attrs.caption || ''} />
+  const intrinsicWidth = Number(node.attrs.width) || 640
+  const intrinsicHeight = Number(node.attrs.height) || 360
+  return <NodeViewWrapper as="figure" className={`layout-image ${selected ? 'selected' : ''}`} data-placement={node.attrs.placement} data-intrinsic-reserved="true" contentEditable={false}>
+    <img src={node.attrs.src} width={intrinsicWidth} height={intrinsicHeight} style={{ aspectRatio: `${intrinsicWidth} / ${intrinsicHeight}` }} alt={node.attrs.alt || node.attrs.caption || ''} title={node.attrs.title || node.attrs.caption || ''} onLoad={(event) => {
+      const img = event.currentTarget
+      if (img.naturalWidth > 0 && img.naturalHeight > 0 && (!node.attrs.width || !node.attrs.height) && editor.isEditable) {
+        updateAttributes({ width: img.naturalWidth, height: img.naturalHeight })
+      }
+    }} />
     <input className="editable-image-caption" aria-label="Image caption" value={node.attrs.caption || ''} readOnly={!editable} placeholder="Add an image caption…" onChange={(event) => { if (editor.isEditable) updateAttributes({ caption: event.target.value, alt: event.target.value, title: event.target.value }) }} />
   </NodeViewWrapper>
 }
 
 const LayoutImage = TiptapImage.extend({
   addAttributes() {
-    return { ...this.parent?.(), placement: { default: 'block', parseHTML: (element) => element.getAttribute('data-placement') || 'block', renderHTML: (attributes) => ({ 'data-placement': attributes.placement }) }, caption: { default: '', parseHTML: (element) => element.getAttribute('data-caption') || '', renderHTML: (attributes) => ({ 'data-caption': attributes.caption, title: attributes.caption || undefined, 'aria-label': attributes.caption || undefined }) } }
+    return {
+      ...this.parent?.(),
+      width: { default: 640, parseHTML: (el) => Number(el.getAttribute('width')) || 640, renderHTML: (attrs) => ({ width: attrs.width || 640 }) },
+      height: { default: 360, parseHTML: (el) => Number(el.getAttribute('height')) || 360, renderHTML: (attrs) => ({ height: attrs.height || 360 }) },
+      placement: { default: 'block', parseHTML: (element) => element.getAttribute('data-placement') || 'block', renderHTML: (attributes) => ({ 'data-placement': attributes.placement }) },
+      caption: { default: '', parseHTML: (element) => element.getAttribute('data-caption') || '', renderHTML: (attributes) => ({ 'data-caption': attributes.caption, title: attributes.caption || undefined, 'aria-label': attributes.caption || undefined }) },
+    }
   },
   addNodeView() { return ReactNodeViewRenderer(LayoutImageView) },
+})
+
+const VideoBlock = Node.create({
+  name: 'videoBlock',
+  group: 'block',
+  atom: true,
+  addAttributes: () => ({
+    src: { default: '' },
+    poster: { default: '' },
+    caption: { default: '' },
+    fit: { default: 'contain' },
+    muted: { default: true },
+    width: { default: 640 },
+    height: { default: 360 },
+  }),
+  parseHTML: () => [{ tag: 'figure[data-video-block]' }],
+  renderHTML: ({ node }) => [
+    'figure',
+    {
+      'data-video-block': 'true',
+      'data-intrinsic-reserved': 'true',
+      'data-fit': String(node.attrs.fit || 'contain'),
+      style: `aspect-ratio:${Number(node.attrs.width) || 640}/${Number(node.attrs.height) || 360};min-height:180px`,
+    },
+    ['video', { src: String(node.attrs.src || ''), poster: node.attrs.poster ? String(node.attrs.poster) : undefined, controls: 'true', muted: node.attrs.muted !== false ? 'true' : undefined, preload: 'metadata', style: `width:100%;height:auto;object-fit:${String(node.attrs.fit || 'contain')}` }],
+    ['figcaption', {}, String(node.attrs.caption || 'Embedded video block (intrinsic box reserved)')],
+  ],
+})
+
+const Model3DBlock = Node.create({
+  name: 'model3DBlock',
+  group: 'block',
+  atom: true,
+  addAttributes: () => ({
+    src: { default: '' },
+    extension: { default: 'glb' },
+    title: { default: '3D Model Asset' },
+    caption: { default: '' },
+    cameraPreset: { default: 'perspective' },
+    width: { default: 640 },
+    height: { default: 380 },
+  }),
+  parseHTML: () => [{ tag: 'figure[data-model3d-block]' }],
+  renderHTML: ({ node }) => [
+    'figure',
+    {
+      'data-model3d-block': 'true',
+      'data-intrinsic-reserved': 'true',
+      'data-model-src': String(node.attrs.src || ''),
+      'data-camera-preset': String(node.attrs.cameraPreset || 'perspective'),
+      style: `aspect-ratio:${Number(node.attrs.width) || 640}/${Number(node.attrs.height) || 380};min-height:220px`,
+    },
+    ['div', { class: 'document-model3d-poster' }, `⬡ 3D Viewport: ${String(node.attrs.title || '3D Model Asset')} (${String(node.attrs.extension || 'glb').toUpperCase()} · Camera: ${String(node.attrs.cameraPreset || 'perspective')})`],
+    ['figcaption', {}, String(node.attrs.caption || '')],
+  ],
+})
+
+const PdfEmbedBlock = Node.create({
+  name: 'pdfEmbedBlock',
+  group: 'block',
+  atom: true,
+  addAttributes: () => ({
+    src: { default: '' },
+    title: { default: 'Embedded PDF' },
+    pageRange: { default: '1' },
+    caption: { default: '' },
+    width: { default: 612 },
+    height: { default: 792 },
+  }),
+  parseHTML: () => [{ tag: 'figure[data-pdf-embed]' }],
+  renderHTML: ({ node }) => [
+    'figure',
+    {
+      'data-pdf-embed': 'true',
+      'data-intrinsic-reserved': 'true',
+      'data-page-range': String(node.attrs.pageRange || '1'),
+    },
+    ['div', { class: 'document-pdf-embed-card' }, `📄 PDF Embed: ${String(node.attrs.title || 'Embedded PDF')} (Pages: ${String(node.attrs.pageRange || '1')})`],
+    ['figcaption', {}, String(node.attrs.caption || '')],
+  ],
 })
 
 export type DocumentWorkspaceViewSnapshot = {
@@ -136,19 +256,6 @@ function documentOutline(content: JSONContent): OutlineEntry[] {
   return entries
 }
 
-function layoutNodeCounts(content: JSONContent) {
-  const counts = { images: 0, tables: 0, footnotes: 0, pageBreaks: 0 }
-  const visit = (node: JSONContent) => {
-    if (node.type === 'image') counts.images += 1
-    if (node.type === 'table') counts.tables += 1
-    if (node.type === 'footnote') counts.footnotes += 1
-    if (node.type === 'pageBreak') counts.pageBreaks += 1
-    node.content?.forEach(visit)
-  }
-  visit(content)
-  return counts
-}
-
 function documentSvg(html: string, width = 1200, height = 900) {
   const safeHtml = html.replace(/<script[\s\S]*?<\/script>/gi, '')
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#f6f1e8"/><foreignObject x="48" y="42" width="${width - 96}" height="${height - 84}"><div xmlns="http://www.w3.org/1999/xhtml" style="box-sizing:border-box;width:100%;height:100%;overflow:hidden;padding:0;color:#25221f;background:#f6f1e8;font:400 16px/1.62 Inter,Arial,sans-serif;">${safeHtml}</div></foreignObject></svg>`
@@ -162,9 +269,11 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
   const focusWritingChangeRef = useRef(onFocusWritingChange)
   focusWritingChangeRef.current = onFocusWritingChange
   const syncingContentRef = useRef(false)
+  const lastEmittedContentRef = useRef<Record<string, unknown> | null>(null)
   const retainedSelectionRef = useRef<{ from: number; to: number } | null>(null)
   const [showMore, setShowMore] = useState(false)
   const paneRef = useRef<HTMLElement>(null)
+  const paginatedLayerRef = useRef<HTMLDivElement>(null)
   const moreButtonRef = useRef<HTMLButtonElement>(null)
   const moreMenuRef = useRef<HTMLDivElement>(null)
   const moreInitialEndRef = useRef(false)
@@ -173,14 +282,19 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
   const [exportStatus, setExportStatus] = useState('')
   const [displayMode, setDisplayMode] = useState<'pages' | 'flow'>('pages')
   const [showOutline, setShowOutline] = useState(false)
+  const [navigatorTab, setNavigatorTab] = useState<'outline' | 'pages'>('outline')
+  const [activePageIndex, setActivePageIndex] = useState(0)
   const [showInspector, setShowInspector] = useState(false)
   const [focusMode, setFocusMode] = useState(false)
+  const [domMeasuredPages, setDomMeasuredPages] = useState(1)
   const viewRef = useRef({ showOutline, showInspector, focusMode })
   viewRef.current = { showOutline, showInspector, focusMode }
   const focusRestoreRef = useRef<{ showOutline: boolean; showInspector: boolean } | null>(null)
   const [fontCatalog, setFontCatalog] = useState<FontCatalog>(UNVERIFIED_FONT_CATALOG)
   const [, setEditorRevision] = useState(0)
-  const outline = documentOutline(content as JSONContent)
+  const [docContentRevision, setDocContentRevision] = useState(0)
+  const outline = useMemo(() => documentOutline(content as JSONContent), [content])
+
   const editor = useEditor({
     immediatelyRender: false,
     editable: !readOnly,
@@ -205,12 +319,20 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
       TableKit.configure({ table: { resizable: true } }),
       LayoutImage.configure({ allowBase64: false, resize: { enabled: true } }),
       PageBreak,
+      BlankPage,
+      SectionBreakContinuous,
+      SectionBreakNextPage,
       Footnote,
+      VideoBlock,
+      Model3DBlock,
+      PdfEmbedBlock,
     ],
     content: content as JSONContent,
     onUpdate: ({ editor: currentEditor }) => {
       if (readOnlyRef.current) return
-      const nextContent = currentEditor.getJSON()
+      const nextContent = currentEditor.getJSON() as Record<string, unknown>
+      lastEmittedContentRef.current = nextContent
+      setDocContentRevision((rev) => rev + 1)
       onChange(nextContent)
     },
     onSelectionUpdate: ({ editor: currentEditor }) => {
@@ -223,7 +345,10 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
         if (!currentEditor.isDestroyed && currentEditor.isFocused && activeRef.current) currentEditor.commands.setTextSelection(retained)
       })
     },
-    onTransaction: () => setEditorRevision((revision) => revision + 1),
+    onTransaction: ({ transaction }) => {
+      if (transaction.docChanged) setDocContentRevision((rev) => rev + 1)
+      setEditorRevision((revision) => revision + 1)
+    },
     editorProps: { attributes: { class: 'document-editor', spellcheck: 'true', role: 'textbox', 'aria-label': 'Project document text', 'aria-multiline': 'true', 'aria-readonly': String(readOnly), tabindex: '0' } },
   })
 
@@ -313,12 +438,16 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
   }, [editor, readOnly])
 
   useEffect(() => {
-    if (editor && JSON.stringify(editor.getJSON()) !== JSON.stringify(content)) {
+    if (!editor || content === lastEmittedContentRef.current) return
+    if (JSON.stringify(editor.getJSON()) !== JSON.stringify(content)) {
       // Parent content remains authoritative, including a different document
       // opened while this workspace is read-only. This never invokes onChange.
       syncingContentRef.current = true
       // Synchronizing authoritative props is hydration, not a user edit.
-      try { editor.chain().setMeta('addToHistory', false).setContent(content as JSONContent, { emitUpdate: false }).run() }
+      try {
+        editor.chain().setMeta('addToHistory', false).setContent(content as JSONContent, { emitUpdate: false }).run()
+        setDocContentRevision((rev) => rev + 1)
+      }
       finally { syncingContentRef.current = false }
     }
   }, [editor, content])
@@ -393,18 +522,37 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
     }
   }
 
+  const pagination = useMemo(() => {
+    const currentJson = editor && !editor.isDestroyed ? editor.getJSON() : (content as JSONContent)
+    return solveDocumentPagination(currentJson, layout, docContentRevision + 1)
+  }, [editor, content, layout, docContentRevision])
+
+  useLayoutEffect(() => {
+    if (displayMode !== 'pages') return
+    const layer = paginatedLayerRef.current
+    const editorEl = layer?.querySelector<HTMLElement>('.document-editor')
+    if (!editorEl) return
+    const measureOverflow = () => {
+      const stride = pagination.pageWidthPx + 26
+      if (stride <= 0) return
+      const scrollW = editorEl.scrollWidth
+      const measured = Math.max(1, Math.ceil((scrollW + 12) / stride))
+      setDomMeasuredPages((prev) => (prev === measured ? prev : measured))
+    }
+    measureOverflow()
+    const observer = new ResizeObserver(measureOverflow)
+    observer.observe(editorEl)
+    return () => observer.disconnect()
+  }, [displayMode, pagination.pageWidthPx, pagination.pageHeightPx, docContentRevision])
+
   if (!editor) return null
 
-  const documentText = editor.getText().trim()
-  const wordCount = documentText ? documentText.split(/\s+/).length : 0
-  const layoutCounts = layoutNodeCounts(editor.getJSON())
-  const automaticPageCount = Math.max(1, Math.ceil((wordCount + layoutCounts.images * 280 + layoutCounts.tables * 180 + layoutCounts.footnotes * 70) / (layout.columns === 2 ? 860 : 620)))
-  const pageCount = Math.max(automaticPageCount, layoutCounts.pageBreaks + 1)
-  const pageDimensions = layout.pageSize === 'a4' ? [794, 1123] : layout.pageSize === 'screen' ? [920, 1080] : [816, 1056]
-  const [portraitWidth, portraitHeight] = pageDimensions
-  const pageWidth = layout.orientation === 'landscape' ? portraitHeight : portraitWidth
-  const pageHeight = layout.orientation === 'landscape' ? portraitWidth : portraitHeight
-  const pagePadding = layout.margins === 'compact' ? 42 : layout.margins === 'wide' ? 92 : 68
+  const wordCount = pagination.wordCount
+  const pageCount = Math.max(pagination.pages.length, displayMode === 'pages' ? domMeasuredPages : 1)
+  const clampedActivePage = Math.min(activePageIndex, Math.max(0, pageCount - 1))
+  const pageWidth = pagination.pageWidthPx
+  const pageHeight = pagination.pageHeightPx
+  const pagePadding = pagination.marginPx
   const pageStyle = {
     '--document-page-width': `${pageWidth}px`,
     '--document-page-height': `${pageHeight}px`,
@@ -448,6 +596,28 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
     window.setTimeout(() => heading?.classList.remove('outline-flash'), 900)
   }
 
+  function navigateToPageSheet(pageIndex: number) {
+    const bounded = Math.max(0, Math.min(pageCount - 1, pageIndex))
+    setActivePageIndex(bounded)
+    const sheet = paneRef.current?.querySelectorAll('.page-sheet').item(bounded)
+    sheet?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+  }
+
+  function appendAuthoredPageBreak(kind: 'pageBreak' | 'blankPage' | 'sectionBreakNextPage') {
+    if (readOnlyRef.current || !editor || editor.isDestroyed) return
+    if (kind === 'blankPage') {
+      editor.chain().focus('end').insertContent([{ type: 'blankPage' }, { type: 'paragraph' }]).run()
+    } else if (kind === 'sectionBreakNextPage') {
+      editor.chain().focus('end').insertContent([
+        { type: 'sectionBreakNextPage', attrs: { title: `Section ${pagination.counts.sectionBreaks + 2}` } },
+        { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: `Section ${pagination.counts.sectionBreaks + 2}` }] },
+        { type: 'paragraph' },
+      ]).run()
+    } else {
+      editor.chain().focus('end').insertContent([{ type: 'pageBreak' }, { type: 'paragraph' }]).run()
+    }
+  }
+
   async function insertFootnote() {
     if (readOnlyRef.current) return
     const footnoteText = (await onRequestText({ title: 'Insert footnote', label: 'Footnote text' }))?.trim()
@@ -462,7 +632,35 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
     if (!src || readOnlyRef.current || editor?.isDestroyed) return
     const caption = await onRequestText({ title: 'Image caption', label: 'Caption (optional)' }) || ''
     if (readOnlyRef.current || editor?.isDestroyed) return
-    editor!.chain().focus().setImage({ src }).updateAttributes('image', { caption, placement: 'block' }).run()
+    editor!.chain().focus().setImage({ src }).updateAttributes('image', { caption, placement: 'block', width: 640, height: 360 }).run()
+  }
+
+  async function insertVideoBlock() {
+    if (readOnlyRef.current) return
+    const src = (await onRequestText({ title: 'Insert video block', label: 'Video URL or local asset path', initialValue: 'https://' }))?.trim()
+    if (!src || readOnlyRef.current || editor?.isDestroyed) return
+    const caption = (await onRequestText({ title: 'Video caption', label: 'Caption (optional)' })) || ''
+    if (readOnlyRef.current || editor?.isDestroyed) return
+    editor!.chain().focus().insertContent({ type: 'videoBlock', attrs: { src, caption, fit: 'contain', muted: true, width: 640, height: 360 } }).run()
+  }
+
+  async function insertModel3DBlock() {
+    if (readOnlyRef.current) return
+    const src = (await onRequestText({ title: 'Insert 3D model block', label: 'glTF / GLB / OBJ asset URL', initialValue: 'https://' }))?.trim()
+    if (!src || readOnlyRef.current || editor?.isDestroyed) return
+    const ext = src.split('.').pop()?.toLowerCase() || 'glb'
+    const caption = (await onRequestText({ title: '3D viewport caption', label: 'Caption (optional)' })) || ''
+    if (readOnlyRef.current || editor?.isDestroyed) return
+    editor!.chain().focus().insertContent({ type: 'model3DBlock', attrs: { src, extension: ext, title: src.split('/').pop() || '3D Asset', caption, cameraPreset: 'perspective', width: 640, height: 380 } }).run()
+  }
+
+  async function insertPdfEmbedBlock() {
+    if (readOnlyRef.current) return
+    const src = (await onRequestText({ title: 'Embed PDF pages', label: 'PDF asset URL or path', initialValue: 'https://' }))?.trim()
+    if (!src || readOnlyRef.current || editor?.isDestroyed) return
+    const pageRange = (await onRequestText({ title: 'PDF page range', label: 'Page or range (e.g. 1, 1-3, all)', initialValue: '1' }))?.trim() || '1'
+    if (readOnlyRef.current || editor?.isDestroyed) return
+    editor!.chain().focus().insertContent({ type: 'pdfEmbedBlock', attrs: { src, title: src.split('/').pop() || 'Document.pdf', pageRange, width: 612, height: 792 } }).run()
   }
 
   async function exportHtml() {
@@ -540,7 +738,7 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
           else if (rect.right > right) controls.scrollLeft += Math.ceil(rect.right - right)
         }}>
         <div className="segmented-control" aria-label="Document display"><button className={displayMode === 'pages' ? 'active' : ''} title="Compose using the selected paper size and margins" aria-pressed={displayMode === 'pages'} type="button" onClick={() => setDisplayMode('pages')}>Pages</button><button className={displayMode === 'flow' ? 'active' : ''} title="Use one continuous writing surface" aria-pressed={displayMode === 'flow'} type="button" onClick={() => setDisplayMode('flow')}>Flow</button></div>
-        <button className={`format-button outline-button ${showOutline ? 'active' : ''}`} type="button" title="Navigate document headings" aria-label="Toggle document outline" aria-expanded={showOutline} onClick={toggleOutline}>☷</button>
+        <button className={`format-button outline-button ${showOutline ? 'active' : ''}`} type="button" title="Navigate document headings and derived pages" aria-label="Toggle document outline" aria-expanded={showOutline} onClick={toggleOutline}>☷</button>
         <span className="toolbar-separator" />
         <select disabled={readOnly} aria-label="Paragraph style" value={activeParagraphStyle} onChange={(event) => setParagraphStyle(event.target.value)}>
           <option value="body">Body</option><option value="1">Heading 1</option><option value="2">Heading 2</option><option value="3">Heading 3</option><option value="caption">Caption</option>
@@ -577,7 +775,13 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().toggleBlockquote().run()}>❝ Quotation</button>
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => { editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(); setShowMore(false) }}>▦ Insert table</button>
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={insertImage}>▧ Insert image</button>
+          <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={insertVideoBlock}>▶ Insert video block</button>
+          <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={insertModel3DBlock}>⬡ Insert 3D model block</button>
+          <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={insertPdfEmbedBlock}>📄 Embed PDF page range</button>
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().insertContent({ type: 'pageBreak' }).run()}>↵ Page break</button>
+          <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().insertContent({ type: 'blankPage' }).run()}>▢ Insert blank page</button>
+          <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().insertContent({ type: 'sectionBreakNextPage', attrs: { title: 'New Section' } }).run()}>§ Section break (next page)</button>
+          <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().insertContent({ type: 'sectionBreakContinuous', attrs: { title: 'Continuous Section' } }).run()}>§ Section break (continuous)</button>
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={insertFootnote}>¹ Insert footnote</button>
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={setLink}>↗ Link</button>
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().toggleHighlight({ color: '#f2d68a' }).run()}>▰ Highlight</button>
@@ -585,7 +789,7 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().toggleSubscript().run()}>x₂ Subscript</button>
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().setMark('textStyle', { lineHeight: activeLineHeight === '1.8' ? '1.45' : '1.8' }).run()}>↕ {activeLineHeight === '1.8' ? 'Compact leading' : 'Relaxed leading'}</button>
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().setMark('textStyle', { letterSpacing: '.04em' }).run()}>↔ Add tracking</button>
-          {editor.isActive('image') && <><button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().updateAttributes('image', { placement: 'left' }).run()}>Image wrap left</button><button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().updateAttributes('image', { placement: 'right' }).run()}>Image wrap right</button><button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().updateAttributes('image', { placement: 'block' }).run()}>Image full width</button></>}
+          {editor.isActive('image') && <><button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().updateAttributes('image', { placement: 'left' }).run()}>Image wrap left</button><button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().updateAttributes('image', { placement: 'right' }).run()}>Image wrap right</button><button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().updateAttributes('image', { placement: 'inline' }).run()}>Image inline</button><button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().updateAttributes('image', { placement: 'anchored' }).run()}>Image anchored</button><button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().updateAttributes('image', { placement: 'block' }).run()}>Image full width</button></>}
           <button disabled={readOnly} type="button" role="menuitem" tabIndex={-1} onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}>⌫ Clear selection formatting</button>
           <span role="separator" />
           <button disabled={!active || readOnly || !editor.can().undo()} type="button" role="menuitem" tabIndex={-1} onClick={() => applyHistory('undo')}>↶ Undo text</button>
@@ -599,11 +803,122 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
         </div></div>, document.body)}
       </div>
       <div className={`document-stage document-${displayMode} document-theme-${layout.theme} ${showInspector ? 'layout-inspector-open' : ''} ${focusMode ? 'document-focus-mode' : ''}`} style={pageStyle}>
-        {showOutline && <nav className="document-outline" aria-label="Document outline"><header><strong>Outline</strong><span>{outline.length} sections</span></header>{outline.length ? outline.map((entry, index) => <button type="button" className={`outline-level-${entry.level}`} key={`${entry.label}-${index}`} onClick={() => navigateToHeading(index)}>{entry.label}</button>) : <p>Add headings to navigate this document.</p>}</nav>}
+        {displayMode === 'pages' && !focusMode && (
+          <div className="document-page-bar" role="region" aria-label="Document pages navigation">
+            <div className="document-page-bar-summary">
+              <strong>Page {String(clampedActivePage + 1).padStart(2, '0')} of {String(pageCount).padStart(2, '0')}</strong>
+              <span>{pagination.pages[clampedActivePage]?.sectionId.toUpperCase() || 'SEC-1'} · {layout.pageSize.toUpperCase()} {layout.orientation}</span>
+            </div>
+            <div className="document-page-pills" role="group" aria-label="Derived page sheets">
+              <button
+                type="button"
+                disabled={clampedActivePage <= 0}
+                onClick={() => navigateToPageSheet(clampedActivePage - 1)}
+                title="Previous page sheet"
+              >
+                ‹ Prev
+              </button>
+              {Array.from({ length: pageCount }, (_, index) => {
+                const slice = pagination.pages[index]
+                const badge = slice?.isBlankPage ? 'Blank' : slice?.hasExplicitBreak ? 'Break' : 'Auto'
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    className={`document-page-pill ${clampedActivePage === index ? 'active' : ''}`}
+                    aria-current={clampedActivePage === index ? 'page' : undefined}
+                    onClick={() => navigateToPageSheet(index)}
+                    title={`Jump to Page ${index + 1} (${badge})`}
+                  >
+                    <span>P{index + 1}</span>
+                    <small>{badge}</small>
+                  </button>
+                )
+              })}
+              <button
+                type="button"
+                disabled={clampedActivePage >= pageCount - 1}
+                onClick={() => navigateToPageSheet(clampedActivePage + 1)}
+                title="Next page sheet"
+              >
+                Next ›
+              </button>
+            </div>
+            <div className="document-page-bar-actions">
+              <button
+                type="button"
+                disabled={readOnly}
+                onClick={() => appendAuthoredPageBreak('pageBreak')}
+                title="Insert authored page break to start a new page sheet"
+              >
+                ＋ Add Page
+              </button>
+              <button
+                type="button"
+                disabled={readOnly}
+                onClick={() => appendAuthoredPageBreak('blankPage')}
+                title="Insert an explicit blank page into the story"
+              >
+                ＋ Blank Page
+              </button>
+              <button
+                type="button"
+                disabled={readOnly}
+                onClick={() => appendAuthoredPageBreak('sectionBreakNextPage')}
+                title="Insert a next-page section break"
+              >
+                ＋ Section
+              </button>
+            </div>
+          </div>
+        )}
+        {showOutline && (
+          <nav className="document-outline" aria-label="Document outline">
+            <header>
+              <strong>{navigatorTab === 'outline' ? 'Outline' : 'Derived Pages'}</strong>
+              <span>{navigatorTab === 'outline' ? `${outline.length} sections` : `${pageCount} pages`}</span>
+            </header>
+            <div className="segmented-control" style={{ marginBottom: 8 }} aria-label="Document navigator view">
+              <button type="button" className={navigatorTab === 'outline' ? 'active' : ''} aria-pressed={navigatorTab === 'outline'} onClick={() => setNavigatorTab('outline')}>Outline</button>
+              <button type="button" className={navigatorTab === 'pages' ? 'active' : ''} aria-pressed={navigatorTab === 'pages'} onClick={() => setNavigatorTab('pages')}>Pages ({pageCount})</button>
+            </div>
+            {navigatorTab === 'outline' ? (
+              outline.length ? outline.map((entry, index) => <button type="button" className={`outline-level-${entry.level}`} key={`${entry.label}-${index}`} onClick={() => navigateToHeading(index)}>{entry.label}</button>) : <p>Add headings to navigate this document.</p>
+            ) : (
+              <div className="document-derived-pages-list">
+                {pagination.pages.map((slice) => (
+                  <button
+                    type="button"
+                    key={slice.pageIndex}
+                    className={`derived-page-card ${clampedActivePage === slice.pageIndex ? 'active' : ''}`}
+                    onClick={() => navigateToPageSheet(slice.pageIndex)}
+                    title={`Page ${slice.pageNumber} · Section ${slice.sectionIndex + 1} · ${Math.round(slice.utilization * 100)}% full`}
+                  >
+                    <strong>Page {String(slice.pageNumber).padStart(2, '0')}</strong>
+                    <small>
+                      {slice.sectionId.toUpperCase()}
+                      {slice.isBlankPage ? ' · Blank' : slice.hasExplicitBreak ? ' · Manual Break' : ' · Derived'}
+                    </small>
+                  </button>
+                ))}
+                {!readOnly && (
+                  <button
+                    type="button"
+                    className="derived-page-add-btn"
+                    onClick={() => appendAuthoredPageBreak('pageBreak')}
+                    title="Insert authored page break after current content"
+                  >
+                    + Add Page Break After
+                  </button>
+                )}
+              </div>
+            )}
+          </nav>
+        )}
         <article className={`paper ${displayMode === 'pages' ? 'paginated-paper' : ''}`} aria-label={`${readOnly ? 'Read-only' : 'Editable'} project brief, ${pageCount} page${pageCount === 1 ? '' : 's'}`}>
           {displayMode === 'pages' ? <>
             <div className="page-sheet-stack" aria-hidden="true">{Array.from({ length: pageCount }, (_, index) => <div className="page-sheet" style={{ left: `calc(${index} * (var(--document-page-width) + 26px))` }} key={index}><header className="paper-header"><span>{layout.headerText || 'ART EQUATION / PROJECT BRIEF'}</span><span>{layout.showPageNumber === false ? '' : String(index + 1).padStart(2, '0')}</span></header><footer className="paper-footer"><span>{layout.footerText || 'Art Equation Studio'}</span><span>{layout.showPageNumber === false ? '' : String(index + 1).padStart(2, '0')}</span></footer></div>)}</div>
-            <div className="paginated-editor-layer"><EditorContent editor={editor} /></div>
+            <div ref={paginatedLayerRef} className="paginated-editor-layer"><EditorContent editor={editor} /></div>
           </> : <><header className="paper-header"><span>{layout.headerText || 'ART EQUATION / PROJECT BRIEF'}</span><span>{layout.showPageNumber === false ? '' : '01'}</span></header><EditorContent editor={editor} /><footer className="paper-footer"><span>{layout.footerText || 'Art Equation Studio'}</span><span>{layout.showPageNumber === false ? '' : '01'}</span></footer></>}
         </article>
         {showInspector && <aside className="document-layout-inspector" aria-label="Page layout and document statistics">
@@ -612,7 +927,12 @@ export function RichDocument({ content, layout, readOnly = false, active = true,
           <section><label><span>Margins</span><select disabled={readOnly} value={layout.margins} onChange={(event) => changeLayout({ ...layout, margins: event.target.value as DocumentLayout['margins'] })}><option value="compact">Compact</option><option value="standard">Standard</option><option value="wide">Editorial wide</option></select></label><label><span>Text columns</span><select disabled={readOnly} value={layout.columns} onChange={(event) => changeLayout({ ...layout, columns: Number(event.target.value) as 1 | 2 })}><option value="1">One column</option><option value="2">Two columns</option></select></label></section>
           <section><label><span>Writing surface</span><select disabled={readOnly} value={layout.theme} onChange={(event) => changeLayout({ ...layout, theme: event.target.value as DocumentLayout['theme'] })}><option value="paper">Warm paper</option><option value="night">Night manuscript</option></select></label><label><span>Selected leading</span><select disabled={readOnly} value={activeLineHeight} onChange={(event) => editor.chain().focus().setMark('textStyle', { lineHeight: event.target.value }).run()}><option value="1.35">Compact</option><option value="1.45">Tight</option><option value="1.62">Standard</option><option value="1.8">Relaxed</option><option value="2">Open</option></select></label></section>
           <section className="document-running-copy"><label><span>Running header</span><input disabled={readOnly} value={layout.headerText || ''} placeholder="Project title" onChange={(event) => changeLayout({ ...layout, headerText: event.target.value })} /></label><label><span>Running footer</span><input disabled={readOnly} value={layout.footerText || ''} placeholder="Studio or chapter" onChange={(event) => changeLayout({ ...layout, footerText: event.target.value })} /></label><label className="layout-checkbox"><input disabled={readOnly} type="checkbox" checked={layout.showPageNumber !== false} onChange={(event) => changeLayout({ ...layout, showPageNumber: event.target.checked })} />Show page number</label></section>
-          <div className="document-stats"><span><strong>{wordCount.toLocaleString()}</strong>words</span><span><strong>{pageCount}</strong>pages</span><span><strong>{Math.max(1, Math.ceil(wordCount / 220))}</strong>min read</span><span><strong>{outline.length}</strong>sections</span></div>
+          <div className="document-stats"><span><strong>{wordCount.toLocaleString()}</strong>words</span><span><strong>{pageCount}</strong>pages</span><span><strong>{pagination.estimatedReadMinutes}</strong>min read</span><span><strong>{outline.length}</strong>sections</span></div>
+          {pagination.overflow.length > 0 && (
+            <p className="document-overflow-notice" role="status">
+              {pagination.overflow[0].message}
+            </p>
+          )}
           <p>Use headings for navigation. Page settings belong to this document and travel with the portable project.</p>
         </aside>}
       </div>

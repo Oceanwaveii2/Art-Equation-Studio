@@ -23,14 +23,24 @@ pub(super) fn encode_prepared_with_images(prepared: &PreparedScene, atlas: Optio
 pub(super) fn encode_prepared_with_image_pages(prepared: &PreparedScene, pages: &[(&ImageData, &AtlasPlan)]) -> Result<Scene, String> {
     let mut scene = Scene::new();
     let clip_only = clip_only_scopes(prepared)?;
+    // Pre-resolve atlas page & slot indices once per unique declared resource so
+    // the inner operation loop performs an O(1) slice index with zero String clones.
+    let resolved_slots: Vec<Option<(&ImageData, crate::image_atlas::Slot)>> = prepared
+        .resources
+        .iter()
+        .map(|res| {
+            let identity = (res.key.clone(), res.revision);
+            pages.iter().find_map(|&(page, plan)| plan.slots.get(&identity).map(|&slot| (page, slot)))
+        })
+        .collect();
     for (operation_index, operation) in prepared.operations.iter().enumerate() {
         let object = match operation {
             PreparedOp::Vector(index) => &prepared.vectors[*index],
             PreparedOp::Image(index) => {
-                let image=&prepared.images[*index];
-                let identity=(image.resource.key.clone(),image.resource.revision);
-                let (page,slot)=pages.iter().find_map(|&(page,plan)|
-                    plan.slots.get(&identity).map(|slot|(page,slot)))
+                let image = &prepared.images[*index];
+                let (page, slot) = resolved_slots
+                    .get(image.resource_index)
+                    .and_then(|entry| *entry)
                     .ok_or("RESOURCE_NOT_READY: GPU image slot missing from native pages")?;
                 scene.fill(Fill::NonZero, image.transform,
                     &ImageBrush::new(page.clone()).with_quality(image.quality).with_alpha(image.opacity),
