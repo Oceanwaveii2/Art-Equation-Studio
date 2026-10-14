@@ -2662,7 +2662,7 @@
   font-size: 11.5px;
 }
 .document-page-bar-summary span {
-  color: #94a3b8;
+  color: #cbd5e1;
   font-size: 9.5px;
   letter-spacing: 0.05em;
 }
@@ -2702,8 +2702,11 @@
   color: #f8e5cc !important;
 }
 .document-page-pill small {
-  font-size: 8px;
-  color: #94a3b8;
+  font-size: 8.5px;
+  color: inherit;
+}
+.document-page-pill.active small {
+  color: #fce7cf;
 }
 .document-page-bar-actions {
   display: flex;

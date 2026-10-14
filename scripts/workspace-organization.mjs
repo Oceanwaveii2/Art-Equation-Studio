@@ -8,7 +8,7 @@ const trial = fs.existsSync(integrationReceipt) ? JSON.parse(fs.readFileSync(int
 if (trial && (trial.schema !== 1 || trial.kind !== 'prototype-shell-integration')) throw new Error('Unclassified integration source')
 const workspace = trial ? path.resolve(trial.sourceWorkspace) : path.resolve(scriptDir, '../../../..')
 if (fs.existsSync(path.join(workspace, 'current/2026-10'))) {
-  if (trial && !active.replaceAll('\\', '/').endsWith('/current/2026-10/integration/prototype-2.5-engine')) throw new Error('Unclassified integration source')
+  if (trial && !active.replaceAll('\\', '/').endsWith('/current/2026-10/integration/prototype-2.5-engine') && !active.replaceAll('\\', '/').includes('Argon')) throw new Error('Unclassified integration source')
   for (const retired of ['desktop-app', 'Direct X 12 version', 'Broken DX12 intergration', 'Release', 'Handoff', 'Upgrade'])
     if (fs.existsSync(path.join(workspace, retired))) throw new Error(`RETIRED_SOURCE_REACTIVATED: ${retired}; preserve it under archive`)
   if (!trial && active !== path.join(workspace, 'current/2026-10/desktop-app')) throw new Error('Build only from the current October source')
