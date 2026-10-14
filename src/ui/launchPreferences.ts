@@ -42,3 +42,18 @@ export function useLaunchPreferences() {
 export type LaunchLayout = 'milinotes'|'graphing'|'advanced-split'
 export function readLaunchLayout():LaunchLayout {try{const value=localStorage.getItem('art-equation:launch-layout:v1');if(value==='graphing'||value==='advanced-split')return value}catch{}return 'milinotes'}
 export function saveLaunchLayout(value:LaunchLayout){try{localStorage.setItem('art-equation:launch-layout:v1',value)}catch{}}
+
+export type CanvasUiPersonality = 'classical' | 'milanote'
+export function readCanvasUiPersonality(): CanvasUiPersonality {
+  try {
+    const value = localStorage.getItem('art-equation:canvas-ui-personality:v1')
+    if (value === 'classical' || value === 'milanote') return value
+  } catch {}
+  return 'classical'
+}
+export function saveCanvasUiPersonality(value: CanvasUiPersonality) {
+  try {
+    localStorage.setItem('art-equation:canvas-ui-personality:v1', value)
+  } catch {}
+}
+

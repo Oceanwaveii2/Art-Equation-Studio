@@ -1,0 +1,185 @@
+/* Milanote Vertical Creation Tool Rail */
+.milanote-tool-rail {
+  position: absolute;
+  left: 10px;
+  top: 12px;
+  bottom: 12px;
+  width: 54px;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 4px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: visible;
+  scrollbar-width: none;
+  user-select: none;
+  
+  /* Default Milanote Dark Theme */
+  background: #202022f2;
+  border: 1px solid #38383e;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  color: #d1d5db;
+}
+
+.milanote-tool-rail::-webkit-scrollbar {
+  display: none;
+}
+
+/* Navy Theme Adaptations */
+.studio-shell.workspace-navy .milanote-tool-rail,
+.workspace-navy .milanote-tool-rail {
+  background: #141822f2;
+  border-color: #2d3748;
+  color: #cbd5e1;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Light Theme Adaptations */
+.studio-shell.workspace-light .milanote-tool-rail,
+.workspace-light .milanote-tool-rail {
+  background: #fffffffa;
+  border-color: #e5e7eb;
+  color: #374151;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+.milanote-tool-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.milanote-tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 44px;
+  padding: 3px 2px;
+  margin: 1px 0;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.milanote-icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.milanote-label {
+  font-size: 9.5px;
+  font-weight: 500;
+  line-height: 1.1;
+  margin-top: 2px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.milanote-tool-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.workspace-light .milanote-tool-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.milanote-tool-btn:focus-visible {
+  outline: 2px solid var(--focus-ring, #79c9ff);
+  outline-offset: 1px;
+}
+
+.milanote-tool-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Active Highlight */
+.milanote-tool-btn.active {
+  background: #4763b7 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(71, 99, 183, 0.4);
+}
+
+.workspace-navy .milanote-tool-btn.active {
+  background: #2563eb !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+}
+
+.workspace-light .milanote-tool-btn.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+/* 3D DCC Accent */
+.milanote-dcc-btn {
+  color: #f59e0b;
+}
+.milanote-dcc-btn:hover:not(:disabled) {
+  color: #fbbf24;
+}
+
+/* Separator */
+.milanote-tool-separator {
+  width: 28px;
+  height: 1px;
+  background: #38383e;
+  margin: 4px 0;
+  flex-shrink: 0;
+}
+
+.workspace-navy .milanote-tool-separator {
+  background: #2d3748;
+}
+
+.workspace-light .milanote-tool-separator {
+  background: #e5e7eb;
+}
+
+/* Bottom Trash Button */
+.milanote-tool-bottom {
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.milanote-trash-btn:hover:not(:disabled) {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* Responsive Handling in Split or Narrow Panes */
+@media (max-width: 640px) {
+  .milanote-tool-rail {
+    width: 44px;
+    padding: 4px 2px;
+  }
+  .milanote-tool-btn {
+    width: 38px;
+    height: 38px;
+  }
+  .milanote-label {
+    display: none;
+  }
+  .milanote-icon {
+    width: 18px;
+    height: 18px;
+  }
+}

@@ -1,4 +1,5 @@
-import {readLaunchTheme,saveLaunchTheme,type LaunchLayout} from './ui/launchPreferences'
+import {readLaunchTheme,saveLaunchTheme,type LaunchLayout,readCanvasUiPersonality,saveCanvasUiPersonality,type CanvasUiPersonality} from './ui/launchPreferences'
+import { MilanoteToolRail } from './ui/MilanoteToolRail'
 import { VirtualList } from './ui/VirtualList'
 import { createToolStore, useStoreField, useControllerEvent, useBoardSelectionStore, useDocumentController } from './state/controllerStores'
 import { modelEqual } from './state/modelEquality'
@@ -186,7 +187,7 @@ import { readImageDimensions } from './board/imageDimensions'
 import type { ColorTarget } from './color/ColorPanel'
 import { createArtEquationCanvasScene } from './board/artEquationCanvasAdapter'
 import { createCanonicalVectorPicker } from './board/canonicalVectorPicking'
-import { CANVAS_THEME_COLORS, DEFAULT_CANVAS_GRID_OPACITY, readableForeground as canvasReadableForeground } from './canvasTheme'
+import { CANVAS_THEME_COLORS, MILANOTE_CANVAS_THEME_COLORS, DEFAULT_CANVAS_GRID_OPACITY, readableForeground as canvasReadableForeground } from './canvasTheme'
 import { UniformGridSpatialIndex } from './canvas-engine/spatialIndex'
 import { useGestureBoard } from './board/useGestureBoard'
 import { guardColumnRowPosition } from './board/columnRowPosition'
@@ -1366,6 +1367,11 @@ function App() {
   const [projectTrash, setProjectTrash] = useState<TrashEntry[]>([])
   const [theme, setThemeState] = useState<'navy' | 'dark' | 'light'>(()=>readLaunchTheme()||'navy')
   const setTheme=useCallback((value:'navy'|'dark'|'light')=>{saveLaunchTheme(value);setThemeState(value)},[])
+  const [canvasUiPersonality, setCanvasUiPersonalityState] = useState<CanvasUiPersonality>(() => readCanvasUiPersonality())
+  const setCanvasUiPersonality = useCallback((value: CanvasUiPersonality) => {
+    saveCanvasUiPersonality(value)
+    setCanvasUiPersonalityState(value)
+  }, [])
   useNativeWindowChrome(theme)
   const [glassStrength, setGlassStrength] = useState(0)
   const [savePolicy,setSavePolicy]=useState<SavePolicy>(defaultSavePolicy)
@@ -3883,7 +3889,7 @@ workspace: <>
           </div>}
           {showBoardCoverPicker && <div className="board-cover-picker" id="board-cover-picker"><CoverArtworkPicker key={`${activeBoard.id}-${activeBoard.coverAssetId || 'automatic'}`} title={`Board image · ${activeBoard.title}`} assets={project.assets.filter((asset) => asset.kind === 'image' && asset.status !== 'missing')} workspaceRoot={workspace?.root} selectedId={activeBoard.coverAssetId} framing={activeBoard.coverFraming} onApply={(assetId, framing) => { setBoardCover(assetId, framing); setShowBoardCoverPicker(false) }} onImport={() => void importCoverArtwork('board')} onReset={() => { setBoardCover(); setShowBoardCoverPicker(false) }} onClose={() => setShowBoardCoverPicker(false)} /><label className="board-tile-accent">Mini-board accent <input type="color" value={activeBoard.tileAccentColor || '#9ab4c8'} onChange={(event) => setProject((current) => ({ ...current, boards: current.boards.map((board) => board.id === activeBoard.id ? { ...board, tileAccentColor: event.target.value } : board) }))} /></label><small>Accent changes the board tile, not the canvas background.</small></div>}
         </nav>}
-</>} key={project.id} onFilmstripVisibilityChange={setShowCanvasFilmstrip} onSelectionChange={receiveCanvasSelection} revealRequest={revealRequest?.boardId === activeBoard.id ? revealRequest : undefined} onMoveSelection={moveBoardSelection} diagramTemplates={project.diagramTemplates || []} onSaveDiagramTemplate={saveDiagramTemplate} theme={theme}      board={activeBoard} boards={project.boards} assets={project.assets} swatches={project.colorSwatches} workspaceRoot={workspace?.root} projectId={project.id} projectName={project.title} readOnly={workspace?.readOnly} openWith={{ ...openWith, ...(project.openWith || {}) }} onOpenWith={launchAsset} onReplaceAsset={relinkAsset} onPreparePyramid={imagePreparation.prepare} onFitImageBounds={fitImageBounds} onSetColumnImageSizing={setColumnImageSizing} onBoardChange={applyBoardChange} onDerivedAsset={(asset, sourceNodeId) => setProject((current) => ({ ...current, assets: [...current.assets, asset], boards: current.boards.map((entry) => entry.id === activeBoard.id ? { ...entry, nodes: entry.nodes.map((node) => node.id === sourceNodeId ? { ...node, assetId: asset.id, title: asset.displayName, imageTransform: undefined } : node) } : entry) }))} onAddGeneratedAsset={addGeneratedAssetToBoard} onImport={importAssets} onDropFiles={importAssetPaths} onSwatchesChange={(colorSwatches) => setProject((current) => ({ ...current, colorSwatches }))} onSwitchBoard={switchBoard} onCreateBoard={() => createNavigatorItem('board')} onCreateNestedBoard={createNestedBoardInActive} onTrashBoard={deleteNavigatorBoard} onUpdateBoardTile={updateBoardTile} onEditBoardImage={(boardId) => { switchBoard(boardId); setShowBoardCoverPicker(true) }} onDuplicateBoard={duplicateActiveBoard} onDeleteBoard={deleteActiveBoard} onRenameBoard={(board) => renameNavigatorItem('board', board.id, board.title)} onReorderBoards={reorderBoards} onSetCover={setBoardCover} onSetProjectThumbnail={(assetId) => setProjectCover(assetId, DEFAULT_COVER_FRAMING)} onTrashSelection={trashCanvasSelection} onPreviewImage={(assetId) => { setPreviewZoomed(false); setPreviewAssetId(assetId) }} onUndo={undoBoard} onRedo={redoBoard} onRequestText={requestText} /><>
+</>} key={project.id} onFilmstripVisibilityChange={setShowCanvasFilmstrip} onSelectionChange={receiveCanvasSelection} revealRequest={revealRequest?.boardId === activeBoard.id ? revealRequest : undefined} onMoveSelection={moveBoardSelection} diagramTemplates={project.diagramTemplates || []} onSaveDiagramTemplate={saveDiagramTemplate} theme={theme} canvasUiPersonality={canvasUiPersonality} onOpenTrash={() => setShowTrashViewer(true)} board={activeBoard} boards={project.boards} assets={project.assets} swatches={project.colorSwatches} workspaceRoot={workspace?.root} projectId={project.id} projectName={project.title} readOnly={workspace?.readOnly} openWith={{ ...openWith, ...(project.openWith || {}) }} onOpenWith={launchAsset} onReplaceAsset={relinkAsset} onPreparePyramid={imagePreparation.prepare} onFitImageBounds={fitImageBounds} onSetColumnImageSizing={setColumnImageSizing} onBoardChange={applyBoardChange} onDerivedAsset={(asset, sourceNodeId) => setProject((current) => ({ ...current, assets: [...current.assets, asset], boards: current.boards.map((entry) => entry.id === activeBoard.id ? { ...entry, nodes: entry.nodes.map((node) => node.id === sourceNodeId ? { ...node, assetId: asset.id, title: asset.displayName, imageTransform: undefined } : node) } : entry) }))} onAddGeneratedAsset={addGeneratedAssetToBoard} onImport={importAssets} onDropFiles={importAssetPaths} onSwatchesChange={(colorSwatches) => setProject((current) => ({ ...current, colorSwatches }))} onSwitchBoard={switchBoard} onCreateBoard={() => createNavigatorItem('board')} onCreateNestedBoard={createNestedBoardInActive} onTrashBoard={deleteNavigatorBoard} onUpdateBoardTile={updateBoardTile} onEditBoardImage={(boardId) => { switchBoard(boardId); setShowBoardCoverPicker(true) }} onDuplicateBoard={duplicateActiveBoard} onDeleteBoard={deleteActiveBoard} onRenameBoard={(board) => renameNavigatorItem('board', board.id, board.title)} onReorderBoards={reorderBoards} onSetCover={setBoardCover} onSetProjectThumbnail={(assetId) => setProjectCover(assetId, DEFAULT_COVER_FRAMING)} onTrashSelection={trashCanvasSelection} onPreviewImage={(assetId) => { setPreviewZoomed(false); setPreviewAssetId(assetId) }} onUndo={undoBoard} onRedo={redoBoard} onRequestText={requestText} /><>
 {!viewBoardId && mode === 'split' && showProjectBoardStrip && !showCanvasFilmstrip && <ProjectBoardStrip project={project} activeBoardId={activeBoard.id} workspaceRoot={workspace?.root} onOpen={(boardId) => openBoardInProject(boardId)} onCreate={() => createNavigatorItem('board')} onDuplicate={duplicateActiveBoard} onRename={(board) => renameNavigatorItem('board', board.id, board.title)} onContextMenu={(boardId, x, y) => openNavigatorItemMenu('board', boardId, x, y)} onReorder={reorderBoards} onHide={() => setShowProjectBoardStrip(false)} />}
 </></section>}
       
@@ -3896,7 +3902,7 @@ inspector: <>
 boardStrip: null,
 overlays: <>
 {showSettings && <SettingsDialog onClose={()=>setShowSettings(false)} sections={[
-        {id:'appearance',label:'Appearance',content:<><section><h2>Appearance</h2><label><span>Workspace theme</span><select value={theme} onChange={(event) => setTheme(event.target.value as 'navy' | 'dark' | 'light')}><option value="navy">Navy</option><option value="dark">Dark</option><option value="light">Light</option></select></label><label><span>Glass strength</span><input aria-label="Glass strength" type="range" min="0" max="100" value={glassStrength} onChange={(event) => setGlassStrength(Number(event.target.value))} /><output>{glassStrength}%</output></label><small>0% uses flat surfaces. Document paper has its own appearance.</small></section></>},
+        {id:'appearance',label:'Appearance',content:<><section><h2>Appearance</h2><label><span>Workspace theme</span><select value={theme} onChange={(event) => setTheme(event.target.value as 'navy' | 'dark' | 'light')}><option value="navy">Navy</option><option value="dark">Dark</option><option value="light">Light</option></select></label><label><span>Canvas layout personality</span><select value={canvasUiPersonality} onChange={(event) => setCanvasUiPersonality(event.target.value as CanvasUiPersonality)}><option value="classical">Studio Classical (Aquarium & Bottom Rail)</option><option value="milanote">Milanote Modern (Left Creation Rail & Neutral Gray Canvas)</option></select></label><label><span>Glass strength</span><input aria-label="Glass strength" type="range" min="0" max="100" value={glassStrength} onChange={(event) => setGlassStrength(Number(event.target.value))} /><output>{glassStrength}%</output></label><small>0% uses flat surfaces. Document paper has its own appearance.</small></section></>},
         {id:'canvas',label:'Canvas and input',content:<><section><h2>Canvas and grid</h2><label><span>Show grid</span><input type="checkbox" checked={activeBoard.gridVisible !== false} onChange={(event) => applyBoardChange({ ...activeBoard, gridVisible: event.target.checked })} /></label><label><span>Grid spacing</span><input type="range" min="12" max="120" step="4" value={activeBoard.gridSpacing || 44} onChange={(event) => applyBoardChange({ ...activeBoard, gridSpacing: Number(event.target.value) })} /></label><label><span>Grid opacity</span><input type="range" min="5" max="100" value={Math.round((activeBoard.gridOpacity ?? DEFAULT_CANVAS_GRID_OPACITY) * 100)} onChange={(event) => applyBoardChange({ ...activeBoard, gridOpacity: Number(event.target.value) / 100 })} /></label><button type="button" onClick={() => applyBoardChange({ ...activeBoard, backgroundColor: undefined, backgroundFollowsTheme: true, gridColor: undefined, gridOpacity: undefined, gridSpacing: undefined })}>Restore theme grid defaults</button></section><section><h2>Input</h2><label><span>Snap objects to grid</span><input type="checkbox" checked={activeBoard.snapToGrid !== false} onChange={(event) => applyBoardChange({ ...activeBoard, snapToGrid: event.target.checked })} /></label><label><span>Smart object alignment</span><input type="checkbox" checked={activeBoard.snapToObjects !== false} onChange={event => applyBoardChange({ ...activeBoard, snapToObjects: event.target.checked })} /></label><label><span>Snap to layout guides</span><input type="checkbox" checked={activeBoard.snapToGuides !== false} onChange={event => applyBoardChange({ ...activeBoard, snapToGuides: event.target.checked })} /></label></section></>},
         {id:'workspace',label:'Workspace',content:<><section><h2>Board navigation</h2><label><span>Minimal canvas interface</span><input type="checkbox" checked={minimalNavigation} onChange={(event) => setMinimalNavigation(event.target.checked)} /></label><small>Hides the permanent project and inspector panels. Breadcrumbs and Settings remain available.</small></section></>},
         {id:'saving',label:'Saving and recovery',content:<><SaveSettingsPanel project={project} enabled={workspace?.storageSchema===2} readOnly={Boolean(workspace?.readOnly||viewBoardId)} policy={savePolicy} pending={savePending} onPolicy={setSavePolicy} onFlush={async()=>{const current=projectRef.current;await saveProject({...current,updatedAt:new Date().toISOString()});if(projectRef.current===current)setSavePending(false);setStatus('Project, board files and recovery snapshot saved')}} /></>},
@@ -4048,7 +4054,13 @@ overlays: <>
         onThemeChange={setTheme}
         title={projectReady ? project.title : 'Art Equation Studio'}
         ready={settingsHydrated && (projectReady || bootStorageFailed)}
-        onComplete={(layout:LaunchLayout) => { changeMode(layout==='advanced-split'?'split':'canvas'); setShowNavigatorPanel(true); setShowInspectorDrawer(layout==='graphing'); completeBoot() }}
+        onComplete={(layout:LaunchLayout) => {
+          changeMode(layout==='advanced-split'?'split':'canvas');
+          setShowNavigatorPanel(true);
+          setShowInspectorDrawer(layout==='graphing');
+          setCanvasUiPersonality(readCanvasUiPersonality());
+          completeBoot()
+        }}
       />}
 </>,
 status: <>
@@ -4561,6 +4573,8 @@ function ProjectInspector({ expanded, project, activeBoard, selectedNodes, readO
 
 type CanvasPaneProps = {
   theme: 'navy' | 'dark' | 'light'
+  canvasUiPersonality?: CanvasUiPersonality
+  onOpenTrash?: () => void
   navigation?: React.ReactNode
   onFilmstripVisibilityChange?: (visible: boolean) => void
   onSelectionChange: (boardId: string, ids: string[]) => void
@@ -4612,7 +4626,7 @@ type CanvasPaneProps = {
   onRequestText: (options: TextPromptOptions) => Promise<string | null>
 }
 
-function CanvasPane({ theme, navigation, onFilmstripVisibilityChange, onSelectionChange, revealRequest, onMoveSelection, diagramTemplates, onSaveDiagramTemplate,  board: persistedBoard, boards, assets, swatches, workspaceRoot, projectId, projectName, readOnly, openWith, onOpenWith, onReplaceAsset, onPreparePyramid, onRequestText, onBoardChange: commitBoardChange, onFitImageBounds, onSetColumnImageSizing, onDerivedAsset, onImport, onDropFiles, onSwatchesChange, onSwitchBoard, onCreateBoard, onCreateNestedBoard, onTrashBoard, onUpdateBoardTile, onEditBoardImage, onDuplicateBoard, onDeleteBoard, onRenameBoard, onReorderBoards, onSetCover, onSetProjectThumbnail, onTrashSelection, onPreviewImage, onAddGeneratedAsset, onUndo, onRedo }: CanvasPaneProps) {
+function CanvasPane({ theme, canvasUiPersonality = 'classical', onOpenTrash, navigation, onFilmstripVisibilityChange, onSelectionChange, revealRequest, onMoveSelection, diagramTemplates, onSaveDiagramTemplate,  board: persistedBoard, boards, assets, swatches, workspaceRoot, projectId, projectName, readOnly, openWith, onOpenWith, onReplaceAsset, onPreparePyramid, onRequestText, onBoardChange: commitBoardChange, onFitImageBounds, onSetColumnImageSizing, onDerivedAsset, onImport, onDropFiles, onSwatchesChange, onSwitchBoard, onCreateBoard, onCreateNestedBoard, onTrashBoard, onUpdateBoardTile, onEditBoardImage, onDuplicateBoard, onDeleteBoard, onRenameBoard, onReorderBoards, onSetCover, onSetProjectThumbnail, onTrashSelection, onPreviewImage, onAddGeneratedAsset, onUndo, onRedo }: CanvasPaneProps) {
   const canvasSessionKey = `${projectId}/${persistedBoard.id}`
   const renderMode = 'vello' as const
   const stageRef = useRef<HTMLDivElement>(null)
@@ -4865,10 +4879,18 @@ function CanvasPane({ theme, navigation, onFilmstripVisibilityChange, onSelectio
   const assetById = useMemo(() => new Map(assets.map((asset) => [asset.id, asset])), [assets])
   const linkedBoardById = useMemo(() => new Map(boards.map(entry => [entry.id, entry])), [boards])
   const nodeById = useMemo(() => new Map(board.nodes.map((node) => [node.id, node])), [board.nodes])
-  const backgroundFollowsTheme = board.backgroundFollowsTheme === true || (board.backgroundFollowsTheme !== false && (!board.backgroundColor || board.backgroundColor === DARK_BOARD_BACKGROUND || board.backgroundColor === LIGHT_BOARD_BACKGROUND))
-  const effectiveBoardBackground = backgroundFollowsTheme ? (theme === 'navy' ? CANVAS_THEME_COLORS.navy.background : theme === 'light' ? LIGHT_BOARD_BACKGROUND : DARK_BOARD_BACKGROUND) : board.backgroundColor!
-  const gridFollowsTheme = !board.gridColor || board.gridColor === DARK_GRID_COLOR || board.gridColor === LIGHT_GRID_COLOR
-  const effectiveGridColor = gridFollowsTheme ? (theme === 'navy' ? CANVAS_THEME_COLORS.navy.grid : theme === 'light' ? LIGHT_GRID_COLOR : DARK_GRID_COLOR) : board.gridColor!
+  const isMilanote = canvasUiPersonality === 'milanote'
+  const activeCanvasThemeColors = isMilanote ? MILANOTE_CANVAS_THEME_COLORS : CANVAS_THEME_COLORS
+  const darkCanvasBg = activeCanvasThemeColors.dark.background
+  const lightCanvasBg = activeCanvasThemeColors.light.background
+  const navyCanvasBg = activeCanvasThemeColors.navy.background
+  const darkCanvasGrid = activeCanvasThemeColors.dark.grid
+  const lightCanvasGrid = activeCanvasThemeColors.light.grid
+  const navyCanvasGrid = activeCanvasThemeColors.navy.grid
+  const backgroundFollowsTheme = board.backgroundFollowsTheme === true || (board.backgroundFollowsTheme !== false && (!board.backgroundColor || board.backgroundColor === DARK_BOARD_BACKGROUND || board.backgroundColor === LIGHT_BOARD_BACKGROUND || board.backgroundColor === MILANOTE_CANVAS_THEME_COLORS.dark.background || board.backgroundColor === MILANOTE_CANVAS_THEME_COLORS.light.background))
+  const effectiveBoardBackground = backgroundFollowsTheme ? (theme === 'navy' ? navyCanvasBg : theme === 'light' ? lightCanvasBg : darkCanvasBg) : board.backgroundColor!
+  const gridFollowsTheme = !board.gridColor || board.gridColor === DARK_GRID_COLOR || board.gridColor === LIGHT_GRID_COLOR || board.gridColor === MILANOTE_CANVAS_THEME_COLORS.dark.grid || board.gridColor === MILANOTE_CANVAS_THEME_COLORS.light.grid
+  const effectiveGridColor = gridFollowsTheme ? (theme === 'navy' ? navyCanvasGrid : theme === 'light' ? lightCanvasGrid : darkCanvasGrid) : board.gridColor!
   
 
   
@@ -6632,6 +6654,58 @@ function CanvasPane({ theme, navigation, onFilmstripVisibilityChange, onSelectio
     setSelectedIds([node.id])
   }
 
+  function addTodoNode() {
+    const center = eventToWorld((stageBoundsRef.current?.left || 0) + stageSize.width / 2, (stageBoundsRef.current?.top || 0) + stageSize.height / 2)
+    const node: BoardNode = {
+      id: `todo-${crypto.randomUUID()}`,
+      kind: 'note',
+      x: Math.round(center.x - 130),
+      y: Math.round(center.y - 80),
+      width: 260,
+      height: 160,
+      title: 'To-do List',
+      body: '☐ First task\n☐ Second task\n☐ Third task',
+      color: '#4e877e',
+    }
+    onBoardChange({ ...board, nodes: [...board.nodes, node] })
+    setSelectedIds([node.id])
+  }
+
+  function addCommentNode() {
+    const center = eventToWorld((stageBoundsRef.current?.left || 0) + stageSize.width / 2, (stageBoundsRef.current?.top || 0) + stageSize.height / 2)
+    const node: BoardNode = {
+      id: `comment-${crypto.randomUUID()}`,
+      kind: 'note',
+      x: Math.round(center.x - 110),
+      y: Math.round(center.y - 60),
+      width: 220,
+      height: 120,
+      title: 'Comment',
+      body: 'Add your comment here…',
+      color: '#e07a5f',
+    }
+    onBoardChange({ ...board, nodes: [...board.nodes, node] })
+    setSelectedIds([node.id])
+  }
+
+  function toggleMilanoteLine() {
+    if (interactionTool === 'connect') {
+      setInteractionTool('select')
+    } else {
+      setShapeKind('line')
+      setInteractionTool('draw')
+    }
+  }
+
+  function toggleMilanoteDraw() {
+    if (interactionTool === 'pencil') {
+      setInteractionTool('select')
+    } else {
+      setViewportTool('select')
+      setInteractionTool('pencil')
+    }
+  }
+
   useEffect(() => {
     const openWebCapture = () => {
       const attached = selectedNode && (selectedNode.kind === 'image' || selectedNode.kind === 'video') ? selectedNode : undefined
@@ -7849,7 +7923,7 @@ function CanvasPane({ theme, navigation, onFilmstripVisibilityChange, onSelectio
         <button className="primary-button" type="button" disabled={Boolean(boardExportReview?.error)} onClick={() => void exportBoardImage()}>Export {boardExportFormat.toUpperCase()}</button>
       </aside>}
       {showDiagramStructure && <DiagramStructurePanel board={board} selectedIds={selectedIds} templates={diagramTemplates} origin={{ x: (stageSize.width / 2 - presentedViewport.x) / presentedViewport.scale, y: (stageSize.height / 2 - presentedViewport.y) / presentedViewport.scale }} readOnly={viewOnly} onPublish={publishDiagramBoard} onSaveTemplate={onSaveDiagramTemplate} onSelect={(ids) => { setSelectedIds(ids); setSelectedConnectorId(null) }} onClose={() => { setShowDiagramStructure(false); restoreDiagramFocus() }} />}
-      <div className={`canvas-stage engine-vello tool-${interactionTool} viewport-${viewportTool} ${marquee ? 'marquee-active' : ''} ${grayscalePreview ? 'grayscale-preview' : ''}`} data-canvas-engine="vello" data-canvas-renderer={renderMode} data-gesture-preview={board !== persistedBoard} data-persisted-node-count={persistedBoard.nodes.length} data-engine-scene-revision={canvasScene.revision} data-spatial-index-size={spatialIndex.size} data-spatial-cell-count={spatialIndex.cellCount} data-spatial-visible-candidates={visibleSceneObjects.length} data-total-nodes={board.nodes.length} data-visible-nodes={visibleNodes.length} data-visible-media={visibleMediaCount} tabIndex={0} style={{ backgroundColor: effectiveBoardBackground }} ref={stageRef} onPointerDownCapture={(event) => {
+      <div className={`canvas-stage engine-vello tool-${interactionTool} viewport-${viewportTool} ${marquee ? 'marquee-active' : ''} ${grayscalePreview ? 'grayscale-preview' : ''} ${isMilanote ? 'milanote-canvas-active' : ''}`} data-canvas-engine="vello" data-canvas-renderer={renderMode} data-gesture-preview={board !== persistedBoard} data-persisted-node-count={persistedBoard.nodes.length} data-engine-scene-revision={canvasScene.revision} data-spatial-index-size={spatialIndex.size} data-spatial-cell-count={spatialIndex.cellCount} data-spatial-visible-candidates={visibleSceneObjects.length} data-total-nodes={board.nodes.length} data-visible-nodes={visibleNodes.length} data-visible-media={visibleMediaCount} tabIndex={0} style={{ backgroundColor: effectiveBoardBackground }} ref={stageRef} onPointerDownCapture={(event) => {
         if (!(event.button === 1 || event.button === 0 && (viewportTool === 'hand' || spacePanRef.current))) return
         const target = event.target instanceof Element ? event.target : null
         if (target?.closest('.canvas-tool-rail, .canvas-subtools, .canvas-tool-rail-restore, .canvas-toolbar, .ocean-toolbar, .board-minimap, .canvas-zoom-control, .unsorted-panel, .canvas-context-menu, .professional-color, .production-studio, .tile-appearance-picker')) return
@@ -7859,7 +7933,26 @@ function CanvasPane({ theme, navigation, onFilmstripVisibilityChange, onSelectio
         handleStagePointerDown(event)
       }} onPointerDown={handleStagePointerDown} onClickCapture={(event) => { if (!transformClickSuppressRef.current) return; event.preventDefault(); event.stopPropagation(); clearPostTransformClickSuppression() }} onContextMenu={(event) => { event.preventDefault(); event.currentTarget.focus(); marqueeCancelRef.current?.(); setSelectedIds([]); setSelectedConnectorId(null); setContextMenu({ x: event.clientX, y: event.clientY }) }}>
         
-        {!presentationOnly && (showToolRail ? <><CanvasToolbar>
+        {!presentationOnly && (showToolRail ? (isMilanote ? (
+          <MilanoteToolRail
+            interactionTool={interactionTool}
+            viewportTool={viewportTool}
+            shapeKind={shapeKind}
+            viewOnly={viewOnly}
+            onAddNote={addNoteNode}
+            onAddLink={addBoardLink}
+            onAddTodo={addTodoNode}
+            onToggleLine={toggleMilanoteLine}
+            onAddSubboard={addNestedBoardPortal}
+            onAddColumn={addColumnNode}
+            onAddComment={addCommentNode}
+            onAddTable={addColumnNode}
+            onImportImage={() => onImport('image')}
+            onImport3DModel={() => onImport('model')}
+            onToggleDraw={toggleMilanoteDraw}
+            onOpenTrash={() => onOpenTrash ? onOpenTrash() : void deleteSelected()}
+          />
+        ) : (<><CanvasToolbar>
           <button className="tool-rail-hide" type="button" aria-label="Hide canvas tool rail" title="Hide canvas tools" onClick={() => setShowToolRail(false)}>‹</button>
           <button className={interactionTool === 'select' && viewportTool === 'select' ? 'active' : ''} type="button" title="Select and move · V" aria-label="Select and move" data-shortcut="V" aria-pressed={interactionTool === 'select' && viewportTool === 'select'} onClick={() => { setViewportTool('select'); setInteractionTool('select'); setConnectorSourceId(null) }}><CanvasToolIcon name="select" /></button>
           <button className={interactionTool === 'node' ? 'active' : ''} type="button" title="Node / direct select · A — edit anchors and path segments" aria-label="Node tool" data-shortcut="A" disabled={viewOnly} aria-pressed={interactionTool === 'node'} onClick={() => { setViewportTool('select'); setInteractionTool('node'); setSelectedConnectorId(null) }}><CanvasToolIcon name="node" /></button>
@@ -7912,7 +8005,7 @@ function CanvasPane({ theme, navigation, onFilmstripVisibilityChange, onSelectio
               <button type="button" title="Actual pixels / 100%" aria-label="Zoom to 100 percent" onClick={() => { setZoom100(); setShowMoreCanvasTools(false) }}>1:1<span>Actual Size (100%)</span></button>
               <button type="button" title="Fit selected objects" aria-label="Fit selection" disabled={!selectedIds.length} onClick={() => { fitSelection(); setShowMoreCanvasTools(false) }}>⌗<span>Fit Selection</span></button>
               <button type="button" title="Return to previous zoom" aria-label="Previous zoom" disabled={!hasPreviousViewport} onClick={() => { restorePreviousZoom(); setShowMoreCanvasTools(false) }}>↶<span>Previous Zoom</span></button>
-        </div>}</> : <button className="canvas-tool-rail-restore" type="button" aria-label="Show canvas tool rail" onClick={() => setShowToolRail(true)}>Tools ›</button>)}
+        </div>}</>)) : <button className="canvas-tool-rail-restore" type="button" aria-label="Show canvas tool rail" onClick={() => setShowToolRail(true)}>Tools ›</button>)}
         {graphEditorId && <GraphColumnEditor board={board} id={graphEditorId} readOnly={viewOnly} onChange={onBoardChange} onClose={() => setGraphEditorId(null)} />}
         {<Suspense fallback={null}><VelloBoardBackdrop onCardOwnership={onEngineCardOwnership} camera={liveCamera} scene={canvasScene} sceneSource={liveCanvasScene} viewport={presentedViewport} selectedIds={selectedIds} visibleObjectIdsKey={visibleSceneObjects.map(object => object.id).join("\n")} /></Suspense>}
         {interactionTool === 'connect' && !connectorSourceId && <div className="connector-draw-surface" aria-label="Draw a free connection" onPointerDown={startFreeConnector} />}
