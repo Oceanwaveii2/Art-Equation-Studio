@@ -1,0 +1,78 @@
+import assert from 'node:assert/strict'
+import { chromium } from 'playwright-core'
+
+const executablePath = process.env.BROWSER_EXECUTABLE || 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
+const browser = await chromium.launch({ executablePath, headless: true })
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+await page.addInitScript(() => {
+  localStorage.setItem('art-equation.navigator', '1')
+  localStorage.setItem('art-equation.inspector', '0')
+})
+
+await page.goto(process.env.UI_TEST_BASE_URL || 'http://127.0.0.1:5173/?catalog=demo', { waitUntil: 'domcontentloaded' })
+await page.getByRole('button', { name: 'Canvas', exact: true }).click()
+await page.getByTestId('navigator-panel-handle').press('Home')
+await page.waitForFunction(() => document.querySelector('.app-body')?.classList.contains('navigator-hidden'))
+const appBody = page.locator('.app-body')
+const projectCenter = page.locator('.project-center')
+const [appBodyBounds, collapsedCenterBounds] = await Promise.all([appBody.boundingBox(), projectCenter.boundingBox()])
+assert(appBodyBounds && collapsedCenterBounds, 'collapsed application layout should be measurable')
+assert(await appBody.evaluate((element) => element.classList.contains('navigator-hidden') && element.classList.contains('inspector-hidden')), 'both panel-hidden states should be active')
+assert(Math.abs(collapsedCenterBounds.x - appBodyBounds.x) < 1, 'canvas should reclaim the hidden navigator column')
+for (const width of [1000, 860]) {
+  await page.setViewportSize({ width, height: 900 })
+  const [responsiveBody, responsiveCenter] = await Promise.all([appBody.boundingBox(), projectCenter.boundingBox()])
+  assert(responsiveBody && responsiveCenter, `collapsed layout should remain measurable at ${width}px`)
+  assert(Math.abs(responsiveCenter.x - responsiveBody.x) < 1, `canvas should reclaim the navigator column at ${width}px`)
+}
+await page.setViewportSize({ width: 1440, height: 900 })
+const canvas = page.locator('.canvas-stage').first()
+const bounds = await canvas.boundingBox()
+assert(bounds, 'canvas bounds should be available')
+const node = page.locator('.board-node:not(.node-column)').first()
+await node.click({ force: true })
+const selectedId = await page.locator('.board-node.selected').getAttribute('data-node-id')
+
+const beforeZoom = await page.locator('.board-world').getAttribute('style')
+await page.mouse.move(bounds.x + bounds.width * .72, bounds.y + bounds.height * .72)
+await page.mouse.wheel(0, 72)
+await page.waitForTimeout(200)
+assert.notEqual(await page.locator('.board-world').getAttribute('style'), beforeZoom, 'plain wheel should zoom')
+assert.equal(await page.locator('.board-node.selected').getAttribute('data-node-id'), selectedId, 'wheel zoom should preserve selection')
+
+const beforePan = await page.locator('.board-world').getAttribute('style')
+await page.keyboard.down('Shift')
+await page.mouse.wheel(0, 72)
+await page.keyboard.up('Shift')
+await page.waitForTimeout(200)
+assert.notEqual(await page.locator('.board-world').getAttribute('style'), beforePan, 'Shift-wheel should pan horizontally')
+assert.equal(await page.locator('.board-node.selected').getAttribute('data-node-id'), selectedId, 'wheel pan should preserve selection')
+
+const committedBeforeSwitch = await page.locator('.board-world').getAttribute('style')
+await page.mouse.wheel(0, -120)
+const pendingBeforeSwitch = await page.locator('.board-world').getAttribute('style')
+assert.notEqual(pendingBeforeSwitch, committedBeforeSwitch)
+await page.getByRole('button', { name: 'Document', exact: true }).click()
+await page.getByRole('button', { name: 'Canvas', exact: true }).click()
+await page.locator('.canvas-stage').waitFor()
+assert.equal(await page.locator('.board-world').getAttribute('style'), pendingBeforeSwitch, 'mode switch should preserve the pending canvas viewport')
+
+await page.keyboard.down('Space')
+assert(await canvas.evaluate((element) => element.classList.contains('viewport-panning')), 'Space should enter temporary pan state')
+await page.keyboard.up('Space')
+assert(!await canvas.evaluate((element) => element.classList.contains('viewport-panning')), 'Space release should restore the prior tool state')
+
+await page.getByLabel('Hand tool').click()
+const beforeHandPan = await page.locator('.board-world').getAttribute('style')
+await page.mouse.move(bounds.x + bounds.width * .78, bounds.y + bounds.height * .78)
+await page.mouse.down()
+await page.mouse.move(bounds.x + bounds.width * .78 + 60, bounds.y + bounds.height * .78 + 30)
+await page.mouse.up()
+await page.waitForTimeout(80)
+assert.notEqual(await page.locator('.board-world').getAttribute('style'), beforeHandPan, 'Hand drag should pan')
+assert.equal(await page.locator('.board-node.selected').getAttribute('data-node-id'), selectedId, 'Hand drag should preserve selection')
+
+await page.getByLabel('Zoom tool').click()
+assert(await canvas.evaluate((element) => element.classList.contains('viewport-zoom')), 'Zoom tool should remain reachable after Hand mode')
+await browser.close()
+console.log('viewport interactions: PASS')

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%23111419%22/><path d=%22M8 22L16 7l8 15z%22 fill=%22%2365d7d0%22/></svg>" />
+    <title>Project B M3 Isolated Harness</title>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Project B / M3 / GPU proof</p>
+      <h1>Vello WebGPU isolated benchmark</h1>
+      <p>This page is intentionally separate from the Art Equation canvas and tool system.</p>
+      <button id="run-gpu" type="button">Run WebGPU benchmark</button>
+      <button id="recover-gpu" type="button">Test GPU recovery</button>
+      <button id="run" type="button">Run CPU baseline</button>
+      <p id="status" role="status">Ready.</p>
+      <canvas id="preview" width="1024" height="768" aria-label="Vello GPU or CPU benchmark output"></canvas>
+      <pre id="results">No results yet.</pre>
+    </main>
+    <script type="module" src="/src/project-b/harness.ts"></script>
+  </body>
+</html>

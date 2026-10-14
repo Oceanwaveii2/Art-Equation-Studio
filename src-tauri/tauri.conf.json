@@ -1,0 +1,47 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Art Equation Studio 2.5 UI Integration",
+  "version": "2.5.0-alpha.1",
+  "identifier": "studio.artequation.p1v21",
+  "mainBinaryName": "art-equation-mitigation",
+  "build": {
+    "frontendDist": "../dist",
+    "beforeBuildCommand": "npm run build:v2"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Art Equation Studio 2.5 UI Integration",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1040,
+        "minHeight": 680,
+        "center": true,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": []
+      }
+    }
+  },
+  "bundle": {
+    "active": false,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "android": {
+      "debugApplicationIdSuffix": ".debug"
+    }
+  }
+}

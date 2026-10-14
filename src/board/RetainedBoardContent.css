@@ -1,0 +1,23 @@
+/* A marker is applied only after the replacement frame succeeds. Layout and
+   semantic DOM stay present; selection and unsupported content use the old path. */
+.canvas-stage[data-canvas-renderer="raster"] .board-node,
+.canvas-stage[data-canvas-renderer="retained"] .board-node { transition:none; }
+.board-world .board-node[data-retained-paint] { background-color:transparent!important; box-shadow:none!important; }
+.board-node[data-retained-paint="image"] > .transformed-image,
+.board-node[data-retained-paint="image"] .format-image-preview { background:transparent!important; }
+.board-node[data-retained-paint="image"] .format-image-preview > img { opacity:0!important; }
+.board-node[data-retained-paint="ellipse"] .node-shape-ellipse > ellipse:not(.shape-hit-area) { opacity:0; }
+.connector-group[data-retained-connection] > .connector-path { opacity:0; }
+.board-world .board-node[data-vello-paint] { background-color:transparent!important; box-shadow:none!important; border-color:transparent!important; }
+/* Interaction indicators belong to the semantic overlay, independent of the
+   engine-owned body paint. An outline does not restore a second card skin. */
+.board-world .board-node[data-vello-paint].selected { outline:2px solid #8fb0c8; outline-offset:1px; }
+.board-world .board-node[data-vello-paint].marquee-preview { outline:2px solid #f2c98f; outline-offset:1px; }
+.board-world .board-node[data-vello-paint].connector-source { outline:3px solid #58c8c1; outline-offset:1px; }
+.board-node[data-vello-paint] .node-vector-shape > :not(g):not(.shape-hit-area):not(.vector-segment-selected),
+.board-node[data-vello-paint] .node-vector-shape path:not(.shape-hit-area):not(.vector-segment-hit):not(.vector-segment-selected),
+.board-node[data-vello-paint] .node-vector-shape g > path:not(.shape-hit-area):not(.vector-segment-hit):not(.vector-segment-selected),
+.board-node[data-vello-paint] .node-shape-ellipse > ellipse:not(.shape-hit-area) { opacity:0!important; }
+.board-node[data-vello-paint] .shape-hit-area,
+.board-node[data-vello-paint] .vector-segment-hit { opacity:0.001!important; pointer-events:all!important; }
+

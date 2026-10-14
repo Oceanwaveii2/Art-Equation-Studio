@@ -1,0 +1,18 @@
+[package]
+name = "art-equation-native-canvas-probe"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[patch.crates-io]
+vello = { path = "../vello-surface/rust/vendor/vello" }
+
+[dependencies]
+art-equation-workspace-core = { path = "../workspace-core" }
+art-equation-p0-app-surface = { path = "../vello-surface/rust" }
+wgpu = { version = "=29.0.4", default-features = false, features = ["std", "vulkan", "wgsl"] }
+winit = "=0.30.13"
+pollster = "=0.4.0"
+serde_json = "=1.0.149"

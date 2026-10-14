@@ -1,0 +1,51 @@
+@import './RetainedBoardContent.css';
+@import './completeMeasuredCardPaint.css';
+
+/* The presenter has one attached display surface. Backend candidates remain
+   detached until their first accepted frame; ordinary frames reuse the canvas. */
+.vello-board { pointer-events: none; }
+.vello-environment { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.vello-environment > .vello-board-canvas { position: absolute; left: 0; top: 0; pointer-events: none; }
+/* Paint ownership hides and restores the same semantic card skin. Animating
+   those border/shadow changes emits transitionend and schedules another frame.
+   Keep this handoff immediate, including the temporary DOM paint interval. */
+.canvas-stage[data-canvas-renderer="vello"] .board-node { transition: none !important; }
+/* Sockets are hit controls. Inherited text-color transitions during the
+   canonical/accepted handoff otherwise invalidate the entire connected graph. */
+.canvas-stage[data-canvas-renderer="vello"] .node-graph-socket { transition: none !important; }
+/* Descendant paint is also hidden/restored during canonical capture. A CSS
+   opacity/filter transition there would feed transitionend back into capture. */
+.canvas-stage[data-canvas-renderer="vello"] .board-node .node-vector-shape,
+.canvas-stage[data-canvas-renderer="vello"] .board-node .node-vector-shape * { transition: none !important; }
+.vello-board > .vello-board-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+  background: transparent;
+}
+.vello-board > .vello-board-canvas[hidden] { display: none !important; }
+.vello-render-notice {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(460px, calc(100% - 32px));
+  padding: 12px;
+  border: 1px solid #9b713a;
+  border-radius: 8px;
+  color: #f4e4ca;
+  background: #24201a;
+  pointer-events: auto;
+}
+.vello-render-notice[hidden] { display: none !important; }
+.vello-render-notice button { font: inherit; padding: 6px 10px; cursor: pointer; }
+
+/* Base artwork belongs to the engine; cached hit paths and transient segment
+   highlights remain synchronous, including while a path is selected. */
+.board-node[data-vello-paint] .node-vector-shape > g { opacity: 1 !important; }
+.board-node[data-vello-paint] .node-vector-shape .vector-segment-selected { opacity: 1 !important; }

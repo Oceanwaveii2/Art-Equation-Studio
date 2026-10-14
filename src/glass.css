@@ -1,0 +1,231 @@
+/*
+ * Art Equation's glass material is deliberately limited to the functional
+ * chrome (navigation, controls, and transient panels). Canvas objects and
+ * document content keep their own opaque, user-authored colors.
+ */
+.studio-shell {
+  --glass-surface: #0f1318;
+  --glass-overlay-surface: #13171d;
+  --glass-opacity: 92%;
+  --glass-overlay-opacity: 97%;
+  --glass-control-opacity: 85%;
+  --glass-border: #d7e4f021;
+  --glass-highlight: #ffffff14;
+  --glass-reflection: #a9d8e009;
+  --glass-shadow: 0 18px 52px #05070bb0, inset 0 1px #ffffff0e;
+  --glass-overlay-shadow: 0 22px 68px #05070bc2, inset 0 1px #ffffff12;
+  --glass-blur: 20px;
+}
+
+.studio-shell.workspace-light {
+  --glass-surface: #f2eee8;
+  --glass-overlay-surface: #faf7f1;
+  --glass-opacity: 88%;
+  --glass-overlay-opacity: 97%;
+  --glass-control-opacity: 84%;
+  --glass-border: #66543b35;
+  --glass-highlight: #ffffffbf;
+  --glass-reflection: #d5b98c30;
+  --glass-shadow: 0 16px 44px #57463029, inset 0 1px #ffffffd9;
+  --glass-overlay-shadow: 0 22px 58px #57463038, inset 0 1px #ffffffed;
+}
+
+/* The functional layer: restrained, more opaque glass over workspace content. */
+.studio-shell :is(
+  .app-bar,
+  .navigator,
+  .project-inspector,
+  .pane-toolbar,
+  .board-navigation,
+  .project-board-strip,
+  .status-bar
+) {
+  border-color: var(--glass-border);
+  background-color: var(--glass-surface);
+  background-image: linear-gradient(148deg, var(--glass-highlight), transparent 39%, transparent 72%, var(--glass-reflection));
+  box-shadow: inset 0 1px var(--glass-highlight);
+}
+
+.studio-shell .app-bar {
+  position: relative;
+  z-index: 100;
+  box-shadow: inset 0 -1px var(--glass-border), inset 0 1px var(--glass-highlight);
+}
+
+.studio-shell .navigator,
+.studio-shell .project-inspector {
+  background-image: linear-gradient(165deg, var(--glass-highlight), transparent 34%, var(--glass-reflection));
+}
+
+/* Floating controls use the regular/high-legibility material, not clear glass. */
+.studio-shell :is(
+  .canvas-toolbar,
+  .canvas-tool-rail,
+  .canvas-subtools,
+  .canvas-zoom-control,
+  .canvas-zoom-menu,
+  .canvas-minimap,
+  .board-minimap,
+  .board-navigation > button,
+  .project-board-strip > header,
+  .project-board-cards > button,
+  .panel-edge-tab
+) {
+  border-color: var(--glass-border);
+  background-color: var(--glass-surface);
+  background-image: radial-gradient(ellipse at 18% 0%, var(--glass-highlight), transparent 48%), linear-gradient(145deg, var(--glass-highlight), transparent 48%, var(--glass-reflection));
+  box-shadow: inset 0 1px var(--glass-highlight), 0 8px 26px #05070b38;
+}
+
+.studio-shell :is(
+  .settings-panel,
+  .trash-viewer,
+  .text-entry-dialog,
+  .project-tools-menu,
+  .new-item-menu,
+  .navigator-item-menu,
+  .board-cover-picker,
+  .project-cover-picker,
+  .canvas-context-menu,
+  .canvas-subtools,
+  .board-export-popover,
+  .canvas-zoom-menu,
+  .canvas-diagnostics,
+  .unsorted-panel,
+  .project-search-results,
+  .document-more-menu,
+  .asset-context-menu,
+  .inspector-drawer,
+  .color-popover,
+  .professional-color
+) {
+  border-color: var(--glass-border);
+  background-color: var(--glass-overlay-surface);
+  background-image: linear-gradient(145deg, var(--glass-highlight), transparent 44%, var(--glass-reflection));
+  box-shadow: var(--glass-overlay-shadow);
+}
+
+.studio-shell .trash-viewer,
+.studio-shell .settings-panel {
+  border-radius: 14px;
+}
+
+.studio-shell .canvas-tool-rail,
+.studio-shell .canvas-toolbar {
+  border-radius: 18px;
+}
+
+.studio-shell :is(.canvas-tool-rail, .canvas-toolbar, .canvas-subtools, .canvas-zoom-control, .panel-edge-tab) {
+  -webkit-backdrop-filter: saturate(145%) blur(var(--glass-blur));
+  backdrop-filter: saturate(145%) blur(var(--glass-blur));
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .studio-shell :is(
+    .app-bar,
+    .navigator,
+    .project-inspector,
+    .pane-toolbar,
+    .board-navigation,
+    .project-board-strip,
+    .status-bar,
+    .canvas-toolbar,
+    .canvas-tool-rail,
+    .canvas-subtools,
+    .canvas-zoom-control,
+    .canvas-zoom-menu,
+    .canvas-minimap,
+    .board-minimap,
+    .panel-edge-tab
+  ) {
+    background-color: color-mix(in srgb, var(--glass-surface) var(--glass-opacity), transparent);
+    -webkit-backdrop-filter: saturate(145%) blur(var(--glass-blur));
+    backdrop-filter: saturate(145%) blur(var(--glass-blur));
+  }
+
+  .studio-shell :is(
+    .settings-panel,
+    .trash-viewer,
+    .text-entry-dialog,
+    .project-tools-menu,
+    .new-item-menu,
+    .navigator-item-menu,
+    .board-cover-picker,
+    .project-cover-picker,
+    .canvas-context-menu,
+    .board-export-popover,
+    .canvas-zoom-menu,
+    .canvas-diagnostics,
+    .unsorted-panel,
+    .project-search-results,
+    .document-more-menu,
+    .asset-context-menu,
+    .inspector-drawer,
+    .color-popover,
+    .professional-color
+  ) {
+    background-color: color-mix(in srgb, var(--glass-overlay-surface) var(--glass-overlay-opacity), transparent);
+    -webkit-backdrop-filter: saturate(138%) blur(24px);
+    backdrop-filter: saturate(138%) blur(24px);
+  }
+
+  .studio-shell :is(.canvas-toolbar, .canvas-tool-rail, .canvas-subtools, .canvas-zoom-control, .canvas-minimap, .board-minimap) {
+    background-color: color-mix(in srgb, var(--glass-surface) var(--glass-control-opacity), transparent);
+    -webkit-backdrop-filter: saturate(155%) blur(22px);
+    backdrop-filter: saturate(155%) blur(22px);
+  }
+}
+
+/* OS transparency preferences can disable translucency without changing theme. */
+@media (prefers-reduced-transparency: reduce) {
+  .studio-shell {
+    --glass-opacity: 99%;
+    --glass-overlay-opacity: 99%;
+    --glass-blur: 0px;
+  }
+
+  .studio-shell :is(
+    .app-bar,
+    .navigator,
+    .project-inspector,
+    .pane-toolbar,
+    .board-navigation,
+    .project-board-strip,
+    .status-bar,
+    .canvas-toolbar,
+    .canvas-tool-rail,
+    .canvas-subtools,
+    .canvas-zoom-control,
+    .canvas-zoom-menu,
+    .board-minimap,
+    .canvas-minimap,
+    .settings-panel,
+    .trash-viewer,
+    .text-entry-dialog,
+    .project-tools-menu,
+    .new-item-menu,
+    .navigator-item-menu,
+    .board-cover-picker,
+    .project-cover-picker,
+    .canvas-context-menu,
+    .board-export-popover,
+    .canvas-diagnostics,
+    .unsorted-panel,
+    .project-search-results,
+    .document-more-menu,
+    .asset-context-menu,
+    .inspector-drawer,
+    .color-popover,
+    .professional-color,
+    .panel-edge-tab
+  ) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio-shell :is(.app-bar, .navigator, .project-inspector, .canvas-toolbar, .canvas-tool-rail, .settings-panel, .trash-viewer) {
+    scroll-behavior: auto;
+  }
+}

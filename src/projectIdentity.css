@@ -1,0 +1,43 @@
+.studio-shell .app-bar.aquarium-app-bar {
+  --aquarium-window: clamp(180px, 17vw, 300px);
+  --aquarium-water-height: 34px;
+  position: relative;
+  isolation: isolate;
+  padding-left: calc(var(--aquarium-window) + 22px);
+  padding-bottom: calc(var(--aquarium-water-height) + 10px);
+  min-height: 129px;
+  border: 0;
+  background: linear-gradient(90deg, #063866, #0c1621 28%, #0a131d);
+}
+.studio-shell .app-bar.aquarium-app-bar::after { content: none; }
+.aquarium-app-bar .project-identity { position: absolute; left: 0; top: 0; bottom: 0; width: var(--aquarium-window); overflow: hidden; background: #0759b4; }
+.aquarium-app-bar .aquarium-poster, .aquarium-app-bar .aquarium-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; pointer-events: none; }
+.aquarium-app-bar .aquarium-video { visibility: hidden; }
+.aquarium-app-bar .aquarium-video.visible { visibility: visible; }
+.aquarium-app-bar .aquarium-fish-action { position: absolute; inset: 0; width: 100%; height: 100%; min-width: 0; padding: 0; border: 0; border-radius: 0; background: transparent; z-index: 1; cursor: pointer; }
+.aquarium-app-bar .aquarium-fish-action:hover { background: transparent; }
+.aquarium-app-bar .aquarium-fish-action:focus-visible { outline: 3px solid #fff; outline-offset: -5px; }
+.aquarium-app-bar .identity-wordmark { position: absolute; top: 6px; left: 7px; padding: 2px 5px; border-radius: 3px; background: #05203edb; color: #fff; font-size: 10px; pointer-events: none; }
+.aquarium-app-bar .aquarium-controls { position: absolute; left: 7px; right: 7px; bottom: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; z-index: 3; color: #fff; pointer-events: none; }
+.aquarium-app-bar .aquarium-status { margin-right: auto; padding: 2px 5px; border-radius: 3px; font-size: 10px; background: #05203edb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.aquarium-app-bar .aquarium-controls button { pointer-events: auto; min-width: 28px; width: 28px; min-height: 28px; height: 28px; padding: 0; border-radius: 5px; border: 1px solid #9bc6ed; background: #072545de; color: #fff; font-size: 13px; }
+.aquarium-app-bar .aquarium-controls button:hover { background: #234f7e; color: #fff; }
+.aquarium-app-bar .aquarium-controls button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.aquarium-app-bar .aquarium-controls button:disabled { opacity: .72; }
+.aquarium-app-bar .aquarium-water-band { position: absolute; left: var(--aquarium-window); right: 0; bottom: 0; height: var(--aquarium-water-height); overflow: hidden; pointer-events: none; z-index: 2; }
+.aquarium-app-bar .aquarium-water-poster { position: absolute; inset: 0; background-image: var(--aquarium-water); background-size: 100% 100%; box-shadow: inset 0 7px 10px #0034797a; }
+.aquarium-app-bar .aquarium-water-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; visibility: hidden; }
+.aquarium-app-bar .aquarium-water-video.visible { visibility: visible; }
+@media (max-width: 850px) { .aquarium-app-bar .aquarium-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); padding: 0; white-space: nowrap; } }
+@media (max-width: 600px) {
+  .studio-shell .app-bar.aquarium-app-bar { --aquarium-window: 140px; --aquarium-water-height: 24px; padding-left: 156px; }
+  .aquarium-app-bar .aquarium-poster, .aquarium-app-bar .aquarium-video { object-position: 65% 50%; }
+}
+@media (prefers-reduced-motion: reduce) { .aquarium-app-bar .project-identity * { animation: none; transition: none; } }
+@media (forced-colors: active) {
+  .aquarium-app-bar .aquarium-fish-action { border: 1px solid ButtonText; }
+  .aquarium-app-bar .aquarium-fish-action:focus-visible, .aquarium-app-bar .aquarium-controls button:focus-visible { outline-color: Highlight; }
+  .aquarium-app-bar .aquarium-status, .aquarium-app-bar .identity-wordmark { background: Canvas; color: CanvasText; }
+  .aquarium-app-bar .aquarium-controls button { background: ButtonFace; color: ButtonText; border-color: ButtonText; }
+  .aquarium-app-bar .aquarium-water-band { border-bottom: 2px solid CanvasText; }
+}

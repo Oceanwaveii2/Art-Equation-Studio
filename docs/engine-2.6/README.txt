@@ -1,0 +1,1 @@
+Art Equation Studio Engine 2.6 scope package. This is a specification and unmodified visual references, not an executable build. Read ART_EQUATION_ENGINE_2_6_SCOPE.md first.

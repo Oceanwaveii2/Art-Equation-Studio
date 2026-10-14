@@ -1,0 +1,28 @@
+.settings-backdrop {position:fixed;inset:0;z-index:10000;display:grid;place-items:center;background:color-mix(in srgb,var(--text) 28%,transparent);padding:24px}
+.studio-shell .settings-panel.settings-dialog {position:relative;inset:auto;width:min(840px,calc(100vw - 48px));max-width:none;height:min(700px,calc(100dvh - 48px));max-height:none;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface-overlay);color:var(--text)}
+.settings-dialog>header {flex:none;padding:20px 24px;position:relative}
+.settings-dialog>header strong {font-size:18px}
+.settings-dialog>header small {font-size:12px}
+.settings-dialog>header button {min-width:36px;min-height:36px;border-radius:6px}
+.settings-dialog-body {display:grid;grid-template-columns:180px minmax(0,1fr);min-height:0;flex:1}
+.settings-dialog-body>nav {display:flex;flex-direction:column;gap:4px;padding:16px 12px;border-right:1px solid var(--line);background:var(--panel)}
+.settings-dialog-body>nav button {text-align:left;min-height:40px;padding:8px 12px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--text);font:inherit}
+.settings-dialog-body>nav button[aria-selected=true] {background:var(--surface-control);border-color:var(--line);color:var(--text-strong)}
+.settings-dialog-content {overflow:auto;padding:8px 12px 24px;min-width:0}
+.settings-dialog-content [hidden] {display:none!important}
+.settings-dialog-content section {padding:16px;gap:16px}
+.settings-dialog-content h2 {font-size:12px}
+.settings-dialog-content :is(label,small,.settings-readout) {font-size:13px;line-height:1.5}
+.settings-dialog-content label {flex-wrap:wrap}
+.settings-dialog-content :is(button,select,input:not([type=checkbox]):not([type=range])) {min-height:36px;max-width:100%}
+.settings-dialog-content select {max-width:280px}
+.settings-dialog-content button {border:1px solid var(--line);border-radius:6px;background:var(--surface-control);color:var(--text);padding:8px 12px}
+.settings-dialog-content input[type=number] {width:100px;background:var(--surface-control);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.settings-dialog .codex-bridge-question {grid-template-columns:minmax(0,1fr);justify-content:stretch;align-items:stretch}
+.settings-save-board-list {max-height:180px;overflow:auto;display:grid;gap:8px}
+.settings-save-board-list .settings-readout {align-items:start}
+.settings-save-board-list span {overflow-wrap:anywhere}
+.settings-save-board-list strong {white-space:nowrap;font-weight:400}
+.settings-dialog :is(button,input,select,textarea):focus-visible {outline:2px solid var(--teal);outline-offset:2px}
+@media(max-width:720px){.settings-backdrop{padding:12px}.studio-shell .settings-panel.settings-dialog{width:calc(100vw - 24px);height:calc(100dvh - 24px)}.settings-dialog-body{grid-template-columns:140px minmax(0,1fr)}.settings-dialog-content{padding:4px}.settings-dialog-content section{padding:12px}.settings-dialog-body>nav{padding:12px 8px}}
+

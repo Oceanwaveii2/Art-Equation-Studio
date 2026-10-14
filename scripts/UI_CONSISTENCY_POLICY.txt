@@ -1,0 +1,80 @@
+ART EQUATION — UI CONSISTENCY POLICY / 2026-10-08
+
+Purpose: Make the integrated P1/P0 workspace as understandable as the approved
+P1 prototype, without sacrificing the owner's isolated Retina performance gate.
+Preserve P1.5 Settings, continuous/interval saving and the Codex bridge.
+
+Philosophy: The aquarium is the identity; the board is the work. Quiet flat chrome
+supports content. Navigation opens or focuses work; inspection never changes it.
+Use one understandable location for each action and preserve working context.
+
+Required conventions
+- Prototype comparison refines presentation while preserving every newer working
+  addition. Keep the Navy waves, Dark white crescent, Light sun and all current
+  image/column, media, inspection and navigation controls; never roll them back
+  to an older reference's feature set or toolbar placement.
+- Keep the aquarium fish, water band, motion controls and reduced-motion behavior.
+- Keep Navy, Dark and Light with equivalent controls and semantic color tokens.
+- Keep the canvas tool rail at bottom center. Compact layouts stack related tools in accessible flyouts;
+  never shrink targets below 30 CSS px or silently remove essential actions.
+- Shell uses the installed Windows Segoe UI family consistently. Do not claim an
+  unbundled Inter font is installed. Document/artwork fonts are separate content
+  choices and require native resolution and visible font evidence for acceptance.
+- Use 4/8/12/16/24 spacing, 12px controls/body, 11px supporting labels, 16px titles,
+  32px control targets, 5–7px corners. Keep helper text legible and sentence case.
+- Accent denotes active state, focus or primary action. Errors need text as well
+  as color. No decorative blur by default; glass remains an explicit preference.
+- Tabs identify open documents; the canvas filmstrip identifies boards and preserve stable item IDs and titles.
+  Closing a tab never deletes content. Navigation and selection are read-only.
+  Overflow scrolls; arrows/Home/End support tab navigation. Controls stay reachable.
+- Split keeps document and canvas mounted. When minimum usable widths cannot fit,
+  show an explicit pane switch with the existing active pane preserved. Side panel
+  visibility must not be confused with document/board deletion or Save.
+- Inspector scopes have shared tab appearance and padding. Selecting an object
+  exposes its properties; clearing selection returns to project controls.
+- All interactive shell elements have named controls, visible keyboard focus and
+  disabled states. Reduced motion disables decorative transitions, not content.
+- Every pass records findings, changes, screenshots and limitations. Test current
+  production output at 1280/1440/1920 in all themes and Document/Split/Canvas.
+  Review overflow, pane/tool collisions, selection, navigation and keyboard use.
+- Keep exact-4K timing separate from UI screenshots. Passing compilation, axe or
+  browser layout checks does not certify native pixels or product performance.
+
+Four passes
+1 VISUAL CONSISTENCY — Quiet chrome, legible hierarchy, shared control tokens.
+  Inspect fonts, surfaces, primary/active/disabled states and the aquarium boundary.
+2 WORKSPACE ORGANIZATION — Stable context, accessible open-work tabs and Split.
+  Inspect navigation, long titles, overflow and preservation of pane/editor state.
+3 CONTEXTUAL INSPECTION — Relevant information with clear section organization.
+  Inspect selection/clear-selection, section styling and all inspector scopes.
+4 USABILITY AND REGRESSION — Predictable keyboard and responsive behavior.
+  Inspect focus, tab movement/close, drawer/pane access, theme parity and motion.
+
+Research: Codex supports previous/next tabs, reopen/close tabs, full/split/hidden-tab
+layouts and panel visibility. These are reference principles, not claims that our
+application implements every Codex command or arbitrary docking.
+https://learn.chatgpt.com/docs/reference/commands
+User screenshot: reference for navigation hierarchy and compact tab chrome only.
+
+Release remains blocked until three exact 3840x2160 integrated runs meet pan p95
+<=16.2ms, zoom p95<=22.3ms, first post-gesture <=78.5ms and complete sharp <=613ms,
+with real GPU ownership and full quality, plus the complete P1 UI/native gates.
+
+Theme control update / 2026-10-08:
+- Navy uses ocean waves, Dark uses a white crescent on a contrasting surface,
+  and Light uses a sun. Use vector symbols, named buttons and aria-pressed.
+- Card title/header chrome follows shell surface/text tokens; saved artwork and
+  body ink retain their model colors. Review title contrast in every theme.
+- Column image sizing is an explicit, undoable content choice: Responsive keeps
+  uncropped artwork proportional to column width; Minimum height adds a 78-unit
+  row floor. Show Saved layout when no choice is authored. Inspection never
+  migrates saved columns. Cards and deliberate crops keep their own framing.
+- The browser review now uses 1280x720, 1440x900 and 1920x1080. Native font
+  identity and contextual Properties/Color/Layers parity are still separate gates.
+- Assert actual document/canvas pane visibility for each mode. Retained session
+  wrappers use display:contents, so wrapper boxes cannot establish visibility.
+  Exercise compact pane switching and preserve document/form context on resize.
+- Accepted Vello card paint must be visible through the semantic DOM overlay.
+  Check actual initial computed backgrounds before selection or canonical reads;
+  a healthy GPU frame and owned-card count do not prove that opaque DOM skins
+  are absent. Keep selection/focus outlines and semantic pointer targets live.

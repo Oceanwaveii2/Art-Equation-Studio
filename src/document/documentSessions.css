@@ -1,0 +1,44 @@
+/* Retained document ownership wrappers keep the existing pane layout. */
+.workbench > .retained-document-session { display: contents; }
+.workbench > .retained-document-session[hidden] { display: none !important; }
+.studio-shell .compact-split > .retained-document-session > .document-pane {
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  height: 100%;
+}
+
+/* Explicit, temporary Focus writing composition. Preferences and Canvas stay retained. */
+@media screen {
+  .studio-shell.document-focus-shell { grid-template-rows: 44px minmax(0, 1fr); }
+  .document-focus-shell > .app-bar,
+  .document-focus-shell > .status-bar,
+  .document-focus-shell > .app-body > .navigator,
+  .document-focus-shell > .app-body > .project-inspector,
+  .document-focus-shell > .app-body > .panel-edge,
+  .document-focus-shell > .app-body > .panel-edge-tab,
+  .document-focus-shell .project-center > .board-navigation,
+  .document-focus-shell .project-center > .project-board-strip,
+  .document-focus-shell .project-center > .project-board-strip-restore,
+  .document-focus-shell .workbench > .canvas-pane,
+  .document-focus-shell .workbench > .split-divider,
+  .document-focus-shell .workbench > .compact-split-tabs { display: none !important; }
+  .studio-shell.document-focus-shell > .app-body { grid-template-columns: minmax(0, 1fr) !important; grid-row: 2; }
+  .studio-shell.document-focus-shell > .app-body > .project-center {
+    grid-column: 1 !important; grid-template-rows: minmax(0, 1fr) !important;
+  }
+  .document-focus-shell .workbench { display: flex !important; }
+  .document-focus-shell .workbench > .retained-document-session:not([hidden]) > .document-pane {
+    width: 100% !important; flex: 1; min-width: 0; min-height: 0;
+  }
+}
+.document-focus-bar {
+  grid-row: 1; display: flex; align-items: center; gap: 12px; min-width: 0;
+  padding: 4px 12px; background: var(--surface-appbar); border-bottom: 1px solid var(--line);
+}
+.document-focus-title { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-size: 13px; }
+.document-focus-readonly { color: var(--muted); font-size: 11px; }
+.document-focus-bar > button { flex: none; white-space: nowrap; min-height: 34px; }
+.document-focus-bar > button:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+@media (max-width: 480px) { .document-focus-bar { gap: 8px; padding-inline: 8px; } .document-focus-bar > button { padding-inline: 8px; } }
+@media print { .document-focus-bar { display: none !important; } }

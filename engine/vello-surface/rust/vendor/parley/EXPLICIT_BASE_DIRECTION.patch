@@ -1,0 +1,102 @@
+diff --git "a/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\.cargo-home\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\parley-0.11.1\\src\\builder.rs" "b/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\vendor\\parley\\src\\builder.rs"
+index 8169197..593f042 100644
+--- "a/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\.cargo-home\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\parley-0.11.1\\src\\builder.rs"
++++ "b/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\vendor\\parley\\src\\builder.rs"
+@@ -25,9 +25,15 @@ pub struct RangedBuilder<'a, B: Brush> {
+     pub(crate) lcx: &'a mut LayoutContext<B>,
+     pub(crate) fcx: &'a mut FontContext,
+     pub(crate) line_break_override: Option<&'a LineBreakOverrideFn>,
++    pub(crate) explicit_base_level: Option<u8>,
+ }
+ 
+ impl<'b, B: Brush> RangedBuilder<'b, B> {
++    /// Explicit paragraph direction for a semantic host such as CSS. `None`
++    /// preserves upstream automatic first-strong direction inference.
++    pub fn set_base_direction_rtl(&mut self, rtl: Option<bool>) {
++        self.explicit_base_level = rtl.map(u8::from);
++    }
+     pub fn push_default<'a>(&mut self, property: impl Into<StyleProperty<'a, B>>) {
+         let resolved = self
+             .lcx
+@@ -74,6 +80,7 @@ impl<'b, B: Brush> RangedBuilder<'b, B> {
+             self.lcx,
+             self.fcx,
+             self.line_break_override,
++            self.explicit_base_level,
+         );
+     }
+ 
+@@ -173,6 +180,7 @@ impl<'b, B: Brush> StyleRunBuilder<'b, B> {
+             self.lcx,
+             self.fcx,
+             self.line_break_override,
++            None,
+         );
+     }
+ 
+@@ -268,6 +276,7 @@ impl<'b, B: Brush> TreeBuilder<'b, B> {
+             self.lcx,
+             self.fcx,
+             self.line_break_override,
++            None,
+         );
+ 
+         text
+@@ -289,6 +298,7 @@ fn build_into_layout<B: Brush>(
+     lcx: &mut LayoutContext<B>,
+     fcx: &mut FontContext,
+     line_break_override: Option<&LineBreakOverrideFn>,
++    explicit_base_level: Option<u8>,
+ ) {
+     if text.is_empty() && lcx.style_runs.is_empty() {
+         lcx.style_table.push(ResolvedStyle::default());
+@@ -302,7 +312,7 @@ fn build_into_layout<B: Brush>(
+         "at least one style run is required"
+     );
+ 
+-    crate::analysis::analyze_text(lcx, text, line_break_override);
++    crate::analysis::analyze_text(lcx, text, line_break_override, explicit_base_level);
+ 
+     layout.data.clear();
+     layout.data.scale = scale;
+diff --git "a/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\.cargo-home\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\parley-0.11.1\\src\\context.rs" "b/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\vendor\\parley\\src\\context.rs"
+index 277e2d2..f5efed8 100644
+--- "a/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\.cargo-home\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\parley-0.11.1\\src\\context.rs"
++++ "b/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\vendor\\parley\\src\\context.rs"
+@@ -105,6 +105,7 @@ impl<B: Brush> LayoutContext<B> {
+             lcx: self,
+             fcx,
+             line_break_override: None,
++            explicit_base_level: None,
+         }
+     }
+ 
+diff --git "a/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\.cargo-home\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\parley-0.11.1\\src\\analysis\\mod.rs" "b/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\vendor\\parley\\src\\analysis\\mod.rs"
+index f21d24b..4fa6e7d 100644
+--- "a/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\.cargo-home\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\parley-0.11.1\\src\\analysis\\mod.rs"
++++ "b/D:\\0\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\desktop-app\\engine\\vello-surface\\rust\\vendor\\parley\\src\\analysis\\mod.rs"
+@@ -232,6 +232,7 @@ pub(crate) fn analyze_text<B: Brush>(
+     lcx: &mut LayoutContext<B>,
+     mut text: &str,
+     line_break_override: Option<&LineBreakOverrideFn>,
++    explicit_base_level: Option<u8>,
+ ) {
+     struct WordBreakSegmentIter<'a, I: Iterator, B: Brush> {
+         text: &'a str,
+@@ -535,14 +536,14 @@ pub(crate) fn analyze_text<B: Brush>(
+             next_mandatory_linebreak
+         });
+ 
+-    if needs_bidi_resolution {
++    if needs_bidi_resolution || explicit_base_level == Some(1) {
+         lcx.bidi.resolve(
+             text.chars().zip(
+                 lcx.info
+                     .iter()
+                     .map(|info| (info.0.bidi_class, info.0.bracket)),
+             ),
+-            None,
++            explicit_base_level,
+         );
+     }
+ }

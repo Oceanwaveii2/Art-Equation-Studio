@@ -1,0 +1,23 @@
+/* This separate marker is authorized only by a complete accepted card list.
+   Descendant opacity preserves layout, pointer targets, selection semantics
+   and accessibility. The owner releases it before editing/provider changes. */
+.board-node[data-vello-card-canonical-read="true"] { transition: none !important; }
+/* Accepted paint must beat authored DOM skin selectors, including the shell's
+   colored column rule. Canonical capture removes this marker before measuring.
+   Keep the engine artwork visible without changing authored colors or hits. */
+.board-world .board-node[data-vello-card-paint="complete"],
+.canvas-stage[data-canvas-renderer="vello"] .board-world .board-node[data-vello-card-paint="complete"] {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  transition: none !important;
+}
+.board-node[data-vello-card-paint="complete"] > :not(.node-transform-box):not(.node-resize-handle):not(.node-rotate-handle):not(.column-resize-handle):not(.vector-node-editor):not(.diagram-node-editor) { opacity: 0 !important; }
+.board-node[data-vello-card-paint="complete"].selected { outline: 2px solid #8fb0c8; outline-offset: 1px; }
+.board-node[data-vello-card-paint="complete"].marquee-preview { outline: 2px solid #f2c98f; outline-offset: 1px; }
+.board-node[data-vello-card-paint="complete"].connector-source { outline: 3px solid #58c8c1; outline-offset: 1px; }
+/* The permanent inset Node Column ring is part of the accepted card paint.
+   Selection/focus outlines remain live semantic overlays. */
+.board-node.node-graph-column[data-vello-card-paint="complete"]:not(.selected):not(.marquee-preview):not(.connector-source) { outline-color: transparent !important; }
+.board-node[data-vello-card-canonical-read="true"][data-rectangle-erasure-clip="true"] { clip-path: none !important; }

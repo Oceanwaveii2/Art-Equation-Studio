@@ -1,0 +1,167 @@
+/* P1 presentation around the unchanged canonical controller and CanvasPane. */
+.prototype25-integrated-shell .workspace-writer-notice { flex:none; display:flex; align-items:center; gap:12px; padding:8px 16px; background:var(--surface-overlay); color:var(--text); border-bottom:2px solid var(--gold); }
+.prototype25-integrated-shell .workspace-writer-notice div { flex:1; min-width:0; }
+.prototype25-integrated-shell .workspace-writer-notice strong, .prototype25-integrated-shell .workspace-writer-notice span { display:block; }
+.prototype25-integrated-shell .workspace-writer-notice span { color:var(--text-subtle); }
+.prototype25-integrated-shell .workspace-writer-notice button { flex:none; min-height:32px; background:var(--surface-control); color:var(--text); border:1px solid var(--border-control); border-radius:5px; padding:4px 10px; }
+@media(max-width:700px) { .prototype25-integrated-shell .workspace-writer-notice { flex-wrap:wrap; } }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell.workspace-navy{--bg:#070d18;--panel:#0a1324;--panel-raised:#0f1c32;--line:#182844;--line-strong:#223759;--text:#fff;--text-strong:#fff;--text-subtle:#93a8c7;--muted:#93a8c7;--faint:#576d8c;--paper:#0b172a;--paper-text:#fff;--gold:#e5a85c;--teal:#38bdf8;--surface-appbar:#071326;--surface-nav:#081120;--surface-toolbar:#091427;--surface-overlay:#0f1c32;--surface-input:#0b172a;--surface-control:#0e1b30;--surface-hover:#162642;--surface-active:#1d3356;--border-subtle:#182844;--border-control:#223759;--focus-ring:#38bdf8;--selection-surface:#1d3356}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell.workspace-dark{--bg:#111216;--panel:#16181d;--panel-raised:#1f2229;--line:#262932;--line-strong:#363b47;--text:#e2e8f0;--text-strong:#f8fafc;--text-subtle:#8b949e;--muted:#8b949e;--faint:#575e6a;--paper:#16181f;--paper-text:#fff;--gold:#e5a85c;--teal:#38bdf8;--surface-appbar:#14161a;--surface-nav:#121418;--surface-toolbar:#16181d;--surface-overlay:#1e2128;--surface-input:#1a1c22;--surface-control:#22252c;--surface-hover:#2a2e38;--surface-active:#343946;--border-subtle:#262932;--border-control:#363b47;--focus-ring:#38bdf8;--selection-surface:#343946}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell.workspace-light{--bg:#f2f5f8;--panel:#fff;--panel-raised:#f7f9fa;--line:#d8e0e8;--line-strong:#bcc7d4;--text:#1d2530;--text-strong:#0d1520;--text-subtle:#526174;--muted:#526174;--faint:#748196;--paper:#fff;--paper-text:#1a1917;--gold:#77511f;--teal:#0a6a65;--surface-appbar:#e8ecf1;--surface-nav:#eef2f6;--surface-toolbar:#edf2f7;--surface-overlay:#fff;--surface-input:#fff;--surface-control:#edf2f7;--surface-hover:#e2e8f0;--surface-active:#d6e0ea;--border-subtle:#d8e0e8;--border-control:#bcc7d4;--focus-ring:#0a6a65;--selection-surface:#d6e0ea}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell{display:flex;flex-direction:column;min-width:0;min-height:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:13px/1.5 'Segoe UI',Arial,sans-serif;--ui-font:'Segoe UI',Arial,sans-serif;--p25-navigation-width:228px;--p25-fish-window:clamp(148px,13vw,240px);--shadow-overlay:rgba(0,0,0,.5)}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell.workspace-light{--shadow-overlay:rgba(13,21,32,.16)}
+.prototype25-integrated-shell .p25-windowbar{display:flex;align-items:center;justify-content:space-between;flex:none;height:27px;min-height:27px;padding:0 16px;letter-spacing:1.2px;font-size:10px;background:var(--surface-appbar);color:var(--text-subtle);border-bottom:1px solid var(--border-subtle)}
+.prototype25-integrated-shell .p25-windowbar i{font-size:9px;letter-spacing:1px;font-style:normal;color:var(--gold);border:1px solid var(--border-control);border-radius:3px;padding:2px 5px;margin-left:12px}
+.prototype25-integrated-shell .p25-windowbar button{min-height:23px;padding:1px 8px;font:11px 'Segoe UI',sans-serif;letter-spacing:0;background:var(--surface-control);color:var(--text);border:1px solid var(--border-control);border-radius:4px;cursor:pointer}
+.prototype25-integrated-shell>header.app-bar.aquarium-app-bar{flex:none;display:flex!important;align-items:center!important;grid-template-columns:none!important;min-height:129px!important;height:auto!important;padding:20px 16px 43px calc(var(--p25-fish-window) + 18px)!important;gap:14px!important;background:linear-gradient(90deg,#063866,var(--surface-appbar) 28%,var(--bg))!important;color:var(--text);border-bottom:0;position:relative}
+.prototype25-integrated-shell>header.app-bar[hidden]{display:none!important}
+.prototype25-integrated-shell .aquarium-scene.project-identity{position:absolute!important;top:0!important;left:0!important;bottom:0!important;width:var(--p25-fish-window)!important;height:auto!important;min-width:0!important;border:0!important;border-radius:0!important;overflow:hidden}
+.prototype25-integrated-shell .aquarium-water-band{height:32px!important;left:var(--p25-fish-window)!important;right:0!important;bottom:0!important}
+.prototype25-integrated-shell .project-heading{flex:1 1 140px;min-width:140px!important;max-width:220px!important;overflow:hidden;align-self:center}
+.prototype25-integrated-shell .project-heading>.eyebrow{font:600 10px/1.4 'Segoe UI',sans-serif!important;letter-spacing:1.3px;color:var(--text-subtle)!important}
+.prototype25-integrated-shell .project-heading>strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 17px/1.3 'Segoe UI',sans-serif!important;color:var(--text-strong)!important;max-width:none!important}
+.prototype25-integrated-shell .app-header-actions{display:flex!important;flex:8 1 1054px;align-items:center;flex-wrap:wrap;justify-content:flex-end!important;gap:5px!important;max-width:none!important;min-width:0!important}
+.prototype25-integrated-shell :is(.app-header-actions,.p25-workspace-actions,.project-library,.navigator) :is(button,input,select){font-family:'Segoe UI',sans-serif!important;font-size:12px!important}
+.prototype25-integrated-shell .app-header-actions :is(button,input,select){min-height:36px!important;height:auto;line-height:1.3;border-color:var(--border-control);color:var(--text)}
+.prototype25-integrated-shell .app-header-actions>button{padding-inline:10px!important;white-space:nowrap}
+.studio-shell.prototype25-integrated-shell .app-header-actions>button:is([aria-label="Toggle project navigation"],[aria-label="Toggle project inspector"],.undo-button,.redo-button){width:32px!important;min-width:32px!important;padding:0!important;font-size:0!important}
+.prototype25-integrated-shell .app-header-actions>button:is([aria-label="Toggle project navigation"],[aria-label="Toggle project inspector"],.undo-button,.redo-button)::before{display:block!important;font:15px/1 'Segoe UI',sans-serif}
+.prototype25-integrated-shell .app-header-actions>button[aria-label="Toggle project navigation"]::before{content:'◧'}
+.prototype25-integrated-shell .app-header-actions>button[aria-label="Toggle project inspector"]::before{content:'◨'}
+.prototype25-integrated-shell .app-header-actions>.undo-button::before{content:'↶'}
+.prototype25-integrated-shell .app-header-actions>.redo-button::before{content:'↷'}
+.prototype25-integrated-shell .app-header-actions .workspace-theme-choices{padding:0!important;gap:0!important;height:36px!important;min-height:36px!important}
+.prototype25-integrated-shell .app-header-actions .workspace-theme-choices>button{height:34px!important;min-height:34px!important}
+.prototype25-integrated-shell .app-header-actions .mode-switch{flex:none}
+.prototype25-integrated-shell .app-header-actions .mode-switch button{padding:6px 11px!important;background:var(--surface-control)!important;border:1px solid var(--border-control)!important}
+.prototype25-integrated-shell .app-header-actions .mode-switch button.active{color:var(--gold)!important;border-color:var(--gold)!important;background:var(--surface-active)!important}
+.prototype25-integrated-shell :is(.p25-workspace-body,.p25-workspace-center,.p25-workspace-slot){min-width:0;min-height:0}
+.prototype25-integrated-shell>.p25-workspace-body.app-body{position:relative;display:flex!important;flex:1;overflow:hidden;grid-template-columns:none!important;padding:0!important;gap:0!important}
+.prototype25-integrated-shell .p25-navigation-slot{flex:0 0 var(--p25-navigation-width);min-width:0;min-height:0;overflow:hidden;border-right:1px solid var(--border-subtle);background:var(--surface-nav)}
+.prototype25-integrated-shell .p25-navigation-slot>.navigator{position:static!important;display:flex!important;flex-direction:column;min-width:0;width:100%!important;height:100%;padding:12px!important;background:var(--surface-nav)!important;border:0!important;overflow:auto!important;gap:10px}
+.prototype25-integrated-shell .p25-navigation-slot .project-library{flex:none;min-width:0;margin:0;padding:0 0 12px!important;border-bottom:1px solid var(--border-subtle)!important}
+.prototype25-integrated-shell .project-library-heading{min-width:0;gap:8px;align-items:center}
+.prototype25-integrated-shell .project-library-heading .eyebrow{font-size:10px!important;color:var(--text-subtle)!important;letter-spacing:1px}
+.prototype25-integrated-shell .project-library-tools{display:grid!important;grid-template-columns:minmax(0,1fr) 80px;gap:5px;margin:8px 0!important}
+.prototype25-integrated-shell .project-library-tools :is(input,select){width:100%;min-width:0;height:32px!important;border:1px solid var(--border-control)!important;background:var(--surface-input)!important;color:var(--text)!important;padding:4px 6px!important;border-radius:4px}
+.prototype25-integrated-shell .project-library-tools>button{grid-column:1/-1;min-height:30px!important;padding:4px 6px!important;background:var(--surface-control)!important;color:var(--text-subtle)!important;border:1px solid var(--border-control)!important}
+.prototype25-integrated-shell .project-library-list{display:flex!important;flex-direction:column;gap:6px;max-height:190px;overflow:auto;min-width:0}
+.prototype25-integrated-shell .project-library-item{display:grid!important;grid-template-columns:minmax(0,1fr) 30px 30px!important;align-items:center;min-width:0;padding:6px!important;border:1px solid var(--border-subtle)!important;border-radius:6px!important;background:var(--panel-raised)!important;gap:3px!important}
+.prototype25-integrated-shell .project-library-item.active{border-color:var(--gold)!important;background:var(--surface-active)!important}
+.prototype25-integrated-shell .project-library-row{display:flex!important;flex-wrap:nowrap!important;align-items:center;gap:8px!important;min-width:0;width:100%;padding:0!important;text-align:left;background:transparent!important;border:0!important}
+.prototype25-integrated-shell .project-library-cover{display:grid;place-items:center;flex:none;width:34px!important;height:40px!important;min-width:34px!important;border:1px solid var(--border-control);border-radius:4px!important;background-size:cover!important;color:var(--gold)!important}
+.prototype25-integrated-shell .project-library-copy{display:block;flex:1;min-width:0;overflow:hidden}
+.prototype25-integrated-shell .project-library-copy>strong{display:block!important;font:600 12px/1.4 'Segoe UI',sans-serif!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap!important;word-break:normal!important;color:var(--text-strong)!important}
+.prototype25-integrated-shell .project-library-copy>:is(small,em){display:block;font:11px/1.4 'Segoe UI',sans-serif!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-subtle)!important;margin:0!important}
+.prototype25-integrated-shell .project-library-item>.project-row-action{width:30px!important;min-width:30px!important;height:32px!important;min-height:32px!important;padding:0!important;color:var(--text-subtle)!important}
+.prototype25-integrated-shell .navigator .tree-row-wrap{display:flex!important;min-width:0;align-items:center;gap:3px;min-height:34px;border-bottom:0!important}
+.prototype25-integrated-shell .navigator .tree-row{display:flex!important;align-items:center;min-width:0;flex:1;min-height:32px!important;height:auto!important;padding:5px 6px!important;font:12px/1.4 'Segoe UI',sans-serif!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap!important;word-break:normal!important;color:var(--text-subtle)!important;gap:6px;border-radius:4px!important}
+.prototype25-integrated-shell .navigator .tree-row.selected{background:var(--surface-active)!important;color:var(--text-strong)!important;box-shadow:inset 3px 0 0 var(--gold)!important}
+.prototype25-integrated-shell .navigator .tree-row-wrap>.project-row-action{flex:none;width:30px!important;min-width:30px!important;min-height:32px!important;padding:0!important}
+.prototype25-integrated-shell .navigator :is(.workspace-heading,.tree-heading){font:600 10px/1.5 'Segoe UI',sans-serif!important;letter-spacing:1px;color:var(--text-subtle)!important;margin-top:10px}
+.prototype25-integrated-shell .navigator .p25-tree-section{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;margin:12px 0 6px;min-height:22px}
+.prototype25-integrated-shell .navigator .p25-tree-section>.tree-section-label{min-width:0;margin:0!important;padding:0!important;white-space:nowrap;font:700 10px/1.4 'Segoe UI',sans-serif!important;letter-spacing:.3px;color:var(--gold)!important;text-transform:uppercase}
+.prototype25-integrated-shell .navigator .p25-tree-section>small{flex:none;white-space:nowrap;font:10px/1.4 'Segoe UI',sans-serif;color:var(--teal)}
+.prototype25-integrated-shell .navigator .asset-summary{min-width:0;flex:none;border-top:1px solid var(--border-subtle);padding-top:10px}
+.prototype25-integrated-shell .navigator .asset-summary :is(p,small,span){font-size:11px!important;line-height:1.5!important}
+.prototype25-integrated-shell .p25-workspace-center.project-center{display:flex!important;flex:1;flex-direction:column;overflow:hidden;grid-template-rows:none!important;grid-column:auto!important;background:var(--bg)}
+.prototype25-integrated-shell .p25-workspace-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;min-height:41px;padding:4px 12px;background:var(--surface-toolbar);border-bottom:1px solid var(--border-subtle);color:var(--text-subtle)}
+.prototype25-integrated-shell .p25-workspace-heading>div{display:flex;align-items:center;gap:12px;min-width:0}
+.prototype25-integrated-shell .p25-workspace-heading>div:first-child{flex:1}
+.prototype25-integrated-shell .p25-workspace-heading span{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prototype25-integrated-shell .p25-workspace-heading i{font-style:normal;padding:0 10px;color:var(--faint)}
+.prototype25-integrated-shell .p25-workspace-heading button{flex:none;min-height:30px;border:1px solid var(--border-control);border-radius:5px;background:transparent;color:var(--text);padding:2px 9px;font:12px 'Segoe UI',sans-serif;cursor:pointer;white-space:nowrap}
+.prototype25-integrated-shell .p25-board-navigation-slot{flex:none;min-width:0;min-height:0}
+.prototype25-integrated-shell .p25-board-navigation-slot>.board-navigation{height:36px;min-height:36px;background:var(--surface-nav);border-bottom:1px solid var(--border-subtle);color:var(--text)}
+.prototype25-integrated-shell .p25-workspace-slot{flex:1;display:flex;overflow:hidden;position:relative}
+.prototype25-integrated-shell .p25-workspace-slot>.workbench{flex:1;min-width:0;min-height:0;width:100%;height:100%}
+.prototype25-integrated-shell .document-pane>.pane-toolbar{background:var(--surface-toolbar)!important;border-bottom:1px solid var(--border-subtle)!important;color:var(--text)}
+.prototype25-integrated-shell .document-pane>.pane-toolbar :is(button,input,select){font:12px/1.4 'Segoe UI',sans-serif!important;min-height:32px!important}
+.prototype25-integrated-shell .document-formatting-controls :is(select,button,.format-button,.toolbar-overflow-menu>summary){min-height:32px!important}
+.prototype25-integrated-shell .document-stage{background:var(--bg)!important;padding:20px!important}
+.prototype25-integrated-shell .document-paper{border:1px solid var(--border-subtle)!important;border-radius:9px!important;box-shadow:0 8px 24px var(--shadow-overlay)!important}
+.prototype25-integrated-shell .p25-board-strip-slot{flex:none;min-width:0;border-top:1px solid var(--border-subtle);background:var(--surface-toolbar)}
+.prototype25-integrated-shell .p25-board-strip-slot>.project-board-strip{height:110px!important;min-height:110px!important;background:var(--surface-toolbar)!important}
+.prototype25-integrated-shell .p25-project-details{position:fixed;top:calc(var(--shell-header-h,129px) + 74px);right:12px;bottom:38px;z-index:120;width:340px;max-width:calc(100vw - 24px);display:flex;flex-direction:column;min-height:0;border:1px solid var(--border-control);border-radius:7px;overflow:hidden;background:var(--surface-overlay);box-shadow:0 12px 36px var(--shadow-overlay)}
+.prototype25-integrated-shell .p25-project-details[hidden]{display:none!important}
+.prototype25-integrated-shell .p25-project-details>header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-subtle);flex:none}
+.prototype25-integrated-shell .p25-project-details>header strong{display:block;font-size:13px;color:var(--text-strong)}
+.prototype25-integrated-shell .p25-project-details>header small{display:block;font-size:11px;color:var(--text-subtle)}
+.prototype25-integrated-shell .p25-project-details>header>button{width:32px;min-height:32px;border:1px solid var(--border-control);border-radius:4px;background:var(--surface-control);color:var(--text);font-size:18px;cursor:pointer}
+.prototype25-integrated-shell .p25-project-details>.project-inspector{position:static!important;display:block!important;flex:1;width:100%!important;min-width:0;min-height:0;height:auto!important;max-height:none!important;overflow:auto!important;transform:none!important;visibility:visible!important;box-shadow:none!important;border:0!important;background:var(--surface-nav)!important;color:var(--text)}
+.prototype25-integrated-shell .p25-project-details .inspector-drawer-close{display:none!important}
+.prototype25-integrated-shell .p25-project-details :is(button,input,select){min-height:32px!important;font:12px/1.4 'Segoe UI',sans-serif!important}
+.prototype25-integrated-shell .p25-project-details :is(label,p,small,strong,.inspector-section-toggle span){font-family:'Segoe UI',sans-serif!important;font-size:12px!important;line-height:1.5!important}
+.prototype25-integrated-shell .p25-project-details .inspector-section-toggle span{color:var(--text-subtle)!important;text-transform:none!important;letter-spacing:0!important}
+.prototype25-integrated-shell>.status-bar{flex:none;min-height:26px;background:var(--surface-toolbar)!important;color:var(--text-subtle);font:11px/1.4 'Segoe UI',sans-serif!important;border-top:1px solid var(--border-subtle)}
+.prototype25-integrated-shell :is(.p25-workspace-actions,.project-library,.navigator,.p25-project-details) :focus-visible{outline:2px solid var(--focus-ring)!important;outline-offset:2px}
+.prototype25-integrated-shell.p25-compact-aquarium>header.app-bar{min-height:64px!important;padding:6px 16px 8px 66px!important;gap:12px!important}
+.prototype25-integrated-shell.p25-compact-aquarium .aquarium-scene.project-identity{height:36px!important;width:46px!important;top:6px!important;left:10px!important;bottom:auto!important;border:1.5px solid var(--focus-ring)!important;border-radius:18px!important;box-shadow:0 0 12px #38bdf873}
+.prototype25-integrated-shell.p25-compact-aquarium .aquarium-identity-controls{display:none!important}
+.prototype25-integrated-shell.p25-compact-aquarium .aquarium-water-band{left:0!important;height:4px!important;opacity:.8}
+.prototype25-integrated-shell.p25-compact-aquarium .project-heading>.eyebrow{display:none}
+.prototype25-integrated-shell.p25-compact-aquarium .project-heading>strong{font-size:15px!important}
+.prototype25-integrated-shell.document-focus-shell>.p25-windowbar{display:none!important}
+.prototype25-integrated-shell.document-focus-shell>.p25-workspace-body{flex:1!important}
+.prototype25-integrated-shell.document-focus-shell :is(.p25-navigation-slot,.p25-workspace-heading,.p25-board-navigation-slot,.p25-board-strip-slot,.p25-project-details){display:none!important}
+@media(max-width:1280px){.studio-shell.p1-v2-shell.prototype25-integrated-shell{--p25-navigation-width:212px}.prototype25-integrated-shell>header.app-bar.aquarium-app-bar{display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding-top:12px!important;padding-bottom:32px!important;min-height:128px!important}.prototype25-integrated-shell .project-heading{max-width:none!important}.prototype25-integrated-shell .app-header-actions{justify-content:flex-start!important}.prototype25-integrated-shell .p25-workspace-heading>button{max-width:144px;overflow:hidden;text-overflow:ellipsis}}
+@media(max-width:850px){.prototype25-integrated-shell .p25-workspace-heading{gap:6px;padding-inline:8px}.prototype25-integrated-shell .project-library-cover{width:28px!important;min-width:28px!important;height:34px!important}.prototype25-integrated-shell .p25-project-details{top:40px;bottom:34px}}
+@media(max-width:600px){.studio-shell.p1-v2-shell.prototype25-integrated-shell{--p25-navigation-width:186px;--p25-fish-window:140px}.prototype25-integrated-shell>header.app-bar.aquarium-app-bar{padding:14px 12px 32px 158px!important;min-height:172px!important}.prototype25-integrated-shell .aquarium-scene.project-identity{bottom:auto!important;height:110px!important}.prototype25-integrated-shell .app-header-actions{grid-column:1/-1;margin-left:-150px;margin-top:24px}.prototype25-integrated-shell .aquarium-water-band{left:0!important;top:110px!important;bottom:auto!important;height:24px!important}.prototype25-integrated-shell .p25-workspace-heading{flex-wrap:wrap}.prototype25-integrated-shell .p25-windowbar i{display:none}.prototype25-integrated-shell .project-library-cover{display:none!important}}
+
+/* Live comparison repairs: preserve paper choices and free navigation space. */
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .questionnaire-theme-light{--paper:#fff;--paper-text:#1a1917}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .document-theme-paper{--paper:#fff;--paper-text:#1a1917}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .questionnaire-theme-dark{--paper:#20211f;--paper-text:#ede9df}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .questionnaire-theme-light .questionnaire-field :is(input,select){background:#eee9e0!important;color:#302c28!important;border-color:#c8c0b5!important}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .theme-choice-dark{background:#16181d!important;color:#fff!important}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-library-item>.project-library-row{grid-column:1/-1;width:100%;min-height:48px!important;justify-self:stretch}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-library-item>.project-library-row>.project-library-copy{min-width:0;flex:1}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-library-item>.project-row-action{justify-self:end}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .p25-navigation-slot{position:relative}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .p25-navigation-resize{position:absolute;top:0;right:0;bottom:0;z-index:75;width:8px!important;min-width:8px!important;min-height:0!important;height:auto!important;margin:0;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;cursor:ew-resize;touch-action:none}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .p25-navigation-resize>span{display:none}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .p25-navigation-resize::after{content:'';position:absolute;top:calc(50% - 18px);left:3px;width:2px;height:36px;border-radius:2px;background:var(--border-control)}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .p25-navigation-resize:is(:hover,:focus-visible)::after{background:var(--focus-ring)}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell :is(.p25-board-strip-slot,.prototype-canvas-workspace)>.project-board-strip{display:flex!important;flex-direction:column;flex:none;grid-template-columns:none!important;min-height:110px!important;height:110px!important;background:var(--surface-toolbar)!important;border-top:1px solid var(--border-subtle)}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-board-strip>header{display:flex!important;align-items:center;justify-content:flex-start;gap:8px;flex:none;height:36px;min-height:36px;padding:3px 12px!important;border:0!important;border-bottom:1px solid var(--border-subtle)!important;background:var(--surface-toolbar)!important}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-board-strip>header>div{display:flex;align-items:center;justify-content:flex-start;gap:6px;font:600 11px/1.4 'Segoe UI',sans-serif!important;color:var(--text-subtle)!important;margin-right:auto;white-space:nowrap}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-board-strip>header button{display:block!important;min-height:28px!important;height:28px!important;padding:4px 8px!important;font:12px/1.4 'Segoe UI',sans-serif!important;color:var(--text)!important;border:1px solid var(--border-control)!important;background:var(--surface-control)!important;white-space:nowrap}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-board-cards{display:flex;flex:1;min-height:0;overflow:auto;padding:5px 10px!important;gap:6px!important}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-board-cards>button{flex:0 0 188px!important;height:62px!important;min-height:62px!important;background:var(--panel-raised)!important;border-color:var(--border-control)!important;gap:8px!important;padding:5px!important}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-board-cards>button.active{border-color:var(--gold)!important}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-board-cover{flex:none;width:46px!important;height:48px!important;min-width:46px!important;border-radius:4px!important}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-board-cards strong{font:600 12px/1.4 'Segoe UI',sans-serif!important;color:var(--text-strong)!important}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .project-board-cards :is(small,em){font:11px/1.4 'Segoe UI',sans-serif!important;color:var(--text-subtle)!important}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .app-header-actions .project-search{flex:none;min-width:140px;width:140px}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .app-header-actions .project-search>input{width:100%;padding-right:8px!important}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .app-header-actions .project-search-scope{display:none}
+
+/* Theme-consistent trash and object menus, including danger and hover states. */
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .trash-viewer,.studio-shell.p1-v2-shell.prototype25-integrated-shell .canvas-context-menu { background:var(--surface-overlay);color:var(--text);border-color:var(--border-control);box-shadow:0 12px 28px var(--shadow-overlay); }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .trash-entry { background:var(--surface-input);border-color:var(--border-subtle); }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .canvas-context-menu button { color:var(--text);min-height:32px;font:12px/1.4 var(--ui-font); }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .canvas-context-menu button:hover,.studio-shell.p1-v2-shell.prototype25-integrated-shell .canvas-context-menu button:focus-visible { background:var(--surface-hover);color:var(--text-strong); }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .canvas-context-menu .context-section { color:var(--gold);border-color:var(--border-subtle);font:600 10px/1.5 var(--ui-font); }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .canvas-context-menu .context-danger { color:var(--danger-text,#ffb4ab); }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell.workspace-light { --danger-text:#a32121; }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .trash-viewer>header strong { font:600 16px/1.4 var(--ui-font); }
+.production-studio-title .production-studio-mode { font:11px/1.4 'Segoe UI',sans-serif;color:var(--text-subtle); }
+
+/* Action popovers must receive pointer input above the floating studio. */
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .canvas-subtools { z-index:190; }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .board-export-popover { z-index:200;background:var(--surface-overlay);color:var(--text);border-color:var(--border-control);box-shadow:0 12px 28px var(--shadow-overlay); }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .board-export-popover :is(button,select) { min-height:32px;background:var(--surface-input);color:var(--text);border-color:var(--border-control);font:12px/1.4 var(--ui-font); }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .canvas-context-menu { z-index:220; }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .board-filmstrip > header span,
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .filmstrip-caption small { color:var(--text-muted);font-size:11px; }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .p25-project-details { z-index:230; }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .trash-viewer { z-index:240; }
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .trash-viewer button { min-height:32px; }
+
+/* The theme control depicts ocean, moon and sunlight consistently. */
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .workspace-theme-choices .theme-choice-navy{color:#55d9cb;background:transparent}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .workspace-theme-choices .theme-choice-navy.active{color:#76f4de!important;background:#096b91!important;box-shadow:inset 0 -2px 0 #4ddbc7}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .workspace-theme-choices .theme-choice-light{color:#b48a39}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .workspace-theme-choices .theme-choice-light.active{color:#6c450b!important;background:#f4bf58!important;box-shadow:inset 0 -2px 0 #d89b28}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .theme-choice-light.active [data-theme-icon] circle{fill:#ffd775;stroke:#9b650d}
+.studio-shell.p1-v2-shell.prototype25-integrated-shell .theme-choice-light.active [data-theme-icon]{filter:drop-shadow(0 0 3px #ffe59ccc)}

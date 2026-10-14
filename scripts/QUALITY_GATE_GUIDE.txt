@@ -1,0 +1,106 @@
+ART EQUATION 2.1 QUALITY GATE GUIDE — 2026-10-08
+
+STATUS: BOTH OWNER MILESTONES ARE OPEN. No release has qualified. Native executable/font/UI evidence is mandatory. The P1 reference screenshot hashes are pinned in the manifest.
+
+Milestone 1: Integrated P1/P0 reaches the isolated Retina 4K measurements.
+Three independent exact 3840x2160 runs, continuous pan/zoom, actual GPU pixels, no unexpected fallback, no reduced resolution/image quality. Pan input-to-committed-frame p95 <=16.2ms; zoom <=22.3ms; first post-gesture frame <=78.5ms; complete sharp profile <=613ms. These are the worst recorded ceilings from the approved Retina three-run set, not a claim that the prototype sustained 60Hz. Also report every run, oldest delayed input, coalescing, errors and resource recovery. rAF alone cannot qualify this milestone.
+
+Milestone 2: Complete the P1 UI.
+Missing fonts, fallback fonts, typography, organization and contextual workflows are failures. Navy/Light/Dark; Canvas/Document/Split; 1280x720, 1440x900, 1920x1080 =27 required UI states. Record actual rendered font identities and face hashes (document.fonts.check alone can succeed with fallback), approved reference and candidate screenshot hashes, clipping/overlap counts and explicit workflow checks. Keep the toolbar bottom-center. An attractive screenshot cannot replace interaction acceptance.
+
+Commands from this desktop-app directory:
+  npm run test:quality
+    Verifies the validators reject known bad/stale/missing/slow/fallback evidence and that telemetry preserves delayed input. Synthetic fixtures test the gate, not the product.
+  npm run test:p0-gates
+    Runs 25 recovered suites. Failure/missing/timeout returns nonzero. This is isolated correctness only.
+  npm run build:v2
+    Runs quality-validator tests, renderer contract, engine boundary, TypeScript and production build. Successful compilation is never release acceptance.
+  npm run test:performance (alias: test:integration-performance)
+    Diagnostic live browser runner, by default three independent runs of Ultra and Test 2 node columns against the candidate preview on port5194. Requires a production preview, packaged fixture and compiled native font resolver. Set AUDIT_TARGET_URL, AUDIT_BOARDS, AUDIT_RUNS and AUDIT_EXACT_4K=1 as needed. Writes a fresh directory and returns nonzero for gross stalls, fallback, stale generation or errors. A smoke-only pass is never release acceptance. Timing run has no tracing; collect failure traces separately.
+  npm run quality:screen -- --report <comparison.json> --version <id> --output <screen.json>
+    Rejects gross regressions in saved diagnostic evidence.
+  npm run quality:manifest -- --exe <built-exe> --output <manifest.json>
+    Freezes current source, Rust renderer, native source, compiled production bundle, policy, project and media hashes. Without an EXE it explicitly cannot qualify a release.
+  npm run quality:release -- --report <release-evidence.json> --manifest <manifest.json> --output <certificate.json>
+    Requires three matching browser AND native runs for all eight boards at 1080p and exact4K, accepted paint ownership and pixels, workflows, Retina measurements, five-minute soaks and all 27 P1 UI states. Missing evidence fails. Rehashes measured artifacts; changes invalidate acceptance.
+  npm run desktop:portable -- -QualityEvidence <release-evidence.json> -QualityManifest <manifest.json>
+    Revalidates evidence and exact EXE hash before copying. Missing/stale/rejected evidence blocks packaging. There is no force/pass override.
+
+Do not edit performance numbers, delete failed samples, reset the baseline to a slower build, substitute a synthetic scene, lower backing resolution, use overview mips as final sharp pixels, or count a deliberate recovery fallback as an ordinary GPU pass. If a test cannot run, report NOT RUN and keep release blocked. Do not disable production features such as animated arrows only to obtain a performance pass; the new diagnostic runner uses normal motion.
+
+Native verification remains necessary. The browser fixture adapter simulates workspace IO. Its result cannot certify WebView2 IPC, disk saves, packaged fonts or process/GPU memory. Use the actual packaged EXE with a disposable copy of the fixture workspace, record its hash, and keep debug/trace runs separate from timing runs. Microsoft provides process-scoped WebView2 remote debugging; do not change global registry settings or the user's active project.
+
+The diagnostic runner also saves performance-analysis.json beside each comparison.
+It separates capture, elapsed GPU wait, paint-cache misses, triggering mutations,
+ownership blockers and pending generations. These overlapping elapsed spans are
+diagnostics, not pure GPU timestamps. Missing input commits, missing drop counts,
+transport loss or truncated snapshot history reject even the browser smoke screen.
+Never treat a missing or discarded sample as zero latency.
+
+Retained images still require exact mutation/revision checks at ownership
+boundaries. image-byte-validation-tests covers the optimized word/byte comparison,
+offset views, detached buffers and every mutation boundary. The offline comparator
+probe is not a rendering benchmark. GPU frontend parsing, upload validation and
+residency now have separate bounded spans; they are not GPU execution timestamps.
+
+Diagnostics now correlate canvas wheel input to the generation actually committed, including oldest/latest delay, coalescing, pending inputs and overflow. It is scoped per canvas. They also record long tasks, long animation frames/forced layout, capture, save spans, accepted object count and backend reasons. Overflow, missing observers or missing commit samples must not be silently interpreted as zero latency. This instrumentation does not measure physical monitor scan-out. Native diagnostic collection has not yet been certified.
+
+Workspace organization: only the 2.1 audit source is active. The eight-board fixture workspace is independent under ../fixtures/workspace. Archived P1 screenshots remain read-only reference evidence. npm run build:v2 verifies workspace organization plus the complete Rust/vendor/source/bindings receipt. After any Rust changes, rebuild WASM and both binding copies before recording engine-provenance; recording a receipt is never product acceptance.
+
+Run npm run build:engine after Rust changes. Refreshing a receipt now rebuilds Rust/WASM and regenerates both binding copies; the recorder cannot bless a pre-existing stale binary by hashing it alone.
+
+Browser timing provenance: the runner freezes the local candidate source, bundle,
+fixtures, references, tools and native font resolver before opening the browser.
+Every run pins that manifest hash. Tracked inputs and the manifest are rehashed
+after timing; missing/changed artifacts reject the saved report and re-screening.
+Keep those inputs immutable during measurement. This local receipt does not prove
+that an arbitrary target URL serves the bundle or replace native EXE evidence.
+
+Mixed coalesced input commits retain every event's kind, sequence and original
+delay with a separate canvas scope. Legacy aggregate rows cannot certify pan or
+zoom separately. Missing, duplicate or malformed per-event credit must reject.
+Font menus disclose catalog or unverified availability; actual resolved faces,
+font byte hashes and browser/native rendered glyphs remain separate evidence.
+
+Exact-4K diagnostics require a bounded read-only Windows process inventory before
+opening the measured browser and again after it closes. Competing Playwright CLI
+sessions or known UI/performance runners reject the report. The runner records
+their process identities and never kills user applications. Inventory-unavailable
+rejects exact-4K timing. Snapshots cannot prove the absence of transient work or
+unrelated GPU applications; preserve this limitation when comparing runs. Run UI
+reviews, debug traces, native tests and performance measurements serially. Close
+task-owned test sessions normally before timing; ordinary browsers are not assumed
+to be test processes. benchmark-isolation-tests includes actual CIM discovery of
+a cooperative child process and verifies that its removal clears that blocker.
+
+Input batches use validated numeric-only bounded chunks. The validator checks
+scope/request grouping, ordered unique event identities and complete chunk counts.
+Missing oldest/tail chunks reject even when transport counters say zero. Entirely
+absent batches still require loss counters and sample-coverage checks. Never
+describe a partial event distribution as complete input latency evidence.
+
+Active October source is current/2026-10/desktop-app. Root Start-2.1-preview.ps1
+checks the served index against its local production bundle before reuse. The
+old experiments audit location holds preserved historical output only; do not
+launch it or treat its old absolute manifests as new acceptance evidence.
+
+GPU allocation health is mandatory before presentation and paint ownership.
+Each diagnostic host.frameMetadata JSON and each release run.frameMetadata
+object must report gpuAllocationStatus checked or retained-checked, numeric
+gpuAllocationFailureFlags 0 and numeric gpuAllocationStatusBytes 32. Optional
+gpuAllocationCounts require valid uint32 counters and failed=0. A retained
+receipt is valid only for a checked texture reused by the same renderer cache.
+Missing status and coarse capacity failure require explicit CPU recovery; that
+recovery remains a failed ordinary GPU/Retina run. A healthy receipt cannot
+replace actual card pixels, independent visual comparisons or latency evidence.
+Never increase scratch budgets or hide failed allocation to obtain acceptance.
+
+Paint ownership visibility requires a separate check. A healthy GPU allocation
+receipt and nonzero owned-card count can coexist with opaque DOM overlays that
+cover the GPU image. The normal Node Columns review records untouched initial
+computed skins and raw GPU pixels before selection/canonical reads, rejects
+opaque complete-owned column bodies, and retains a composited initial screenshot.
+paint-ownership-style-tests uses actual production stylesheets in both load
+orders and all themes, including a control that reproduces the old collision.
+These DOM cascade/hit guards are correctness checks; full-board exact pixels,
+native rendering and Retina latency remain separate mandatory acceptance.

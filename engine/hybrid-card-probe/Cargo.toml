@@ -1,0 +1,24 @@
+[package]
+name = "ae-hybrid-card-probe"
+version = "0.1.0"
+edition = "2024"
+[workspace]
+[features]
+native-shared-atlas = ["art-equation-p0-app-surface/native-hybrid"]
+[[bin]]
+name = "native-shared-atlas"
+path = "src/bin/shared_atlas.rs"
+required-features = ["native-shared-atlas"]
+[patch.crates-io]
+vello = { path = "../vello-surface/rust/vendor/vello" }
+[dependencies]
+art-equation-p0-app-surface = { path = "../vello-surface/rust" }
+vello_hybrid = { version = "=0.2.0", default-features = false, features = ["wgpu"] }
+vello_common = "=0.2.0"
+wgpu = { version = "=29.0.4", default-features = false, features = ["std", "dx12", "vulkan", "wgsl"] }
+serde_json = "=1.0.149"
+pollster = "0.4"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
+sha2 = "=0.10.9"
+[profile.release]
+opt-level = 3

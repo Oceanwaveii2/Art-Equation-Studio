@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-10-14T05:27:08.069Z",
+  "results": [
+    {
+      "boardId": "ultra-graph-test-1",
+      "label": "Test 1: Real Time Board Ultra Graph Test 1 (Miro Authentic Flow)",
+      "fetchLatencyMs": "25.11",
+      "avgFrameMs": "3.10",
+      "residentMemoryMb": "134.4",
+      "nodeCount": 57,
+      "connectorCount": 20
+    },
+    {
+      "boardId": "test-2-foxy-momma",
+      "label": "Test 2: American Foxy Momma (Producing Parker + Roger Smith + Transparent Analysis)",
+      "fetchLatencyMs": "19.38",
+      "avgFrameMs": "3.10",
+      "residentMemoryMb": "134.4",
+      "nodeCount": 11,
+      "connectorCount": 4
+    },
+    {
+      "boardId": "test-3-boondocks",
+      "label": "Test 3: The Boondocks (84px Condensed Serif Title + 3 Media Columns + Yuzuruha)",
+      "fetchLatencyMs": "21.75",
+      "avgFrameMs": "3.10",
+      "residentMemoryMb": "134.4",
+      "nodeCount": 11,
+      "connectorCount": 0
+    }
+  ]
+}

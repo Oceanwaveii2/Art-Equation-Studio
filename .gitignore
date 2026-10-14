@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production build outputs
+dist/
+build/
+
+# Rust build artifacts
+target/
+**/target/
+src-tauri/target/
+engine/**/target/
+
+# Playwright & test outputs
+output/
+artifacts/
+tools/
+.playwright-cli/
+test-results/
+.mimosa/
+**/.mimosa/
+
+# Editor & OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Large binaries & archives
+*.exe
+*.zip
+*.tar.gz
+*.7z
+
+# Environment & logs
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*

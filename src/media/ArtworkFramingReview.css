@@ -1,0 +1,63 @@
+.artwork-framing-review { --framing-line: var(--border-control, #3a4656); --framing-text: var(--text, #e7edf5); --framing-muted: var(--text-subtle, #b4bfcc); color: var(--framing-text); min-width: 0; container-type: inline-size; font: 14px/1.5 "Segoe UI", sans-serif; }
+.artwork-framing-review *, .artwork-framing-review *::before, .artwork-framing-review *::after { box-sizing: border-box; }
+.artwork-framing-review__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+.artwork-framing-review h2 { margin: 0; font: 25px/1.2 Georgia, serif; }
+.artwork-framing-review h3 { margin: 0 0 6px; font-size: 15px; }
+.artwork-framing-review__eyebrow { margin: 0 0 7px; color: var(--ui-accent-text, #cba36b); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; }
+.artwork-framing-review button, .artwork-framing-review select { min-height: 36px; border: 1px solid var(--framing-line); background: var(--surface-input, #13171c); color: var(--framing-text); border-radius: 5px; padding: 7px 11px; font: inherit; cursor: pointer; }
+.artwork-framing-review__header > button { min-width: 36px; padding: 2px 8px; font-size: 23px; }
+.artwork-framing-review button:disabled, .artwork-framing-review fieldset:disabled, .artwork-framing-review select:disabled { cursor: default; }
+.artwork-framing-review button:disabled { opacity: .6; }
+.artwork-framing-review :is(button, select, input):focus-visible { outline: 2px solid var(--focus-ring, #d3af74); outline-offset: 3px; }
+.artwork-framing-review :is(input[type=radio], input[type=checkbox], input[type=range]) { accent-color: var(--gold, #cba36b); }
+.artwork-framing-review__scope, .artwork-framing-review__hint { color: var(--framing-muted); font-size: 12px; }
+.artwork-framing-review__scope { margin: 14px 0 18px; max-width: 85ch; }
+.artwork-framing-review__readonly { border: 1px solid var(--framing-line); border-left: 3px solid var(--gold, #cba36b); padding: 10px 12px; font-size: 12px; }
+.artwork-framing-review__layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(240px, 1fr); align-items: start; gap: 22px; }
+.artwork-framing-review__preview-column, .artwork-framing-review__controls { min-width: 0; }
+.artwork-framing-review__figure { margin: 0; }
+.artwork-framing-review__stage { padding: 18px; min-height: 270px; background: var(--surface-input, #13171c); border: 1px solid var(--framing-line); border-radius: 7px; display: grid; place-items: center; }
+.artwork-framing-review__frame { position: relative; overflow: hidden; flex: none; background: repeating-conic-gradient(#273342 0% 25%, #1b2531 0% 50%) 50% / 16px 16px; border: 1px solid #cba36b; }
+.artwork-framing-review__frame > img, .artwork-framing-review__identities img { display: block; width: 100%; height: 100%; }
+.artwork-framing-review__frame > img, .artwork-framing-review__identities img { position: absolute; inset: 0; }
+.artwork-framing-review__figure > figcaption { display: grid; gap: 3px; padding: 10px 0; overflow-wrap: anywhere; font-size: 12px; }
+.artwork-framing-review__figure > figcaption span { color: var(--framing-muted); font-size: 11px; }
+.artwork-framing-review__guides { position: absolute; inset: 0; pointer-events: none; border: 1px solid #fff8; }
+.artwork-framing-review__guides i { position: absolute; display: block; box-shadow: 0 0 1px #000; }
+.artwork-framing-review__guides i:nth-child(1), .artwork-framing-review__guides i:nth-child(2) { top: 0; bottom: 0; width: 1px; background: #fff9; }
+.artwork-framing-review__guides i:nth-child(1) { left: 33.333%; }
+.artwork-framing-review__guides i:nth-child(2) { left: 66.666%; }
+.artwork-framing-review__guides i:nth-child(3), .artwork-framing-review__guides i:nth-child(4) { left: 0; right: 0; height: 1px; background: #fff9; }
+.artwork-framing-review__guides i:nth-child(3) { top: 33.333%; }
+.artwork-framing-review__guides i:nth-child(4) { top: 66.666%; }
+.artwork-framing-review label.artwork-framing-review__guide-toggle { display: flex; align-items: center; gap: 8px; margin: 7px 0 16px; font-size: 12px; }
+.artwork-framing-review__guide-toggle input { width: 16px; height: 16px; flex: none; }
+.artwork-framing-review__identities { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.artwork-framing-review__identities figure { margin: 0; min-width: 0; }
+.artwork-framing-review__identities figure > div { position: relative; overflow: hidden; border: 1px solid var(--framing-line); border-radius: 4px; background: #18222e; }
+.artwork-framing-review__identities figcaption { padding-top: 6px; font-size: 10px; color: var(--framing-muted); }
+.artwork-framing-review fieldset { padding: 14px; margin: 0; min-width: 0; border: 1px solid var(--framing-line); border-radius: 6px; }
+.artwork-framing-review legend { padding: 0 6px; font-weight: 600; font-size: 13px; }
+.artwork-framing-review__modes { display: grid; gap: 9px; margin-bottom: 16px; }
+.artwork-framing-review .artwork-framing-review__modes label { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 12px; }
+.artwork-framing-review__modes input { width: 16px; height: 16px; flex: none; }
+.artwork-framing-review label.artwork-framing-review__field { display: grid; gap: 7px; margin: 14px 0; font-size: 12px; }
+.artwork-framing-review__field select, .artwork-framing-review__field input { min-width: 0; width: 100%; }
+.artwork-framing-review__field > span { display: flex; justify-content: space-between; gap: 8px; }
+.artwork-framing-review__field output { font-variant-numeric: tabular-nums; }
+.artwork-framing-review__field small { color: var(--framing-muted); font-size: 10px; }
+.artwork-framing-review__source { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 9px; }
+.artwork-framing-review__source h3, .artwork-framing-review__source p { flex-basis: 100%; margin: 0; }
+.artwork-framing-review__source p, .artwork-framing-review__geometry { color: var(--framing-muted); font-size: 11px; }
+.artwork-framing-review__file { display: none; }
+.artwork-framing-review__geometry { margin: 14px 0 0; padding: 10px; background: var(--surface-control, #1d242e); border-radius: 5px; }
+.artwork-framing-review__error { border: 1px solid #e39786; color: var(--text, #ffccbf); padding: 10px 12px; border-radius: 5px; font-size: 12px; }
+.artwork-framing-review__footer { border-top: 1px solid var(--framing-line); margin-top: 20px; padding-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.artwork-framing-review__footer > p { margin: 0; font-size: 11px; color: var(--framing-muted); max-width: 60ch; }
+.artwork-framing-review__footer > div { display: flex; flex: none; gap: 9px; }
+.artwork-framing-review .artwork-framing-review__apply { border-color: var(--gold, #cba36b); }
+@media (max-width: 740px) { .artwork-framing-review__layout { grid-template-columns: minmax(0, 1fr); gap: 18px; } .artwork-framing-review__stage { min-height: 220px; padding: 12px; } .artwork-framing-review__footer { align-items: flex-start; flex-direction: column; } .artwork-framing-review__footer > div { align-self: flex-end; } }
+@container (max-width: 700px) { .artwork-framing-review__layout { grid-template-columns: minmax(0, 1fr); gap: 18px; } .artwork-framing-review__stage { min-height: 220px; padding: 12px; } .artwork-framing-review__footer { align-items: flex-start; flex-direction: column; } .artwork-framing-review__footer > div { align-self: flex-end; } }
+@media (max-width: 420px) { .artwork-framing-review__identities { grid-template-columns: repeat(2, minmax(0, 1fr)); } .artwork-framing-review h2 { font-size: 22px; } }
+@media (prefers-reduced-motion: reduce) { .artwork-framing-review *, .artwork-framing-review *::before, .artwork-framing-review *::after { animation: none !important; transition: none !important; } }
+@media (forced-colors: active) { .artwork-framing-review__frame, .artwork-framing-review__identities figure > div, .artwork-framing-review__error { border: 1px solid CanvasText; background: Canvas; } .artwork-framing-review__guides { border-color: Highlight; } .artwork-framing-review__guides i { background: Highlight !important; } .artwork-framing-review button:disabled { opacity: 1; color: GrayText; } }

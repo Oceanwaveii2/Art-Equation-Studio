@@ -1,0 +1,47 @@
+[package]
+name = "art-equation-p0-app-surface"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89"
+license = "MIT OR Apache-2.0"
+
+[workspace]
+exclude = ["vendor/parley", "vendor/vello"]
+
+[patch.crates-io]
+vello = { path = "vendor/vello" }
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+# Explicit native experiment; the default WASM fallback remains worker-local
+# and single-threaded. This is not automatic CPU/GPU backend switching.
+native-cpu-parallel = ["vello_cpu/multithreading"]
+native-hybrid = ["dep:vello_hybrid", "dep:vello_common"]
+browser-hybrid = ["dep:vello_hybrid", "dep:vello_common"]
+
+[dependencies]
+serde_json = "=1.0.149"
+serde = { version = "=1.0.229", features = ["derive"] }
+parley = { version = "=0.11.1", path = "vendor/parley", default-features = false, features = ["std", "complex-scripts"] }
+skrifa = { version = "=0.44.0", default-features = false, features = ["std"] }
+sha2 = "=0.10.9"
+icu_segmenter = { version = "=2.3.0", features = ["compiled_data"], default-features = false }
+vello = { version = "=0.10.0", default-features = false, features = ["wgpu"] }
+vello_cpu = { version = "=0.2.0", default-features = false, features = ["std", "u8_pipeline"] }
+wgpu = { version = "=29.0.4", default-features = false, features = ["std", "webgpu", "wgsl"] }
+vello_hybrid = { version = "=0.2.0", optional = true, default-features = false, features = ["wgpu"] }
+vello_common = { version = "=0.2.0", optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.114"
+wasm-bindgen-futures = "=0.4.64"
+web-sys = { version = "=0.3.91", features = ["HtmlCanvasElement"] }
+js-sys = "=0.3.91"
+futures-channel = "=0.3.34"
+
+[profile.release]
+lto = "thin"
+opt-level = 3
+

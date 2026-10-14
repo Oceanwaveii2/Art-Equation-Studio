@@ -1,0 +1,110 @@
+/* Filenames wrap inside the existing header instead of relying on native
+   ellipsis paint, which is not a qualified card-text provider. */
+.studio-shell .node-video>.node-drag-handle { overflow:hidden; }
+.studio-shell .node-video>.node-drag-handle>strong { min-width:0; white-space:normal; overflow-wrap:anywhere; word-break:normal; text-overflow:clip; line-height:12px; }
+.video-review { height:calc(100% - 37px); min-height:0; display:grid; grid-template-rows:minmax(76px,1fr) 48px 8px auto; grid-auto-rows:auto; overflow:auto; background:var(--panel); color:var(--text); scrollbar-width:thin; }
+.video-review>video { min-width:0; width:100%; height:100%; display:block; background:#07090c; object-fit:contain; cursor:pointer; }
+.video-review-controls { box-sizing:border-box; min-width:0; display:grid; grid-template-rows:20px 20px; gap:3px; padding:2px 4px; border-top:1px solid var(--border-subtle); background:var(--surface-toolbar); }
+.video-control-row { min-width:230px; display:flex; align-items:center; gap:2px; }
+.video-review-controls button,.video-compact-controls button { display:flex; align-items:center; justify-content:center; width:20px; height:20px; padding:0; flex:none; border:1px solid transparent; border-radius:3px; background:transparent; color:var(--text-subtle); cursor:pointer; }
+.video-review-controls button:hover,.video-compact-controls button:hover { background:var(--surface-hover); }
+.video-review-controls button:focus-visible,.video-compact-controls button:focus-visible { outline:none; border-color:var(--focus-ring); background:var(--surface-active); }
+.video-mute-icon,.video-playback-icon { display:block; width:16px; height:16px; margin:auto; }
+.video-review-controls output { display:block; flex:none; width:56px; color:var(--text-subtle); font:700 8px/20px "Segoe UI",sans-serif; }
+
+/* Native controls keep focus, hit testing and keyboard behavior. Their ordinary
+   HTML mirrors provide the paint captured for a retained video card. */
+.video-review .video-control-hit,.video-controls-dialog .video-control-hit { position:absolute; inset:0; box-sizing:border-box; min-width:0; width:100%; height:100%; margin:0; border:0; padding:0; opacity:0; cursor:pointer; outline:none; }
+.video-range-control { position:relative; min-width:25px; height:20px; box-sizing:border-box; border:1px solid transparent; border-radius:3px; --video-range-accent:var(--gold); }
+.video-volume-control { width:38px; flex:none; --video-range-accent:var(--teal); }
+.video-position-control { width:100%; }
+.video-range-control:focus-within,.video-frame-rate-control:focus-within,.video-color-control:focus-within { border-color:var(--focus-ring); background:var(--surface-active); }
+.video-range-track { position:absolute; left:5px; right:5px; top:8px; height:3px; border-radius:2px; background:var(--border-control); pointer-events:none; }
+.video-range-progress { display:block; height:100%; border-radius:2px; background:var(--video-range-accent); }
+.video-range-thumb { position:absolute; top:-3px; width:8px; height:8px; border-radius:4px; background:var(--video-range-accent); transform:translateX(-50%); }
+.video-frame-rate-control { position:relative; flex:none; width:42px; height:20px; box-sizing:border-box; border:1px solid transparent; border-radius:3px; margin-left:auto; }
+.video-frame-rate-paint { display:block; padding:0 3px; color:var(--text-subtle); font:8px/18px "Segoe UI",sans-serif; pointer-events:none; }
+.video-playback-rate-control { position:relative; flex:none; width:34px; height:20px; box-sizing:border-box; border:1px solid transparent; border-radius:3px; }
+.video-playback-rate-control:focus-within { border-color:var(--focus-ring); background:var(--surface-active); }
+.video-playback-rate-paint { display:block; padding:0 2px; color:var(--text-subtle); font:8px/18px "Segoe UI",sans-serif; pointer-events:none; }
+.video-review-controls button.video-control-active, .video-compact-controls button.video-control-active { color:var(--gold); background:var(--surface-active); border-color:var(--gold); }
+
+.video-marker-track { position:relative; margin:0 8px; background:var(--border-control); }
+.video-marker-track button { position:absolute; top:-2px; width:5px; height:12px; transform:translateX(-50%); border:1px solid transparent; border-radius:2px; background:var(--gold); padding:0; cursor:pointer; }
+.video-marker-track button:focus-visible { outline:none; border-color:var(--focus-ring); }
+.video-annotation-entry { display:flex; gap:5px; padding:4px 6px; border-top:1px solid var(--border-subtle); background:var(--panel); }
+.video-text-control { position:relative; box-sizing:border-box; min-width:0; flex:1; height:21px; border:1px solid var(--border-control); border-radius:3px; background:var(--surface-input); color:var(--text); font:8px/19px "Segoe UI",sans-serif; }
+.video-text-control:focus-within { border-color:var(--focus-ring); background:var(--surface-active); }
+.video-text-paint { display:block; padding:0 6px; overflow:hidden; white-space:nowrap; font:8px/19px "Segoe UI",sans-serif; pointer-events:none; }
+.video-text-placeholder { color:var(--muted); }
+.video-review .video-control-editor,.video-controls-dialog .video-control-editor { padding:0 6px; background:transparent; color:var(--text); caret-color:var(--text); font:inherit; line-height:normal; cursor:text; }
+.video-review .video-control-editor:focus,.video-controls-dialog .video-control-editor:focus { opacity:1; }
+.video-text-control:focus-within .video-text-paint { display:none; }
+.video-color-control { position:relative; box-sizing:border-box; flex:none; width:23px; height:21px; padding:3px; border:1px solid var(--border-control); border-radius:3px; background:var(--surface-input); }
+.video-color-paint { display:block; width:100%; height:100%; border-radius:1px; pointer-events:none; }
+.video-annotation-entry button { display:flex; align-items:center; justify-content:center; height:21px; flex:none; border:1px solid var(--border-control); border-radius:3px; background:var(--surface-active); color:var(--gold); padding:0 6px; font:8px/19px "Segoe UI",sans-serif; cursor:pointer; }
+.video-action-label { display:block; font:8px/19px "Segoe UI",sans-serif; }
+.video-annotation-entry button:focus-visible { outline:none; border-color:var(--focus-ring); }
+.video-annotation-entry button:disabled { opacity:.42; cursor:default; }
+.video-annotation-list { max-height:86px; overflow:auto; border-top:1px solid var(--border-subtle); background:var(--surface-input); scrollbar-width:thin; }
+.video-annotation-list>div { display:grid; grid-template-columns:minmax(0,1fr) 22px; border-bottom:1px solid var(--border-subtle); }
+.video-annotation-list>div>button:first-child { min-width:0; display:grid; grid-template-columns:58px minmax(0,1fr); gap:5px; align-items:center; border:1px solid transparent; background:transparent; color:var(--text-subtle); padding:5px 7px; text-align:left; cursor:pointer; }
+.video-annotation-list time { color:var(--gold); font:700 7px/1 ui-monospace,monospace; }
+.video-annotation-list span { overflow:hidden; font-size:8px; text-overflow:ellipsis; white-space:nowrap; }
+.video-annotation-list>div>button:last-child { border:1px solid transparent; background:transparent; color:var(--muted); cursor:pointer; }
+.video-annotation-list>div>button:focus-visible { outline:none; border-color:var(--focus-ring); background:var(--surface-active); }
+.video-annotation-list>div:hover { background:var(--surface-hover); }
+.video-annotation-search { display:flex; align-items:center; gap:6px; padding:4px 7px; border-top:1px solid var(--border-subtle); background:var(--panel); }
+.video-annotation-search .video-text-control { height:20px; line-height:18px; }
+.video-annotation-search .video-text-paint { line-height:18px; }
+.video-annotation-count { color:var(--muted); font-size:7px; }
+.video-annotation-list>p { margin:0; padding:8px; color:var(--muted); font-size:8px; }
+
+/* The imported 156x148 cards have a 154x109 content viewport. Keep direct
+   playback/seek paint inside that viewport; expose every other workflow by
+   an explicit controls action without changing saved node geometry. */
+.video-review-compact { grid-template-rows:minmax(24px,1fr) 42px; overflow:hidden; }
+.video-compact-controls { min-width:0; display:grid; grid-template-rows:20px 16px; gap:1px; padding:2px 4px; border-top:1px solid var(--border-subtle); background:var(--surface-toolbar); }
+.video-compact-control-row { min-width:0; display:flex; align-items:center; gap:2px; }
+.video-compact-controls output { display:block; flex:none; width:42px; color:var(--text-subtle); font:700 8px/20px "Segoe UI",sans-serif; }
+.video-compact-controls .video-controls-trigger { width:auto; min-width:0; flex:1; padding:0 3px; background:var(--surface-active); }
+.video-controls-trigger .video-action-label { font:8px/18px "Segoe UI",sans-serif; white-space:nowrap; }
+.video-compact-controls .video-position-control { height:16px; }
+.video-compact-controls .video-range-track { top:6px; }
+
+/* This nonmodal portal lives in the shell, outside the canvas paint order.
+   It operates the original mounted player and leaves the workspace reachable. */
+.video-controls-dialog { position:fixed; z-index:220; top:50%; left:50%; transform:translate(-50%,-50%); width:min(480px,calc(100vw - 32px)); max-height:calc(100vh - 32px); display:flex; flex-direction:column; gap:8px; overflow:auto; padding:12px; border:1px solid var(--border-control); border-radius:6px; background:var(--surface-overlay); color:var(--text); box-shadow:0 12px 32px var(--shadow-overlay); font:12px/1.4 "Segoe UI",sans-serif; }
+.video-controls-dialog>header { display:flex; align-items:center; gap:8px; }
+.video-controls-dialog h2 { min-width:0; flex:1; margin:0; color:var(--text-strong); font:600 16px/1.3 "Segoe UI",sans-serif; overflow-wrap:anywhere; }
+.video-controls-dialog>header>button { flex:none; min-height:32px; border:1px solid var(--border-control); border-radius:5px; background:var(--surface-input); color:var(--text); padding:0 8px; font:12px/30px "Segoe UI",sans-serif; cursor:pointer; }
+.video-controls-dialog>header>button:focus-visible { outline:none; border-color:var(--focus-ring); background:var(--surface-active); }
+.video-controls-summary { margin:0; color:var(--muted); font-size:11px; }
+.video-controls-dialog .video-review-controls { flex:none; display:flex; flex-direction:column; gap:8px; padding:8px; border:1px solid var(--border-subtle); border-radius:5px; }
+.video-controls-dialog .video-control-row { min-width:0; flex-wrap:wrap; gap:4px; }
+.video-controls-dialog .video-review-controls button { width:32px; height:32px; border-radius:5px; }
+.video-controls-dialog .video-range-control { height:32px; }
+.video-controls-dialog .video-volume-control { width:64px; }
+.video-controls-dialog .video-range-track { top:14px; height:4px; }
+.video-controls-dialog .video-range-thumb { top:-3px; width:10px; height:10px; border-radius:5px; }
+.video-controls-dialog .video-review-controls output { width:64px; font:700 12px/32px "Segoe UI",sans-serif; }
+.video-controls-dialog .video-frame-rate-control { width:64px; height:32px; border-radius:5px; }
+.video-controls-dialog .video-frame-rate-paint { font:12px/30px "Segoe UI",sans-serif; }
+.video-controls-dialog .video-playback-rate-control { width:52px; height:32px; border-radius:5px; }
+.video-controls-dialog .video-playback-rate-paint { font:12px/30px "Segoe UI",sans-serif; }
+.video-controls-dialog .video-marker-track { flex:none; height:8px; margin:4px 8px; }
+.video-controls-dialog .video-annotation-entry { flex:none; flex-wrap:wrap; gap:8px; padding:8px; border:1px solid var(--border-subtle); border-radius:5px; }
+.video-controls-dialog .video-color-control { width:32px; height:32px; border-radius:5px; }
+.video-controls-dialog .video-text-control { min-width:100px; height:32px; border-radius:5px; font:12px/30px "Segoe UI",sans-serif; }
+.video-controls-dialog .video-text-paint { font:12px/30px "Segoe UI",sans-serif; }
+.video-controls-dialog .video-annotation-entry button { height:32px; border-radius:5px; padding:0 8px; font:12px/30px "Segoe UI",sans-serif; }
+.video-controls-dialog .video-action-label { font:12px/30px "Segoe UI",sans-serif; }
+.video-controls-dialog .video-annotation-search { flex:none; padding:8px; border:1px solid var(--border-subtle); border-radius:5px; }
+.video-controls-dialog .video-annotation-count { font-size:11px; }
+.video-controls-dialog .video-annotation-list { flex:none; max-height:min(320px,40vh); border:1px solid var(--border-subtle); border-radius:5px; }
+.video-controls-dialog .video-annotation-list>div { grid-template-columns:minmax(0,1fr) 32px; }
+.video-controls-dialog .video-annotation-list>div>button { min-height:32px; }
+.video-controls-dialog .video-annotation-list>div>button:first-child { grid-template-columns:64px minmax(0,1fr); gap:8px; padding:8px; }
+.video-controls-dialog .video-annotation-list time { font:700 11px/1.4 "Segoe UI",sans-serif; }
+.video-controls-dialog .video-annotation-list span { font-size:12px; }
+.video-controls-dialog .video-annotation-list>p { font-size:12px; }

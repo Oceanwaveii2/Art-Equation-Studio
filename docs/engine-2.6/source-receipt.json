@@ -1,0 +1,22 @@
+{
+  "archive": "C:\\Users\\User\\.codex\\worktrees\\ec92\\Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope\\Release\\Art-Equation-Engine-2.6-Scope.zip",
+  "sha256": "20b032e3e24f87636d10e7b7678d0ea9f7bce0ec4583e8ec44b39171b7c87fe9",
+  "files": [
+    {
+      "path": "ART_EQUATION_ENGINE_2_6_SCOPE.md",
+      "sha256": "6c4be58cabf158ed7a509429b601d800252e26ada8c2275a30f8fcad0a34d46f"
+    },
+    {
+      "path": "README.txt",
+      "sha256": "5ba413c264202defa6df60a28cf5a0cd99159f9badacb3bbf64ec1fa27a7a6e2"
+    },
+    {
+      "path": "references/image-bounds-original.png",
+      "sha256": "f6d31574c46abafcb76022b0b1a1cdcf9060ec71ec5f9cc0b3d3ad23cdabf0ce"
+    },
+    {
+      "path": "references/theme-top-bar-original.png",
+      "sha256": "7406007539519cea366202939541cfd2ca047023138f08bd686e208cdffe999e"
+    }
+  ]
+}

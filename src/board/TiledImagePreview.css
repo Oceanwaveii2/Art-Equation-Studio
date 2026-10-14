@@ -1,0 +1,11 @@
+.tiled-image-frame { position: relative; width: 100%; height: 100%; min-width: 0; overflow: hidden; }
+.tiled-image-preview { position: relative; width: 100%; height: 100%; min-width: 0; }
+.tiled-image-preview .tile-poster { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: contain; display: block; }
+.tile-surface { position: absolute; pointer-events: none; }
+.tile-message { position: absolute; bottom: 32px; left: 6px; right: 6px; background: var(--panel, #242830); color: var(--text, #eee); padding: 5px; font-size: 11px; z-index: 2; }
+.tile-retry { position: absolute; bottom: 4px; right: 4px; z-index: 2; font-size: 11px; }
+.tile-message[hidden] + .tile-retry { display: none; }
+.pyramid-preparation { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 500; display: flex; align-items: center; gap: 12px; max-width: 80vw; padding: 12px 16px; border: 1px solid var(--border, #777); background: var(--panel, #242830); color: var(--text, #eee); border-radius: 8px; box-shadow: 0 4px 20px #0004; }
+.asset-preview-stage > .tiled-image-frame { min-height: 100%; }
+.asset-preview-stage:has(> .tiled-image-frame) { display: block; position: relative; }
+.asset-preview-stage .tile-poster { box-shadow: none; }

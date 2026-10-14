@@ -1,0 +1,174 @@
+/* Approved P1 shell adapted onto the canonical native app and engine. */
+.studio-shell.p1-v2-shell.workspace-navy { --bg:#070d18; --panel:#0a1324; --panel-raised:#0f1c32; --text:#ffffff; --text-strong:#ffffff; --text-subtle:#93a8c7; --muted:#93a8c7; --gold:#e5a85c; --surface-appbar:#071326; --surface-nav:#081120; --surface-toolbar:#091427; --surface-overlay:#0f1c32; --surface-input:#0b172a; --surface-control:#0e1b30; --surface-hover:#162642; --surface-active:#1d3356; --selection-surface:#1d3356; --focus-ring:#38bdf8; --canvas-surface:#060a12; --canvas-grid:#132035; }
+.studio-shell.p1-v2-shell.workspace-dark { --bg:#111216; --panel:#16181d; --panel-raised:#1f2229; --text:#e2e8f0; --text-strong:#f8fafc; --text-subtle:#8b949e; --muted:#8b949e; --gold:#e5a85c; --surface-appbar:#14161a; --surface-nav:#121418; --surface-toolbar:#16181d; --surface-overlay:#1e2128; --surface-input:#1a1c22; --surface-control:#22252c; --surface-hover:#2a2e38; --surface-active:#343946; --selection-surface:#343946; --focus-ring:#38bdf8; --canvas-surface:#0e1013; --canvas-grid:#1e222a; }
+.studio-shell.p1-v2-shell.workspace-light { --bg:#f2f5f8; --panel:#ffffff; --panel-raised:#f7f9fa; --text:#1d2530; --text-strong:#0d1520; --text-subtle:#526174; --muted:#526174; --gold:#b38344; --surface-appbar:#e8ecf1; --surface-nav:#eef2f6; --surface-toolbar:#edf2f7; --surface-overlay:#ffffff; --surface-input:#ffffff; --surface-control:#edf2f7; --surface-hover:#e2e8f0; --surface-active:#d6e0ea; --selection-surface:#d6e0ea; --focus-ring:#21918a; --canvas-surface:#e8edf2; --canvas-grid:#cbd5e1; }
+.p1-v2-shell.workspace-navy { --bg:#101c2a; --panel:#142234; --panel-raised:#1a2b40; --line:#2b3e54; --line-strong:#3c526c; --text:#e7edf6; --text-strong:#f1f5fc; --text-subtle:#bac8d9; --muted:#9aadc3; --gold:#8fb9ef; --surface-appbar:#142234; --surface-nav:#142234; --surface-toolbar:#192b40; --surface-overlay:#1b2d43; --surface-input:#112033; --surface-hover:#263e58; --surface-active:#294765; --border-subtle:#2e455e; --border-control:#3c5671; --focus-ring:#9ac6ff; --selection-surface:#294765; --canvas-surface:#102031; --canvas-grid:#2d465d; }
+.studio-shell.p1-v2-shell { --ui-font:'Segoe UI Variable','Segoe UI',sans-serif; --ui-body-size:12px; --ui-label-size:11px; background:var(--bg); font-family:var(--ui-font); }
+.p1-v2-shell :is(.app-bar,.navigator,.project-inspector,.pane-toolbar,.status-bar,.canvas-toolbar,.project-board-strip,.board-filmstrip) { background:var(--panel)!important; backdrop-filter:none!important; -webkit-backdrop-filter:none!important; box-shadow:none!important; }
+.studio-shell.p1-v2-shell .app-bar { background:var(--surface-appbar)!important; color:var(--text); }
+.studio-shell.p1-v2-shell .navigator { background:var(--surface-nav)!important; }
+.studio-shell.p1-v2-shell :is(.pane-toolbar,.canvas-toolbar,.status-bar,.board-filmstrip,.project-board-strip) { background:var(--surface-toolbar)!important; }
+.studio-shell.p1-v2-shell .document-layout-inspector header button { min-width:32px; min-height:32px; margin-left:auto; background:var(--surface-control); color:var(--text); border:1px solid var(--border-control); border-radius:5px; }
+.p1-v2-shell :is(.quiet-button,.mode-switch,.canvas-tool-rail,.canvas-context-menu,.settings-panel,.project-tools-menu,.canvas-subtools) { background:var(--surface-overlay)!important; color:var(--text)!important; backdrop-filter:none!important; box-shadow:none!important; }
+.p1-v2-shell :is(.quiet-button,.primary-button) { transform:none!important; border-radius:5px; }
+.p1-v2-shell .canvas-stage { background-image:none; container-type:inline-size; container-name:p1canvas; }
+.studio-shell.p1-v2-shell .canvas-tool-rail { position:absolute; top:auto!important; left:50%!important; bottom:16px!important; right:auto; transform:translateX(-50%)!important; display:flex!important; flex-direction:row!important; align-items:center; gap:6px; width:max-content; max-width:calc(100% - 24px); max-height:none; padding:6px 10px; border:1px solid var(--border-control); border-radius:8px; overflow-x:auto; overflow-y:hidden; scrollbar-width:thin; z-index:76; box-shadow:0 4px 18px #0004; }
+.p1-v2-shell .canvas-tool-rail .tool-rail-group { display:flex; flex-direction:row; align-items:center; flex:none; gap:4px; padding:0 6px; border:0; border-left:1px solid var(--line); }
+.p1-v2-shell .canvas-tool-rail button { width:32px; height:32px; min-height:32px; flex:none; border-radius:5px; }
+.p1-v2-shell .canvas-tool-rail .tool-rail-hide { width:22px; }
+.studio-shell.p1-v2-shell .canvas-subtools { top:auto; bottom:66px; left:50%; transform:translateX(-50%); width:240px; max-height:calc(100% - 80px); border-radius:8px; box-shadow:0 6px 20px #0005; }
+.p1-v2-shell .canvas-tool-rail-restore { top:auto; bottom:16px; left:50%; transform:translateX(-50%); }
+.p1-v2-shell .drawing-notice { top:16px; left:50%; transform:translateX(-50%); max-width:min(480px, calc(100% - 32px)); padding:6px 12px; border-radius:6px; box-shadow:0 4px 14px #0004; backdrop-filter:blur(8px); }
+.studio-shell.p1-v2-shell .compact-document > .canvas-pane,.studio-shell.p1-v2-shell .compact-canvas > .document-pane { display:none!important; }
+.p1-v2-shell .document-stage { padding:20px; }
+.p1-v2-shell .paper { padding:28px; }
+.studio-shell.p1-v2-shell .app-bar .project-heading strong { font:600 16px/1.3 'Segoe UI',sans-serif; color:var(--text-strong); }
+.studio-shell.p1-v2-shell .app-bar.aquarium-app-bar { grid-template-columns:minmax(0,1fr); gap:8px; }
+.studio-shell.p1-v2-shell .app-header-actions { justify-content:flex-start; max-width:100%; }
+.p1-v2-shell .app-header-actions { flex-wrap:wrap; gap:5px; }
+.p1-v2-shell .app-header-actions :is(button,input) { min-height:32px; font-size:12px; }
+.p1-v2-shell .project-inspector.drawer-open { top:var(--shell-header-h,140px); }
+@container p1canvas (max-width:620px) { .p1-v2-shell .canvas-tool-rail .tool-rail-history,.p1-v2-shell .canvas-tool-rail .tool-rail-hide { display:none; } .p1-v2-shell .canvas-tool-rail button { width:29px; height:30px; min-height:30px; } .p1-v2-shell .canvas-tool-rail .tool-rail-group { padding:0 1px; } }
+@media(max-width:1100px) { .studio-shell.p1-v2-shell .app-bar.aquarium-app-bar { min-height:172px; padding-right:12px; } .p1-v2-shell .app-header-actions { justify-content:flex-start; } }
+.studio-shell.p1-v2-shell.p1-glass-enabled :is(.app-bar,.navigator,.project-inspector,.pane-toolbar,.status-bar,.canvas-tool-rail,.settings-panel,.canvas-subtools) { background:color-mix(in srgb,var(--panel) var(--p1-glass-alpha),transparent)!important; backdrop-filter:blur(var(--p1-glass-blur)) saturate(115%)!important; -webkit-backdrop-filter:blur(var(--p1-glass-blur)) saturate(115%)!important; } .p1-v2-shell.workspace-light .project-heading strong {color:var(--text-strong)}
+
+/* Pass 1: shared shell typography and flat controls; content fonts stay separate. */
+.p1-v2-shell :is(.app-bar,.navigator,.project-inspector,.status-bar,.board-navigation,.pane-toolbar,.settings-panel,.canvas-subtools) :is(button,input,select,small,label,strong,.eyebrow) { font-family:var(--ui-font); }
+.p1-v2-shell :is(.navigator,.project-inspector,.status-bar) { font-size:12px; line-height:1.4; }
+.p1-v2-shell .eyebrow { font-size:11px; letter-spacing:.08em; color:var(--text-subtle); }
+.p1-v2-shell :is(.project-search>input,.project-search-scope) { font-size:12px; min-height:32px; color:var(--text-subtle); background:var(--surface-input); border-color:var(--border-control); }
+.p1-v2-shell :is(.quiet-button,.mode-switch button,.pane-toolbar button) { color:var(--text); border-color:var(--border-control); }
+.p1-v2-shell :is(.quiet-button,.mode-switch button,.pane-toolbar button):hover { background:var(--surface-hover)!important; color:var(--text-strong); }
+.p1-v2-shell .mode-switch { background:var(--surface-input)!important; }
+.p1-v2-shell .mode-switch button.active { color:var(--text-strong); background:var(--selection-surface); }
+.p1-v2-shell .primary-button { background:var(--gold); color:var(--bg); border-color:var(--gold); font-weight:600; }
+.p1-v2-shell .project-heading strong { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.p1-v2-shell .canvas-toolbar .canvas-render-status { color:var(--text-subtle); }
+.p1-v2-shell .status-bar { color:var(--text-subtle); }
+
+/* Pass 2: open-work tabs and bounded Split chrome. */
+.p1-v2-shell .project-center.has-workspace-tabs { grid-template-rows:38px minmax(0,1fr) 112px; }
+.p1-v2-shell .project-center.has-workspace-tabs.has-board-navigation { grid-template-rows:38px 36px minmax(0,1fr) 112px; }
+.p1-v2-shell .project-center.has-workspace-tabs.board-strip-hidden,
+.p1-v2-shell .project-center.has-workspace-tabs:has(.mode-canvas) { grid-template-rows:38px minmax(0,1fr); }
+.p1-v2-shell .project-center.has-workspace-tabs.has-board-navigation.board-strip-hidden,
+.p1-v2-shell .project-center.has-workspace-tabs.has-board-navigation:has(.mode-canvas) { grid-template-rows:38px 36px minmax(0,1fr); }
+.p1-v2-shell.document-focus-shell .project-center.has-workspace-tabs { grid-template-rows:minmax(0,1fr); }
+.p1-v2-shell .workspace-tabs { display:flex; align-items:center; min-width:0; overflow:hidden; background:var(--surface-appbar); border-bottom:1px solid var(--border-subtle); }
+.p1-v2-shell .workspace-tab-list { display:flex; flex:1; min-width:0; height:100%; overflow-x:auto; scrollbar-width:thin; }
+.p1-v2-shell .workspace-tab { display:flex; gap:8px; padding:0 12px; height:100%; flex:none; align-items:center; min-width:120px; max-width:260px; border:0; border-right:1px solid var(--border-subtle); border-bottom:2px solid transparent; background:transparent; color:var(--text-subtle); font:12px/1.3 var(--ui-font); cursor:pointer; }
+.p1-v2-shell .workspace-tab.active { background:var(--surface-active); border-bottom-color:var(--gold); }
+.p1-v2-shell .workspace-tab>span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.p1-v2-shell .workspace-tab.active { color:var(--text-strong); }
+.p1-v2-shell .workspace-tab-close { width:32px; height:32px; flex:none; border:0; border-radius:4px; background:transparent; color:var(--text-subtle); font-size:17px; cursor:pointer; }
+.p1-v2-shell :is(.workspace-tab,.workspace-tab-close):hover { background:var(--surface-hover); color:var(--text-strong); }
+.p1-v2-shell .board-navigation { gap:8px; background:var(--surface-toolbar); }
+.p1-v2-shell .board-navigation>button { width:30px; height:30px; background:var(--surface-input); color:var(--text); }
+.p1-v2-shell .compact-split-tabs { justify-content:flex-start; }
+.p1-v2-shell .compact-split-tabs button { min-height:32px; padding:0 16px; font:12px var(--ui-font); }
+
+/* Pass 3: scopes wrap inspector sections; style the actual content hierarchy. */
+.p1-v2-shell .inspector-tab-content { min-height:0; }
+.p1-v2-shell .inspector-tab-content>section { display:grid; gap:8px; padding:16px; border-bottom:1px solid var(--border-subtle); }
+.p1-v2-shell .inspector-tab-content>section.collapsed { gap:0; }
+.p1-v2-shell .inspector-tab-content>section>header { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.p1-v2-shell .inspector-tab-content>section>header button { min-height:32px; border:0; border-radius:5px; padding:4px 8px; background:transparent; color:var(--text-subtle); font:12px var(--ui-font); cursor:pointer; }
+.p1-v2-shell .inspector-tab-content>section>header button:hover { color:var(--text-strong); background:var(--surface-hover); }
+.p1-v2-shell .inspector-tab-content>section>header .inspector-section-toggle { display:flex; align-items:center; justify-content:space-between; flex:1; gap:8px; padding-left:0; text-align:left; }
+.p1-v2-shell .inspector-section-toggle span { color:var(--text); font:600 12px var(--ui-font); text-transform:none; letter-spacing:0; }
+.p1-v2-shell .inspector-section-toggle i { color:var(--text-subtle); font:16px var(--ui-font); }
+.p1-v2-shell .inspector-tab-content>section :is(small,p) { font-size:11px; line-height:1.5; color:var(--text-subtle); }
+.p1-v2-shell .inspector-tab-content>footer { display:grid; gap:6px; padding:16px; font-size:11px; color:var(--text-subtle); }
+.p1-v2-shell .inspector-status select { max-width:120px; min-height:32px; border:1px solid var(--border-control); background:var(--surface-input); color:var(--text); font-size:12px; }
+.p1-v2-shell .inspector-status>div { font-size:12px; color:var(--text-subtle); }
+.p1-v2-shell .inspector-status>i { display:block; height:4px; background:var(--border-subtle); }
+.p1-v2-shell .inspector-status>i b { display:block; height:100%; background:var(--gold); }
+.p1-v2-shell :is(.inspector-link,.inspector-empty) { min-height:32px; font-size:12px; color:var(--text-subtle); }
+.p1-v2-shell .inspector-link strong { font-size:12px; color:var(--text); }
+.p1-v2-shell .inspector-link small { font-size:11px; color:var(--text-subtle); }
+.p1-v2-shell .inspector-dock-header { padding:4px 8px; background:var(--surface-toolbar); }
+.p1-v2-shell .inspector-scope-tab { min-width:0; min-height:32px; padding-inline:4px; font:600 12px var(--ui-font); letter-spacing:0; text-transform:none; overflow:hidden; text-overflow:ellipsis; }
+.p1-v2-shell .inspector-scope-tab.active { color:var(--text-strong); background:var(--selection-surface); }
+.p1-v2-shell .project-inspector-cover h2 { font:600 16px/1.35 var(--ui-font); }
+.p1-v2-shell .inspector-selection>strong { white-space:normal; overflow-wrap:anywhere; }
+
+/* Pass 4: explicit themes, keyboard focus and usable controls at narrow widths. */
+.p1-v2-shell .workspace-theme-choices { display:flex; flex:none; gap:2px; border:1px solid var(--border-control); padding:2px; border-radius:5px; background:var(--surface-input); }
+.p1-v2-shell .workspace-theme-choices button { min-height:32px; padding:0 9px; border:0; border-radius:3px; background:transparent; color:var(--text-subtle); font:12px var(--ui-font); cursor:pointer; }
+.p1-v2-shell .workspace-theme-choices button.active { color:var(--text-strong); background:var(--selection-surface); }
+.p1-v2-shell :is(button,input,select,summary,[tabindex]):focus-visible { outline:2px solid var(--focus-ring); outline-offset:2px; }
+.p1-v2-shell .board-breadcrumbs { min-width:0; overflow-x:auto; scrollbar-width:thin; }
+.p1-v2-shell .board-breadcrumbs button { min-height:30px; }
+.p1-v2-shell .canvas-pane { container-type:inline-size; container-name:p1pane; }
+.p1-v2-shell .canvas-toolbar { min-width:0; overflow-x:auto; scrollbar-width:thin; }
+.p1-v2-shell .canvas-toolbar>button,.p1-v2-shell .canvas-toolbar>select { flex:none; }
+.p1-v2-shell .canvas-board-title { flex:0 1 180px; min-width:72px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@container p1canvas (max-width:1100px) {
+  .p1-v2-shell .canvas-zoom-control { bottom:70px; }
+  .p1-v2-shell .board-minimap { bottom:114px; }
+}
+.studio-shell.p1-v2-shell .app-header-actions .project-search input { color:var(--text); background:var(--surface-input); padding-right:12px; }
+.studio-shell.p1-v2-shell .app-header-actions .project-search-scope,
+.studio-shell.p1-v2-shell .project-heading .eyebrow,
+.studio-shell.p1-v2-shell .tree-section-label { color:var(--text-subtle); }
+@media(max-width:1100px) {
+  .studio-shell.p1-v2-shell .app-bar.aquarium-app-bar { min-height:140px; }
+  .p1-v2-shell .app-header-actions :is(.project-tools-toggle,.inspector-toggle) { width:auto; color:var(--text); padding-inline:10px; font-size:12px; }
+  .p1-v2-shell .app-header-actions .inspector-toggle::before { display:none; }
+  .p1-v2-shell .app-header-actions .project-tools-toggle span { position:static; color:inherit; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .p1-v2-shell :is(.app-bar,.navigator,.project-inspector,.workspace-tabs,.canvas-tool-rail) :is(button,input,select),
+  .p1-v2-shell .project-inspector { transition:none!important; scroll-behavior:auto; }
+}
+
+/* Theme symbols: moon remains white against its own contrasting surface. */
+.p1-v2-shell .workspace-theme-choices button { width:36px; padding:0; display:grid; place-items:center; }
+.p1-v2-shell .workspace-theme-choices .theme-choice-dark { background:var(--paper-text); }
+.p1-v2-shell .workspace-theme-choices button.active { box-shadow:inset 0 -2px 0 var(--gold); }
+
+/* Card headers are workspace chrome; body/artwork keeps the saved ink color. */
+.p1-v2-shell .board-node:not(.node-column)>.node-drag-handle {
+  background:var(--surface-toolbar); color:var(--text-strong);
+}
+.p1-v2-shell .board-node:not(.node-column)>.node-drag-handle>span { color:var(--text-subtle); }
+
+/* Theme-adaptive glowing icon effects for Left Pane Projects & Boards:
+   - Navy: vibrant glowing water shimmer
+   - Dark: clean glowing white radiance
+   - Light: warm glowing turquoise-blue highlight */
+.p1-v2-shell.workspace-navy :is(.project-library-row:hover, .project-library-item.active .project-library-row) .project-library-cover {
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.65), 0 0 20px rgba(14, 165, 233, 0.45);
+  border-color: #38bdf8 !important;
+  color: #7dd3fc !important;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.p1-v2-shell.workspace-navy :is(.tree-row:hover, .tree-row.selected) > span {
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.75)) drop-shadow(0 0 12px rgba(14, 165, 233, 0.5));
+  color: #7dd3fc !important;
+  transition: filter 0.2s ease, color 0.2s ease;
+}
+
+.p1-v2-shell.workspace-dark :is(.project-library-row:hover, .project-library-item.active .project-library-row) .project-library-cover {
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7), 0 0 18px rgba(248, 250, 252, 0.45);
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.p1-v2-shell.workspace-dark :is(.tree-row:hover, .tree-row.selected) > span {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+  color: #ffffff !important;
+  transition: filter 0.2s ease, color 0.2s ease;
+}
+
+.p1-v2-shell.workspace-light :is(.project-library-row:hover, .project-library-item.active .project-library-row) .project-library-cover {
+  box-shadow: 0 0 10px rgba(33, 145, 138, 0.55), 0 0 18px rgba(59, 130, 246, 0.35);
+  border-color: #21918a !important;
+  color: #1a7a74 !important;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.p1-v2-shell.workspace-light :is(.tree-row:hover, .tree-row.selected) > span {
+  filter: drop-shadow(0 0 5px rgba(33, 145, 138, 0.65)) drop-shadow(0 0 10px rgba(37, 99, 235, 0.35));
+  color: #1a7a74 !important;
+  transition: filter 0.2s ease, color 0.2s ease;
+}

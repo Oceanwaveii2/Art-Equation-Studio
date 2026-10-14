@@ -1,0 +1,11 @@
+.settings-panel .codex-bridge-settings { min-width:0; }
+.codex-bridge-settings>small { display:block; color:var(--text-muted); line-height:1.5; }
+.codex-bridge-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.settings-panel .codex-bridge-actions button { min-height:32px; padding:4px 8px; border:1px solid var(--line); border-radius:5px; background:var(--surface-control); color:var(--text); font:inherit; }
+.settings-panel .codex-bridge-settings select { min-width:0; max-width:65%; min-height:32px; }
+.settings-panel .codex-bridge-question { display:grid; gap:8px; }
+.codex-bridge-question textarea { box-sizing:border-box; width:100%; min-height:80px; resize:vertical; border:1px solid var(--line); border-radius:5px; padding:8px; background:var(--surface-control); color:var(--text); font:inherit; }
+.codex-bridge-answer { max-height:240px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; padding:8px; border:1px solid var(--line); border-radius:5px; color:var(--text); background:var(--surface-control); font:inherit; line-height:1.5; }
+.codex-bridge-settings p { overflow-wrap:anywhere; line-height:1.5; }
+.codex-bridge-settings button:disabled { opacity:.55; }
+.codex-bridge-settings :is(button,textarea,select):focus-visible { outline:2px solid var(--teal); outline-offset:2px; }

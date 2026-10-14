@@ -1,0 +1,32 @@
+/* The questionnaire paper palette is independent of the workspace theme. */
+.studio-shell .questionnaire-theme-toggle{display:flex;align-items:center;gap:5px;min-height:32px;flex:none}
+.studio-shell .questionnaire-theme-toggle.questionnaire-theme-choice-navy{background:#0b172a!important;color:#60dccf!important}
+.studio-shell .questionnaire-theme-toggle.questionnaire-theme-choice-dark{background:#20211f!important;color:#f1f6ff!important}
+.studio-shell .questionnaire-theme-toggle.questionnaire-theme-choice-light{background:#fff!important;color:#77511f!important}
+.questionnaire-theme-menu{position:fixed;z-index:1500;width:172px;padding:5px;border:1px solid var(--border-control,#223759);border-radius:6px;background:var(--surface-overlay,#0f1c32);color:var(--text,#f1f6ff);box-shadow:0 8px 28px #0005;font:12px/1.4 'Segoe UI',sans-serif}
+.questionnaire-theme-menu>button{display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:4px 7px;background:transparent;color:inherit;border:1px solid transparent;border-radius:4px;cursor:pointer;text-align:left;font:inherit}
+.questionnaire-theme-menu>button>span:last-child{margin-left:auto}
+.questionnaire-theme-menu>button:hover,.questionnaire-theme-menu>button:focus-visible{background:var(--surface-hover,#1d3356);outline:2px solid var(--focus-ring,#38bdf8);outline-offset:-2px}
+.questionnaire-theme-symbol{display:grid;place-items:center;width:24px;height:24px;border-radius:4px;flex:none}
+.questionnaire-theme-symbol.questionnaire-theme-choice-navy{background:#0b172a;color:#60dccf}
+.questionnaire-theme-symbol.questionnaire-theme-choice-dark{background:#20211f;color:#fff}
+.questionnaire-theme-symbol.questionnaire-theme-choice-light{background:#fff;color:#77511f}
+@media screen {
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy{--paper:#0b172a;--paper-text:#f1f6ff;color-scheme:dark}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy .document-stage{background:#070d18!important}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy .questionnaire-paper{background:var(--paper)!important;color:var(--paper-text)!important;box-shadow:0 16px 55px #0009,inset 0 0 0 1px #223759}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy :is(.paper-header,.questionnaire-footer,.questionnaire-stage-heading){border-color:#365071;color:#b7c9e0}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy :is(.questionnaire-title textarea,.questionnaire-stage-heading h2,.questionnaire-question h3){color:#f1f6ff!important}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy :is(.questionnaire-deck,.questionnaire-field>span,.questionnaire-question>p){color:#b7c9e0}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy :is(.questionnaire-kicker,.questionnaire-stage-heading>span,.question-number){color:#60dccf}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy .question-tag{color:#60dccf;border-color:#365071}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy :is(.questionnaire-field input,.questionnaire-field select,.questionnaire-question>textarea){background:#14243c!important;color:#f1f6ff!important;border-color:#365071!important}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy :is(input,textarea)::placeholder{color:#9cafcb;opacity:1}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy :is(.questionnaire-field input,.questionnaire-field select,.questionnaire-question>textarea):focus{border-color:#60dccf!important;box-shadow:0 0 0 2px #60dccf38}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy .questionnaire-title textarea:focus{border-bottom-color:#60dccf}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy .questionnaire-outline{background:#0f1c32;border-color:#223759}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy .questionnaire-outline :is(header,button){border-color:#223759}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy .questionnaire-outline :is(button,header span,p){color:#b7c9e0}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy .questionnaire-outline :is(button span,header strong){color:#60dccf}
+  .studio-shell .questionnaire-pane.questionnaire-theme-navy .questionnaire-outline button:hover{background:#1d3356;color:#f1f6ff}
+}

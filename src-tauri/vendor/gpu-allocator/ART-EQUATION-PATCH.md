@@ -1,0 +1,1 @@
+Upstream gpu-allocator 0.28.0 from crates.io. Original license files retained. Only Windows dependency constraints changed to 0.62.2 to match wgpu-hal 29.0.4 interfaces. The upstream <=0.62 constraint excludes 0.62.2 and resolves to incompatible windows 0.61 interfaces. No allocator algorithms changed. Native DX12 build compatibility patch; not a performance change.

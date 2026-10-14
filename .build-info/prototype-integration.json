@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "kind": "prototype-shell-integration",
+  "sourceWorkspace": "D:/0/Art_Equation_Studio_2026-08-27_v81-combined-with-desktop-scope",
+  "sourceApp": "current/2026-10/desktop-app",
+  "prototypeApp": "current/2026-10/integration/prototype-2.5-engine",
+  "enginePolicy": "Preserve latest engine source, consumed bindings and receipt; qualify this integration separately.",
+  "releaseAcceptance": false
+}

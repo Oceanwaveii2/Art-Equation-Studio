@@ -1,0 +1,6 @@
+import fs from 'node:fs'
+fs.writeFileSync('../baseline/src__board__columns.ts',fs.readFileSync('src/board/columns.ts'))
+let p=fs.readFileSync('src/model/project.ts','utf8').replace('  columnPresentation?:', '  columnPreserveCardSizes?: boolean\n  columnPresentation?:');fs.writeFileSync('src/model/project.ts',p)
+p=fs.readFileSync('src/board/columns.ts','utf8').replace('childWidth = innerWidth','childWidth = column.columnPreserveCardSizes ? Math.min(innerWidth, sourceWidth) : innerWidth').replace("childHeight = child.kind === 'document' ? Math.max(70, sourceHeight) : Math.max(78, Math.round(sourceHeight * innerWidth / sourceWidth))", "childHeight = column.columnPreserveCardSizes ? sourceHeight * childWidth / sourceWidth : child.kind === 'document' ? Math.max(70, sourceHeight) : Math.max(78, Math.round(sourceHeight * innerWidth / sourceWidth))")
+fs.writeFileSync('src/board/columns.ts',p)
+p=fs.readFileSync('src/App.tsx','utf8');const start=p.indexOf('    const result = layoutBoardColumnsForNodesResult(proposal.board');const end=p.indexOf('\n  }',start);p=p.slice(0,start)+`    if (applyBoardChange(proposal.board)) { changeMode('split'); setStatus('Visual references organized. Sizes and ownership preserved. ' + proposal.warnings.length + ' protected references retained.') }`+p.slice(end);fs.writeFileSync('src/App.tsx',p)

@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "scope": "Recorded known-bad diagnostic, never passing release evidence",
+  "sourceReceiptSha256": "3e1e31da4ed96d7843400157e602f82012ee8035052d51bb872c092c34d65c07",
+  "browser": "154.0.4258.62",
+  "results": [
+    {
+      "version": "integration-2.0",
+      "board": "ultra-graph-test-1",
+      "nodes": 60,
+      "frames": {
+        "p50": 16.89999999999418,
+        "p95": 1516.5,
+        "max": 2566.7999999999956,
+        "over50": 30
+      },
+      "errors": [],
+      "observed": {
+        "gpu": {
+          "renderer": "vello-cpu",
+          "acceptedBackend": "cpu",
+          "backendReason": "GPU_IMAGE_ATLAS_FULL: complete frame does not fit fixed page",
+          "generation": "565",
+          "acceptedGeneration": "549",
+          "pending": "true",
+          "paintedObjects": "4",
+          "renderError": null
+        },
+        "canvases": [
+          {
+            "width": 3840,
+            "height": 2160,
+            "cssWidth": 1920,
+            "cssHeight": 1080
+          },
+          {
+            "width": 340,
+            "height": 212,
+            "cssWidth": 170,
+            "cssHeight": 106
+          },
+          {
+            "width": 340,
+            "height": 212,
+            "cssWidth": 170,
+            "cssHeight": 106
+          }
+        ]
+      }
+    }
+  ]
+}

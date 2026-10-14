@@ -1,0 +1,403 @@
+{
+  "schema": "art-equation.p0-app-surface-build",
+  "schemaVersion": 1,
+  "verifiedAtUtc": "2026-10-03T17:05:41.759113+00:00",
+  "ticket": "AE-2026-10-03-CODEX-P0-TEXT-COMPLETION",
+  "command": "rust/build.ps1 -Test (84 native tests and capped WASM build); scripts/p0-image-resources-tests.mjs (14 actual WASM/frontend groups)",
+  "offline": true,
+  "locked": true,
+  "target": "wasm32-unknown-unknown",
+  "bindgenTarget": "web",
+  "dependencies": {
+    "vello": "0.10.0",
+    "wgpu": "29.0.4",
+    "vello_cpu": "0.2.0",
+    "wasm_bindgen": "0.2.114",
+    "parley": "0.11.1",
+    "skrifa": "0.44.0",
+    "icu_segmenter": "2.3.0",
+    "sha2": "0.10.9"
+  },
+  "tests": {
+    "passed": 84,
+    "failed": 0,
+    "shapedText": 21,
+    "generatedWasmFrontendImageGroups": 14
+  },
+  "nativeAppBuild": false,
+  "nativeAppLaunch": false,
+  "nativeRustUnitTestExecutableRun": true,
+  "wasmLinearMemory": {
+    "declaredMaximumBytes": 268435456,
+    "enforcement": "linker --max-memory; actual generated memory.grow reaches256MiB then throwsRangeError",
+    "scope": "per main or CPU worker WASM realm; distinct from managed estimates and GPU driver allocations"
+  },
+  "coverage": [
+    "shared strict ordered clip/composite/vector/image/gradient/shadow paint",
+    "immutable premultiplied image versions and explicit GPU atlas capacity",
+    "real registered font face shaping/outlines including bidi/ligatures/variable axes and bounded commands",
+    "genuine CPU transparent image composition through supported opacity layer"
+  ],
+  "acceptanceOpen": [
+    "all current mounted card/font/artwork coverage",
+    "representative sustained production workloads",
+    "native WebView2/DPI/keyboard/IME/accessibility with final source-bound EXE"
+  ],
+  "files": [
+    {
+      "path": "generated/p0_engine_wasm.d.ts",
+      "bytes": 8611,
+      "sha256": "C35ABE66CD2929B727F56A29E3446BB2A571391A60E02285CBB4712A29E8BD8D"
+    },
+    {
+      "path": "generated/p0_engine_wasm.js",
+      "bytes": 81141,
+      "sha256": "253FC95AE6580577B1C8A4E13580648502D383C05AD918DE71F7587D4F8C4CD3"
+    },
+    {
+      "path": "generated/p0_engine_wasm_bg.wasm",
+      "bytes": 8283580,
+      "sha256": "A9178796D0E40253FFA5819DCA2076F5B0C6684A1E885ECB9E1908609A10A7FC"
+    },
+    {
+      "path": "generated/p0_engine_wasm_bg.wasm.d.ts",
+      "bytes": 4550,
+      "sha256": "C1740F21C2966C808701F46F84EED388D9B6D67CD79F86FAEDF00FC68806C6EF"
+    },
+    {
+      "path": "rust/build.ps1",
+      "bytes": 2962,
+      "sha256": "2AE262E06777E6718531B68526D8AC0E46D7C61291ADE0F39AE1AE92283AA8CC"
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "bytes": 36791,
+      "sha256": "43E252CA31E5E2AA91F994EA32C7F0BEFE61A0310A423507EFB932ED0F671C29"
+    },
+    {
+      "path": "rust/Cargo.toml",
+      "bytes": 1171,
+      "sha256": "205B53CCB9750C603837F696D9B9E9FB2609E866CFA37CCFEDBA6FBA26A96103"
+    },
+    {
+      "path": "rust/fixtures/fonts/NotoSans-OFL.txt",
+      "bytes": 4396,
+      "sha256": "CEE9892F9F0CC8FE882C9E9537EE6A89621D86EE7CEAF70B02E2B2B1C25C061A"
+    },
+    {
+      "path": "rust/fixtures/fonts/NotoSans-wdth-wght.ttf",
+      "bytes": 2049096,
+      "sha256": "BFB7BB691513F12E734DC346C03A03F784912432D7E3FA8E56EFCF906FE86B3D"
+    },
+    {
+      "path": "rust/fixtures/fonts/NotoSansArabic-OFL.txt",
+      "bytes": 4382,
+      "sha256": "07FC70BFEB985CC1A87A8587D0A0C80BAB11C86C9DC3FD95B6F0CB332F983E96"
+    },
+    {
+      "path": "rust/fixtures/fonts/NotoSansArabic-wdth-wght.ttf",
+      "bytes": 844676,
+      "sha256": "63111B5B2E074DD48CC67692E0A2726D86EE94C1C37FE8598257B7B4E87E869E"
+    },
+    {
+      "path": "rust/fixtures/fonts/PROVENANCE.md",
+      "bytes": 926,
+      "sha256": "4932D1AE6C4740596E8DC7EAD9A1DD32F50B937FC8F905D9073AB599FB98FAF9"
+    },
+    {
+      "path": "rust/fixtures/real-board-sacrificial.json",
+      "bytes": 3562,
+      "sha256": "96E92A225E14BC6084806F013C81A28AC7B8A22CCB46CA59A27F2A3F68586CD4"
+    },
+    {
+      "path": "rust/src/cpu.rs",
+      "bytes": 32987,
+      "sha256": "E2405CBB8BC9A9149E24D9A8F49B520CE9563E844AB402DBCE28D7ADE28EC65C"
+    },
+    {
+      "path": "rust/src/gpu_scene.rs",
+      "bytes": 5142,
+      "sha256": "AA3430CD954714E2288A05C5611654159D026746E7E1BEA5DEBB08469A23D9C8"
+    },
+    {
+      "path": "rust/src/image_atlas.rs",
+      "bytes": 6087,
+      "sha256": "DC8FB68662695E841C413C09669F2658C4FDDF0D182993A771CBEA54A715AD30"
+    },
+    {
+      "path": "rust/src/image_resources.rs",
+      "bytes": 10752,
+      "sha256": "A1FE9E43FB1ACC0014D1B5770EE5B8977B980199EFA17CBBC106533CFB442891"
+    },
+    {
+      "path": "rust/src/lib.rs",
+      "bytes": 41451,
+      "sha256": "B08916D5C2FD4F0895AB563828CC39E96E04674C2AF85A503E3723E6B4748D9C"
+    },
+    {
+      "path": "rust/src/prepared_display_list.rs",
+      "bytes": 28795,
+      "sha256": "B3154C0A4D43F19CD3F5275CA45C1271F10303947BEA64BCF84EC229BA83A369"
+    },
+    {
+      "path": "rust/src/prepared_scene.rs",
+      "bytes": 24564,
+      "sha256": "0CE78D068DF38B468F064ECF7FADDBED466560DF059144277A32EF2AA5DF6CEC"
+    },
+    {
+      "path": "rust/src/shaped_text.rs",
+      "bytes": 44807,
+      "sha256": "B07850FCBCF280FC6DBA740CBF6BF4BEFC1CD38917FB8DE36182A678D7D89379"
+    },
+    {
+      "path": "rust/vendor/parley/.cargo_vcs_info.json",
+      "bytes": 100,
+      "sha256": "CF3A17C9E327A49B9C4FFB55E52C515C447F9703DC89821B4C4A7E7BA7A3EA4C"
+    },
+    {
+      "path": "rust/vendor/parley/ART_EQUATION_PATCH.md",
+      "bytes": 1639,
+      "sha256": "64BEA41D20C825AB8D4B153229E6CEC9926C775CD52DCB9C71C956FAAC2824F2"
+    },
+    {
+      "path": "rust/vendor/parley/Cargo.toml",
+      "bytes": 3808,
+      "sha256": "F89D6A436C3809C92092B7F85330F8D6DEDA619424B96A7C0445DF29A7A78CD4"
+    },
+    {
+      "path": "rust/vendor/parley/EXPLICIT_BASE_DIRECTION.patch",
+      "bytes": 5265,
+      "sha256": "00F72FF6ED0C682F3C00563C274E03D94C108F22B69E025A4226B48F12A8E7A9"
+    },
+    {
+      "path": "rust/vendor/parley/LICENSE-APACHE",
+      "bytes": 10847,
+      "sha256": "A60EEA817514531668D7E00765731449FE14D059D3249E0BC93B36DE45F759F2"
+    },
+    {
+      "path": "rust/vendor/parley/LICENSE-MIT",
+      "bytes": 1058,
+      "sha256": "285111F788D3856F28C164B3760AA151CAD55310FA16E19103F36F3052B033F0"
+    },
+    {
+      "path": "rust/vendor/parley/README.md",
+      "bytes": 2443,
+      "sha256": "93B8718C9F4BCDC52150C7B54399C415F7286772D03A5E5C483C0D2BCAF3A892"
+    },
+    {
+      "path": "rust/vendor/parley/src/analysis/cluster.rs",
+      "bytes": 10918,
+      "sha256": "115FCE9069FAF354FBD8A27894C9098C7032B048D508D701711958C18537F2CE"
+    },
+    {
+      "path": "rust/vendor/parley/src/analysis/mod.rs",
+      "bytes": 19716,
+      "sha256": "C05B51F002C5C0426522D6AFF3A707F8D2713E8669157B8C23DCB3155606CABD"
+    },
+    {
+      "path": "rust/vendor/parley/src/bidi.rs",
+      "bytes": 30892,
+      "sha256": "4247F526DAB62E89207908B4287653F0E42F53D331934AFCED480FBB2E36CC91"
+    },
+    {
+      "path": "rust/vendor/parley/src/break_overrides.rs",
+      "bytes": 16202,
+      "sha256": "5F5D740BB00FE5157FE8470604F48FAF6B694039601C7F0406725B0EDDB35866"
+    },
+    {
+      "path": "rust/vendor/parley/src/builder.rs",
+      "bytes": 12073,
+      "sha256": "B4C49CF0365C66641A639330EF17B410410C67D1850FE208FD452AE46E082321"
+    },
+    {
+      "path": "rust/vendor/parley/src/context.rs",
+      "bytes": 6927,
+      "sha256": "B71E015F9D017071D2B8431885C43B2D0EBD934E5555C4D6CA06C95BC6C9E881"
+    },
+    {
+      "path": "rust/vendor/parley/src/convert.rs",
+      "bytes": 668,
+      "sha256": "3D8EC71D86D8258F58A96F2704908FE41C1F74441203FDF123F5204D721C9CCB"
+    },
+    {
+      "path": "rust/vendor/parley/src/editing/cursor.rs",
+      "bytes": 17203,
+      "sha256": "CD7237D6C75C495F6AA0941E3ECF9182DC62D33B6F0D4599A6A117765265E156"
+    },
+    {
+      "path": "rust/vendor/parley/src/editing/editor.rs",
+      "bytes": 46656,
+      "sha256": "100C4F0828C195BD407D9BD5D3FBBED853B8FEAE73BF64ACED7BE6741537AA25"
+    },
+    {
+      "path": "rust/vendor/parley/src/editing/mod.rs",
+      "bytes": 202,
+      "sha256": "3E93709DDD495A77C7D6CCCA1DD09A55C6823ADBF0ECFB205CE8ECBF843CD1D7"
+    },
+    {
+      "path": "rust/vendor/parley/src/editing/selection.rs",
+      "bytes": 25921,
+      "sha256": "E96AB53B7C5C2F0DFEEEC4F1F1C0EE568A66163825BF73460A67D0EAB3A75FAA"
+    },
+    {
+      "path": "rust/vendor/parley/src/font.rs",
+      "bytes": 604,
+      "sha256": "62F6D126C6169E0CD163C2676DE60C7E168DF9E990A80303FCEAD812BECC4A32"
+    },
+    {
+      "path": "rust/vendor/parley/src/inline_box.rs",
+      "bytes": 1800,
+      "sha256": "35846B88EC73F0F086113F56901917A05C37222CA5A040CCC2A0393AC7F92753"
+    },
+    {
+      "path": "rust/vendor/parley/src/layout/accessibility.rs",
+      "bytes": 12395,
+      "sha256": "E123F6CBA476A1291D94F3BCCDA621449B59ED7720817367CE7397B588B56C08"
+    },
+    {
+      "path": "rust/vendor/parley/src/layout/alignment.rs",
+      "bytes": 7548,
+      "sha256": "3D1A983556868A4E7D848F047ED31F9777423D5032248D263132E24B7DB32EA1"
+    },
+    {
+      "path": "rust/vendor/parley/src/layout/cluster.rs",
+      "bytes": 21829,
+      "sha256": "43795E0D29905679D983080F99EA070D665043601C192CF822550228D10C6899"
+    },
+    {
+      "path": "rust/vendor/parley/src/layout/data.rs",
+      "bytes": 35993,
+      "sha256": "79ACBFFC247E39BBACAFDDFDC080E7446F219ADA0EAD0F5C27F3CDD1DD24C413"
+    },
+    {
+      "path": "rust/vendor/parley/src/layout/glyph.rs",
+      "bytes": 447,
+      "sha256": "4A5C5A8CA07A7CCF77DF63FDCA5C5C906F0ACF319E71266D7A416A48C1B41D07"
+    },
+    {
+      "path": "rust/vendor/parley/src/layout/layout.rs",
+      "bytes": 7790,
+      "sha256": "3E93583C1AF8849CE836ACA5F3144AA71D4AAA4CBF4FC57DAED6CB0B67A6DD3A"
+    },
+    {
+      "path": "rust/vendor/parley/src/layout/line.rs",
+      "bytes": 10274,
+      "sha256": "1D3AF75719FCCE44B67C4AB9DA03537C44B14FBC905F6EA7DB38685E9AE338D3"
+    },
+    {
+      "path": "rust/vendor/parley/src/layout/line_break.rs",
+      "bytes": 56446,
+      "sha256": "A41F56117BB55A0294E9A96D4AD651E7EBAEAD38B337C96CABC3443EFDD697E4"
+    },
+    {
+      "path": "rust/vendor/parley/src/layout/mod.rs",
+      "bytes": 3574,
+      "sha256": "A975E7F26E8FE3DC51C3BB8A3DF483E091726C1AB567A0CE954DF3A4835A1069"
+    },
+    {
+      "path": "rust/vendor/parley/src/layout/run.rs",
+      "bytes": 6919,
+      "sha256": "EE995A919E1C647130BF840952EE9B27D123CABA2C883C586387DD8A55DFF02D"
+    },
+    {
+      "path": "rust/vendor/parley/src/lib.rs",
+      "bytes": 5526,
+      "sha256": "41BA16F8E491CDEB7202581D0FB588A1FE9332B7482A7F9AD9E72998458F1FA7"
+    },
+    {
+      "path": "rust/vendor/parley/src/lru_cache.rs",
+      "bytes": 6361,
+      "sha256": "FC5CF96F67E269AFA5243C59BDDB16F2C39C7BF8CCF60977086A37D0DB253AB4"
+    },
+    {
+      "path": "rust/vendor/parley/src/resolve/mod.rs",
+      "bytes": 20011,
+      "sha256": "7FAD42CD7D3E4BBC16B5F2A30D6181B912F556BDA367CA9E0DF216E5B329A1B3"
+    },
+    {
+      "path": "rust/vendor/parley/src/resolve/range.rs",
+      "bytes": 8396,
+      "sha256": "0052C1C446AE8E8FF3E27FF85FE9D2D1B260B1CCBD3DE1CC9F68EFC040515F50"
+    },
+    {
+      "path": "rust/vendor/parley/src/resolve/tree.rs",
+      "bytes": 10351,
+      "sha256": "302A3F2F3786A1A71F6C10ABA5F56FA5F939CE196F458DA7E8D70BEE4C685BF3"
+    },
+    {
+      "path": "rust/vendor/parley/src/setting.rs",
+      "bytes": 187,
+      "sha256": "9BD642F3B83DA67667B513907E17974BC759FD8C7CE4460EC1923A9C86971057"
+    },
+    {
+      "path": "rust/vendor/parley/src/shape/cache.rs",
+      "bytes": 4952,
+      "sha256": "935C3F9E7224BE419930DDA89197DC252C77E8DCB43AD197E39FC5F9AEDD61FA"
+    },
+    {
+      "path": "rust/vendor/parley/src/shape/mod.rs",
+      "bytes": 24078,
+      "sha256": "4AE56607C41672E0771889174DDC767DCA74A8D2A8CC2C2DD56969A459AE70C5"
+    },
+    {
+      "path": "rust/vendor/parley/src/style/brush.rs",
+      "bytes": 294,
+      "sha256": "D09DFA6E3283C03550186BCED5F9F32CE39C4F5798B2979B02F945DC2C55B8E6"
+    },
+    {
+      "path": "rust/vendor/parley/src/style/font.rs",
+      "bytes": 2122,
+      "sha256": "F65A9B1106B618C5301964453F943C59A866A73A5516393400DFBEDEF23E3D21"
+    },
+    {
+      "path": "rust/vendor/parley/src/style/mod.rs",
+      "bytes": 8788,
+      "sha256": "FDBED2D895B4C381EA4A4555793109A45F033E663477248E3F638E0AF2A406C6"
+    },
+    {
+      "path": "rust/vendor/parley/src/style/styleset.rs",
+      "bytes": 3302,
+      "sha256": "CD7851DE616865786EEA7D72D114ABD8AD60B9AA49372CD23C7AB1FE70D88E65"
+    },
+    {
+      "path": "rust/vendor/parley/src/tests/mod.rs",
+      "bytes": 133,
+      "sha256": "04C5DB2BB4D0801C2F228DFF7FA458A2439DEDEC68ECCE9C284672A50A13491E"
+    },
+    {
+      "path": "rust/vendor/parley/src/tests/test_analysis.rs",
+      "bytes": 40301,
+      "sha256": "1AB23308B010EB91271635252DC1843CE2E134C38601C36A9D242FD4663DE681"
+    },
+    {
+      "path": "rust/vendor/parley/src/tests/test_builders.rs",
+      "bytes": 18690,
+      "sha256": "90768CFC09219A7A3DEFAA936F9B68A2B6BEE84B7AEC3C78A74D0061C920C292"
+    },
+    {
+      "path": "rust/vendor/parley/src/tests/utils/asserts.rs",
+      "bytes": 3111,
+      "sha256": "3168268FD5DC0590301A6769672BE72DE6C440C0CF3DD882232FD31BE499B439"
+    },
+    {
+      "path": "rust/vendor/parley/src/tests/utils/mod.rs",
+      "bytes": 566,
+      "sha256": "DAF628EB1A0FC92F611F2D0643D25D7962EFCDDA3304F06B044789ADC2CAF6FB"
+    },
+    {
+      "path": "rust/vendor/parley/src/util.rs",
+      "bytes": 1457,
+      "sha256": "FA541354618EBCC115494D969983D316726D6BD37FAA32439E47A011BD32D39B"
+    }
+  ],
+  "sourceSelfContained": {
+    "siblingPathDependencies": 0,
+    "internalPathDependencies": [
+      "rust/vendor/parley"
+    ],
+    "licensedFontFixtures": "rust/fixtures/fonts",
+    "windowsFontTest": "installed font runtime fixture; not redistributed; environment-specific evidence",
+    "extractedFreshRebuild": "not yet run for this artifact"
+  },
+  "priorEvidence": "docs/engine-p0/2026-10-03/full-acceptance/PRIOR_DISPLAY_LIST_BUILD_VERIFICATION.json"
+}

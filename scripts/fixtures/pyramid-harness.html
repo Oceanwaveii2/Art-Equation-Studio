@@ -1,0 +1,11 @@
+<!doctype html><html><head><meta charset="UTF-8"><title>P10/P11 tile verification</title><style>
+*{box-sizing:border-box}html,body{margin:0;background:#253040}#root{width:100vw;height:100vh}.canvas-stage{position:relative;width:100vw;height:100vh;overflow:hidden}.board-world{position:absolute;transform-origin:0 0}.test-body{position:relative}.test-body>img{width:100%;height:100%;object-fit:contain;display:block}
+</style></head><body><div id="root"></div><script type="module">
+import React from 'react'; import { createRoot } from 'react-dom/client'; import { TiledImagePreview } from '/src/board/TiledImagePreview.tsx';
+const root=createRoot(document.getElementById('root')), manifests={};
+for(const name of ['small','giant']) manifests[name]=await(await fetch('/tmp/pyramid-fixtures/'+name+'.json')).json();
+let current={name:'small',scale:1,panX:0,panY:0,angle:0,flipX:false,flipY:false,reference:false,count:1};
+window.renderFixture=(options={})=>{current={...current,...options}; const o=current, p=manifests[o.name], base='/tmp/pyramid-fixtures/';
+root.render(React.createElement('div',{className:'canvas-stage'},React.createElement('div',{className:'board-world',style:{transform:`translate(${-o.panX}px,${-o.panY}px) scale(${o.scale})`}},Array.from({length:o.count},(_,i)=>React.createElement('div',{key:i,className:'test-body',style:{position:i?'absolute':'relative',left:i?i*5:0,top:i?i*5:0,width:p.width,height:p.height}},o.reference?React.createElement('img',{src:base+'projects/test-project/assets/originals/'+o.name+'.png',style:{transform:`rotate(${o.angle}deg) scale(${o.flipX?-1:1},${o.flipY?-1:1})`}}):React.createElement(TiledImagePreview,{pyramid:p,posterUrl:base+p.posterRelativePath,tilesUrl:base+p.tilesRelativePath,alt:o.name,viewportScale:o.scale,rotation:o.angle,flipX:o.flipX,flipY:o.flipY,viewKey:`${o.panX}/${o.panY}`,style:{transform:`rotate(${o.angle}deg) scale(${o.flipX?-1:1},${o.flipY?-1:1})`}}))))));};
+window.fixtureManifests=manifests;window.renderFixture();
+</script></body></html>

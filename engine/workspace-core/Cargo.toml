@@ -1,0 +1,15 @@
+[package]
+name = "art-equation-workspace-core"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+rusqlite = { version = "=0.40.2", features = ["bundled", "backup"] }
+serde_json = "1.0"
+sha2 = "0.11"
+log = "0.4"
+
+uuid = { version = "1", features = ["v4"] }

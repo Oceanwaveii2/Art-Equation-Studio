@@ -1,0 +1,41 @@
+.version 7.0
+.target sm_50
+.address_size 64
+.visible .entry downsample(.param .u64 src, .param .u64 dst, .param .u32 width, .param .u32 height) {
+ .reg .pred %p<8>; .reg .b32 %r<48>; .reg .b64 %d<8>;
+ ld.param.u64 %d0,[src]; ld.param.u64 %d1,[dst];
+ ld.param.u32 %r0,[width]; ld.param.u32 %r1,[height];
+ mov.u32 %r2,%ctaid.x; mov.u32 %r3,%ntid.x; mov.u32 %r4,%tid.x;
+ mad.lo.u32 %r5,%r2,%r3,%r4;
+ add.u32 %r6,%r0,1; shr.u32 %r6,%r6,1;
+ add.u32 %r7,%r1,1; shr.u32 %r7,%r7,1;
+ mul.lo.u32 %r8,%r6,%r7; setp.ge.u32 %p0,%r5,%r8; @%p0 bra DONE;
+ rem.u32 %r9,%r5,%r6; shl.b32 %r9,%r9,1;
+ div.u32 %r10,%r5,%r6; shl.b32 %r10,%r10,1;
+ mov.u32 %r11,0; mov.u32 %r12,0; mov.u32 %r13,0; mov.u32 %r14,0; mov.u32 %r15,0;
+ mov.u32 %r16,%r10; add.u32 %r17,%r10,2; min.u32 %r17,%r17,%r1;
+ YLOOP:
+ mov.u32 %r18,%r9; add.u32 %r19,%r9,2; min.u32 %r19,%r19,%r0;
+ XLOOP:
+ mad.lo.u32 %r20,%r16,%r0,%r18; mul.wide.u32 %d2,%r20,4; add.u64 %d3,%d0,%d2;
+ ld.global.u32 %r21,[%d3]; shr.u32 %r22,%r21,24;
+ and.b32 %r23,%r21,255; mad.lo.u32 %r11,%r23,%r22,%r11;
+ shr.u32 %r23,%r21,8; and.b32 %r23,%r23,255; mad.lo.u32 %r12,%r23,%r22,%r12;
+ shr.u32 %r23,%r21,16; and.b32 %r23,%r23,255; mad.lo.u32 %r13,%r23,%r22,%r13;
+ add.u32 %r14,%r14,%r22; add.u32 %r15,%r15,1;
+ add.u32 %r18,%r18,1; setp.lt.u32 %p1,%r18,%r19; @%p1 bra XLOOP;
+ add.u32 %r16,%r16,1; setp.lt.u32 %p2,%r16,%r17; @%p2 bra YLOOP;
+ setp.eq.u32 %p3,%r14,0; @%p3 bra ZERO;
+ shr.u32 %r24,%r14,1;
+ add.u32 %r11,%r11,%r24; div.u32 %r11,%r11,%r14;
+ add.u32 %r12,%r12,%r24; div.u32 %r12,%r12,%r14;
+ add.u32 %r13,%r13,%r24; div.u32 %r13,%r13,%r14;
+ bra PACK;
+ ZERO: mov.u32 %r11,0; mov.u32 %r12,0; mov.u32 %r13,0;
+ PACK:
+ shr.u32 %r24,%r15,1; add.u32 %r14,%r14,%r24; div.u32 %r14,%r14,%r15;
+ shl.b32 %r12,%r12,8; shl.b32 %r13,%r13,16; shl.b32 %r14,%r14,24;
+ or.b32 %r25,%r11,%r12; or.b32 %r25,%r25,%r13; or.b32 %r25,%r25,%r14;
+ mul.wide.u32 %d4,%r5,4; add.u64 %d5,%d1,%d4; st.global.u32 [%d5],%r25;
+ DONE: ret;
+}

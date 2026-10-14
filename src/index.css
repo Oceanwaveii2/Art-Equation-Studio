@@ -1,0 +1,23 @@
+:root {
+  font-family: Inter, "Segoe UI Variable", "Segoe UI", sans-serif;
+  color: #e8e4dc;
+  background: #0d0e11;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+.fatal-error { width:100%; height:100%; display:grid; place-content:center; justify-items:start; gap:14px; padding:clamp(28px,8vw,120px); background:#111318; color:#e7e1d8; }.fatal-error span { color:#c99a62; font:700 10px/1 Inter,sans-serif; letter-spacing:.16em; }.fatal-error h1 { max-width:720px; margin:0; font:500 clamp(28px,4vw,54px)/1.05 Georgia,serif; }.fatal-error p { max-width:680px; margin:0; color:#aeb2ba; font:14px/1.6 Inter,sans-serif; }.fatal-error pre { max-width:min(780px,80vw); overflow:auto; margin:0; padding:12px; border:1px solid #3d424c; border-radius:5px; background:#0b0d11; color:#d6b9a0; font:12px/1.5 Consolas,monospace; }.fatal-error button { height:36px; border:1px solid #bc915f; border-radius:4px; background:#bc915f; color:#17130f; padding:0 16px; font-weight:700; cursor:pointer; }
+button, select { font: inherit; }
+button { color: inherit; transition:background-color .12s ease,border-color .12s ease,color .12s ease,opacity .12s ease; }
+button:disabled,select:disabled,input:disabled { opacity:.42; cursor:not-allowed!important; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline:2px solid #58c8c1; outline-offset:2px; }
+.project-search { position:relative; display:flex; align-items:center; gap:5px; flex:1 1 220px; max-width:420px; }.project-search>input { flex:1; min-width:0; height:31px; border:1px solid #383d46; border-radius:5px; background:#17191f; color:#e2e3e5; padding:0 10px; font-size:9px; }.project-search-scope { flex:none; border:1px solid #383d46; border-radius:5px; color:#969ba5; padding:7px 8px; font:700 8px/1 Inter,sans-serif; letter-spacing:.04em; white-space:nowrap; }.project-search-results { position:absolute; z-index:150; top:37px; left:0; right:0; max-height:360px; overflow:auto; border:1px solid #3a404a; border-radius:5px; background:#171a20; box-shadow:0 14px 32px #000a; }.project-search-results button { display:grid; width:100%; gap:3px; border:0; border-bottom:1px solid #2b3038; background:transparent; color:#ddd; padding:9px 10px; text-align:left; cursor:pointer; }.project-search-results button:hover { background:#262b33; }.project-search-results small { color:#959aa4; font-size:7px; }.project-search-results p { margin:0; padding:12px; color:#9699a3; font-size:8px; }
+.recovery-panel { position:fixed; z-index:120; inset:64px 0 28px 222px; overflow:auto; background:#121419; color:var(--text); }.recovery-panel>header { display:flex; justify-content:space-between; gap:20px; padding:24px 28px; border-bottom:1px solid var(--line); background:#17191f; }.recovery-panel h2 { margin:0; font:500 26px/1.1 Georgia,serif; }.recovery-panel p { color:var(--muted); font-size:10px; }.recovery-panel>header>button { align-self:flex-start; height:31px; padding:0 12px; border:1px solid var(--line-strong); border-radius:4px; background:#22252c; cursor:pointer; }.recovery-list { display:grid; gap:8px; padding:20px 28px; }.recovery-list article { display:grid; grid-template-columns:100px minmax(0,1fr) 190px 70px; align-items:center; gap:12px; padding:12px; border:1px solid #30343d; border-radius:5px; background:#191c22; font-size:9px; }.recovery-list article span { overflow:hidden; color:#c9cbd0; text-overflow:ellipsis; white-space:nowrap; }.recovery-list article small { color:var(--muted); font-size:8px; }.recovery-list article button { height:25px; border:1px solid #3f5d50; border-radius:3px; background:#1d2b25; color:#91c6a6; font-size:8px; cursor:pointer; }
+[contenteditable]:focus-visible { outline:none; box-shadow:inset 0 0 0 1px #58c8c166; }
+.workspace-light .project-search>input,.workspace-light .project-search-scope,.workspace-light .project-search-results { background:var(--surface-input); border-color:var(--border-control); color:var(--text); }
+.workspace-light .project-search-results button:hover { background:var(--surface-hover); }
+.workspace-light .recovery-panel,.workspace-light .fatal-error { background:var(--panel); color:var(--text); }
+.workspace-light .recovery-panel>header { background:var(--surface-toolbar); }

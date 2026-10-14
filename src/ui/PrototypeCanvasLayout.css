@@ -1,0 +1,45 @@
+.prototype25-integrated-shell .workbench > .prototype-canvas-workspace { display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; overflow:hidden; }
+.prototype25-integrated-shell .prototype-canvas-workspace > .canvas-pane { flex:1; width:100%!important; min-width:0; min-height:0; }
+.prototype25-integrated-shell .prototype-canvas-workspace > .project-board-strip { flex:none; width:100%; }
+.prototype25-integrated-shell .workbench.compact-split > .prototype-canvas-workspace { grid-column:1; grid-row:2; width:100%; height:100%; }
+.prototype25-integrated-shell .workbench.compact-document > .prototype-canvas-workspace { display:none!important; }
+.prototype25-integrated-shell .canvas-navigation-row > .board-navigation { display:flex; flex:1; min-width:0; height:auto; padding:0; border:0; background:transparent!important; }
+.prototype25-integrated-shell .canvas-toolbar .board-navigation > button:not(.board-actions-trigger) { width:26px; min-width:26px; padding:2px; }
+.prototype25-integrated-shell .canvas-toolbar .board-navigation .board-breadcrumbs { flex:1; min-width:0; overflow:hidden; }
+.prototype25-integrated-shell .canvas-toolbar .board-navigation .board-breadcrumbs button { max-width:180px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
+.prototype25-integrated-shell .board-node.node-type { background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0;overflow:visible; }
+.prototype25-integrated-shell .board-node.node-type > .board-rich-text { height:100%;padding:0;border:0;background:transparent!important;grid-template-rows:minmax(0,1fr);overflow:visible; }
+.prototype25-integrated-shell .board-node.node-type .board-text-editor { padding:0;min-height:0;background:transparent; }
+.prototype25-integrated-shell .node-type .board-rich-text > div:not(.board-text-toolbar) { overflow:visible; }
+.prototype25-integrated-shell .board-node.node-type .board-rich-text > div:not(.board-text-toolbar) > .tiptap { min-height:0; }
+.prototype25-integrated-shell .node-type-area .board-rich-text > div:not(.board-text-toolbar) { overflow:hidden; }
+.prototype25-integrated-shell .node-type-point .ProseMirror { display:inline-block;width:max-content;max-width:none; }
+.prototype25-integrated-shell .node-type-point .ProseMirror { white-space:pre;min-width:0; }
+.prototype25-integrated-shell .node-type-area .ProseMirror { white-space:pre-wrap; }
+.prototype25-integrated-shell .type-frame-draft { position: absolute; border: 1px dashed #35c9ef; background: #35c9ef12; pointer-events: none; z-index: 100; }
+.prototype25-integrated-shell .node-type-area .board-rich-text { height: 100%; overflow: hidden; }
+.prototype25-integrated-shell .type-overset-indicator { position: absolute; right: 0; bottom: 0; font: 11px/1.5 sans-serif; color: #071322; background: #ffc878; padding: 1px 4px; pointer-events: none; }
+.prototype25-integrated-shell .graph-v2-port-overlay { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; z-index: 100; }
+.prototype25-integrated-shell .graph-v2-summary { display: grid; gap: 6px; padding: 12px; font-size: 13px; color: var(--text); overflow: hidden; }
+.prototype25-integrated-shell .graph-v2-summary small { color: var(--muted); font-size: 11px; }
+.prototype25-integrated-shell .graph-v2-summary span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prototype25-integrated-shell .type-draw-surface { z-index: 20; }
+.prototype25-integrated-shell .node-graph-v2 { padding: 0; background: transparent; border: 0; box-shadow: none; overflow: visible; }
+.prototype25-integrated-shell .node-graph-v2 .graph-v2-summary { display: block; padding: 0; overflow: visible; }
+.prototype25-integrated-shell .graph-column-editor { position: absolute; right: 16px; top: 64px; width: min(360px, calc(100% - 32px)); max-height: calc(100% - 144px); overflow: auto; z-index: 120; padding: 12px; background: var(--surface-overlay); color: var(--text); border: 1px solid var(--line); border-radius: 6px; }
+.prototype25-integrated-shell .graph-column-editor header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.prototype25-integrated-shell .graph-column-editor label { display: grid; gap: 6px; margin: 12px 0; }
+.prototype25-integrated-shell .graph-column-editor :is(li,.graph-input-row) { display: flex; gap: 4px; margin: 8px 0; }
+.prototype25-integrated-shell .graph-column-editor select { min-width: 0; flex: 1; }
+.prototype25-integrated-shell .graph-column-editor :is(select,button,input) { min-height: 32px; background: var(--surface-control); color: var(--text); border: 1px solid var(--line); border-radius: 5px; }
+.prototype25-integrated-shell .graph-column-editor p { color: var(--text-subtle); font-size: 12px; }
+.prototype25-integrated-shell .graph-column-editor :focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.canvas-stage .graph-v2-port-overlay [data-vello-card-paint="complete"], .canvas-stage .connector-group[data-vello-paint="true"] { opacity: 0 !important; }
+.canvas-stage .graph-port-interaction { z-index: 50; overflow: visible; pointer-events: none; }
+.graph-port-interaction .graph-port-hit, .graph-port-interaction .graph-port-target { fill: transparent; stroke: transparent; pointer-events: all; cursor: crosshair; }
+.graph-port-interaction .graph-port-hit:hover, .graph-port-interaction .graph-port-hit:focus-visible, .graph-port-interaction .graph-port-target:hover, .graph-port-interaction .magnetic { stroke: #67d5cd; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.graph-port-interaction .graph-port-draft { pointer-events: none; }
+
+.prototype25-integrated-shell .graph-column-editor fieldset { min-width: 0; margin-top: 12px; border: 1px solid var(--line); padding: 8px; }
+
+.prototype25-integrated-shell .canvas-stage .board-node.node-type .board-text-editor { padding:0 !important; }

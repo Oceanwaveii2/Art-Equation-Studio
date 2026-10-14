@@ -1,0 +1,31 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory;
+export const __wbg_b3renderer_free: (a: number, b: number) => void;
+export const b3renderer_destroy_device_for_recovery_test: (a: number) => void;
+export const b3renderer_initialize: (a: number) => any;
+export const b3renderer_new: () => number;
+export const b3renderer_render: (a: number, b: number, c: number, d: number) => any;
+export const b3renderer_render_overlap_fixture: (a: number, b: number, c: number) => any;
+export const b3renderer_render_real_board: (a: number, b: number, c: number) => any;
+export const b3renderer_render_real_board_pixels: (a: number, b: number, c: number) => any;
+export const b3renderer_render_replay: (a: number, b: number, c: number) => any;
+export const b3renderer_render_snapshot: (a: number, b: number, c: number, d: number, e: number) => any;
+export const b3renderer_render_snapshot_pixels: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => any;
+export const b3renderer_render_workload: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => any;
+export const project_b_preflight: () => [number, number, number, number];
+export const render_b1_fixture: (a: number, b: number, c: number) => [number, number];
+export const render_b1_workload: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
+export const wasm_bindgen_641f96222e64b03b___closure__destroy___dyn_core_f0fd674eaa06beef___ops__function__FnMut__wasm_bindgen_641f96222e64b03b___JsValue____Output_______: (a: number, b: number) => void;
+export const wasm_bindgen_641f96222e64b03b___closure__destroy___dyn_core_f0fd674eaa06beef___ops__function__FnMut__wasm_bindgen_641f96222e64b03b___JsValue____Output___core_f0fd674eaa06beef___result__Result_____wasm_bindgen_641f96222e64b03b___JsError___: (a: number, b: number) => void;
+export const wasm_bindgen_641f96222e64b03b___convert__closures_____invoke___wasm_bindgen_641f96222e64b03b___JsValue__core_f0fd674eaa06beef___result__Result_____wasm_bindgen_641f96222e64b03b___JsError___true_: (a: number, b: number, c: any) => [number, number];
+export const wasm_bindgen_641f96222e64b03b___convert__closures_____invoke___js_sys_f479fed54ab3b745___Function_fn_wasm_bindgen_641f96222e64b03b___JsValue_____wasm_bindgen_641f96222e64b03b___sys__Undefined___js_sys_f479fed54ab3b745___Function_fn_wasm_bindgen_641f96222e64b03b___JsValue_____wasm_bindgen_641f96222e64b03b___sys__Undefined_______true_: (a: number, b: number, c: any, d: any) => void;
+export const wasm_bindgen_641f96222e64b03b___convert__closures_____invoke___wasm_bindgen_641f96222e64b03b___JsValue______true_: (a: number, b: number, c: any) => void;
+export const __wbindgen_malloc: (a: number, b: number) => number;
+export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+export const __wbindgen_exn_store: (a: number) => void;
+export const __externref_table_alloc: () => number;
+export const __wbindgen_externrefs: WebAssembly.Table;
+export const __wbindgen_free: (a: number, b: number, c: number) => void;
+export const __externref_table_dealloc: (a: number) => void;
+export const __wbindgen_start: () => void;

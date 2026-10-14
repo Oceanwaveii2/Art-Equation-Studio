@@ -1,0 +1,11 @@
+.layout-research-panel { position: absolute; right: 16px; top: 80px; z-index: 90; width: min(440px, calc(100% - 32px)); max-height: calc(100% - 100px); overflow: auto; background: #182128; color: #e7eef2; border: 1px solid #53636d; border-radius: 12px; padding: 16px; box-shadow: 0 8px 40px #0008; font-size: 14px; }
+.layout-research-panel header { display:flex; align-items:center; justify-content:space-between; }
+.layout-research-panel h2 { margin:0; font-size:20px; }
+.layout-research-panel h3 { font-size:16px; margin:0 0 8px; }
+.layout-research-panel section { border-top:1px solid #53636d; padding-top:14px; margin-top:14px; }
+.layout-research-panel p { line-height:1.5; }
+.layout-research-panel button, .layout-research-panel select, .layout-research-panel input { color:inherit; background:#263640; border:1px solid #657d89; border-radius:5px; padding:7px; margin:4px; font:inherit; }
+.layout-research-panel input { width:85px; }
+.layout-research-panel button:disabled { opacity:.5; }
+.layout-research-panel small { display:block; color:#bccbd4; }
+.layout-research-panel svg, .semantic-review svg { width:100%; height:200px; background:#0e1419; margin:8px 0; border:1px solid #53636d; }

@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "description": "A smoke pass rejects gross regressions only. Release additionally requires matching native and browser evidence; missing evidence is a failure.",
+  "requiredBoards": [
+    "ultra-graph-test-1",
+    "test-2-layout",
+    "test-2-nodes",
+    "test-3-layout",
+    "test-3-nodes",
+    "BasketballMohawks",
+    "sample-miami-by-giordano-poloni",
+    "sample-vision-by-nastka-drabot"
+  ],
+  "smoke": {
+    "maxFrameGapMs": 250,
+    "maxP95FrameGapMs": 100,
+    "requireGpu": true,
+    "requireSettledGeneration": true
+  },
+  "release": {
+    "minimumRuns": 3,
+    "inputToCommitP95Ms": 22.3,
+    "minimumSoakSeconds": 300,
+    "requiredPhysicalSizes": [
+      [
+        1920,
+        1080
+      ],
+      [
+        3840,
+        2160
+      ]
+    ],
+    "maxVisualDiffPixels": 0
+  },
+  "milestones": {
+    "performance": "Integrated P1/P0 reaches the isolated Retina prototype 4K timings; no pass before this.",
+    "ui": "Complete P1 UI, fonts/typography, hierarchy and organization; no partial-shell pass."
+  },
+  "retina": {
+    "physicalCanvas": [
+      3840,
+      2160
+    ],
+    "panP95Ms": 16.2,
+    "zoomP95Ms": 22.3,
+    "firstPostGestureFrameMs": 78.5,
+    "sharpProfileCompleteMs": 613,
+    "minimumPanSamples": 120,
+    "minimumZoomSamples": 60,
+    "requireGpu": true,
+    "requireFullQuality": true,
+    "repeats": 3,
+    "metric": "input-to-committed-frame, not rAF or paint-call-only",
+    "referenceReceipts": [
+      {
+        "file": "nav-memo-40-4k-120a.json",
+        "sha256": "f13636d48d7301e66c888b3099624f1ed04d44513a1d5389338b09af14ce9c2d"
+      },
+      {
+        "file": "nav-memo-40-4k-120b.json",
+        "sha256": "4cce1019a9b277911a0179ec6185f6dfa32f9db83b3b103c0495fe58361323ee"
+      },
+      {
+        "file": "nav-memo-40-4k-120c.json",
+        "sha256": "77f94da57ed4ffa641de06cad351cf90029f5e2433326b3079c6e3d8e46d4673"
+      }
+    ]
+  },
+  "ui": {
+    "themes": [
+      "navy",
+      "light",
+      "dark"
+    ],
+    "modes": [
+      "canvas",
+      "document",
+      "split"
+    ],
+    "viewports": [
+      [
+        1280,
+        720
+      ],
+      [
+        1440,
+        900
+      ],
+      [
+        1920,
+        1080
+      ]
+    ],
+    "requiredChecks": [
+      "fontCoverage",
+      "typographyParity",
+      "panelOrganization",
+      "contextualInspector",
+      "familyTree",
+      "toolbarBottomCenter",
+      "splitCrowding",
+      "keyboardFocus",
+      "readOnlyControls",
+      "themeParity",
+      "boardLifecycle",
+      "recursiveNavigation",
+      "layersVisibilityLocksOrdering",
+      "colorInspector"
+    ],
+    "reference": "Approved P1 UI prototype, including contextual inspector and layers/groups/frames references"
+  }
+}

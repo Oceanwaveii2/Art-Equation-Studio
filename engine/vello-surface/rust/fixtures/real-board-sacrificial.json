@@ -1,0 +1,125 @@
+{
+  "provenance": {
+    "source": "portable/projects/rainee-redesign/project.json",
+    "boardId": "master-reference-board",
+    "capturedAt": "2026-09-20",
+    "policy": "Sanitized, repository-owned sacrificial copy. Never write to the live project."
+  },
+  "schema": "art-equation.scene",
+  "schemaVersion": 1,
+  "documentId": "sacrificial-rainee-redesign",
+  "sceneId": "master-reference-board",
+  "revision": "fixture-2026-09-20",
+  "coordinateSystem": {
+    "units": "document-unit",
+    "xAxis": "right",
+    "yAxis": "down"
+  },
+  "environment": {
+    "background": "#15181d",
+    "colorSpace": "srgb"
+  },
+  "objects": [
+    {
+      "id": "character-column",
+      "order": 0,
+      "kind": "vector",
+      "bounds": { "x": 163, "y": 174, "width": 307, "height": 467 },
+      "transform": [1, 0, 0, 1, 0, 0],
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "blendMode": "normal",
+      "payload": { "fill": "#d7a36a" }
+    },
+    {
+      "id": "character-image",
+      "order": 1,
+      "kind": "vector",
+      "bounds": { "x": 173, "y": 242, "width": 287, "height": 218 },
+      "transform": [1, 0, 0, 1, 0, 0],
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "blendMode": "normal",
+      "payload": { "fill": "#c87562" }
+    },
+    {
+      "id": "silhouette-note",
+      "order": 2,
+      "kind": "vector",
+      "bounds": { "x": 173, "y": 470, "width": 287, "height": 161 },
+      "transform": [1, 0, 0, 1, 0, 0],
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "blendMode": "normal",
+      "payload": { "fill": "#3c4553" }
+    },
+    {
+      "id": "environment-column",
+      "order": 3,
+      "kind": "vector",
+      "bounds": { "x": 470, "y": 170, "width": 290, "height": 471 },
+      "transform": [1, 0, 0, 1, 0, 0],
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "blendMode": "normal",
+      "payload": { "fill": "#62a7a4" }
+    },
+    {
+      "id": "environment-image",
+      "order": 4,
+      "kind": "vector",
+      "bounds": { "x": 480, "y": 238, "width": 270, "height": 205 },
+      "transform": [1, 0, 0, 1, 0, 0],
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "blendMode": "normal",
+      "payload": { "fill": "#477b86" }
+    },
+    {
+      "id": "walkthrough-video",
+      "order": 5,
+      "kind": "vector",
+      "bounds": { "x": 480, "y": 453, "width": 270, "height": 178 },
+      "transform": [1, 0, 0, 1, 0, 0],
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "blendMode": "normal",
+      "payload": { "fill": "#3c4553" }
+    },
+    {
+      "id": "production-notes",
+      "order": 6,
+      "kind": "vector",
+      "bounds": { "x": 85, "y": 619, "width": 260, "height": 109 },
+      "transform": [1, 0, 0, 1, 0, 0],
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "blendMode": "normal",
+      "payload": { "fill": "#3c4553" }
+    }
+  ],
+  "connections": [
+    {
+      "id": "character-to-environment",
+      "style": "curve",
+      "source": { "objectId": "character-column", "port": "right" },
+      "target": { "objectId": "environment-column", "port": "left" },
+      "paint": "#58c8c1",
+      "width": 2,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true
+    }
+  ],
+  "assetIds": [],
+  "extensions": {
+    "sourceViewport": { "scale": 0.3139721664995918, "x": 393.4961056815408, "y": 300.7063670947082 }
+  }
+}

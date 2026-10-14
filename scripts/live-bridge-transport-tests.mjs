@@ -1,0 +1,14 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
+import http from 'node:http'
+import assert from 'node:assert/strict'
+import {spawn} from 'node:child_process'
+import readline from 'node:readline'
+const temp=await fs.mkdtemp(path.join(os.tmpdir(),'ae-bridge-test-')),dir=path.join(temp,'studio.artequation.p1v21','codex-live-instances')
+await fs.mkdir(dir,{recursive:true});const servers=[],children=[]
+const token='a'.repeat(64)
+async function instance(pid){const server=http.createServer((req,res)=>{let body='';req.on('data',c=>body+=c);req.on('end',()=>{if(req.headers.authorization!==`Bearer ${token}`){res.writeHead(403);res.end();return}const q=JSON.parse(body);res.setHeader('Content-Type','application/json');res.end(JSON.stringify({ok:true,data:q.tool==='art_app_handshake'?{pid,version:2}:{records:[{row:{sequence:42}}],nextCursor:'next'}}))})});await new Promise(r=>server.listen(0,'127.0.0.1',r));servers.push(server);const file=path.join(dir,pid+'.json');await fs.writeFile(file,JSON.stringify({pid,port:server.address().port,token}));return file}
+function client(explicit){const env={...process.env,LOCALAPPDATA:temp};delete env.ART_EQUATION_BRIDGE_DISCOVERY;if(explicit)env.ART_EQUATION_BRIDGE_DISCOVERY=explicit;const child=spawn(process.execPath,['scripts/live-app-mcp-server.mjs'],{env,windowsHide:true,stdio:['pipe','pipe','pipe']});children.push(child);const pending=new Map();readline.createInterface({input:child.stdout}).on('line',s=>{const m=JSON.parse(s);pending.get(m.id)?.(m);pending.delete(m.id)});let id=0;return (method,params={})=>new Promise((resolve,reject)=>{const n=++id;const timer=setTimeout(()=>reject(Error('timeout')),5000);pending.set(n,m=>{clearTimeout(timer);resolve(m)});child.stdin.write(JSON.stringify({jsonrpc:'2.0',id:n,method,params})+'\n')})}
+try{const first=await instance(111),c=client();const list=await c('tools/list');assert.ok(list.result.tools.some(t=>t.name==='art_app_events'));const one=await c('tools/call',{name:'art_app_handshake',arguments:{}});assert.equal(JSON.parse(one.result.content[0].text).pid,111);await instance(222);const ambiguous=await c('tools/call',{name:'art_app_handshake',arguments:{}});assert.equal(ambiguous.result.isError,true);assert.match(ambiguous.result.content[0].text,/Multiple/);const selected=client(first);const events=await selected('tools/call',{name:'art_app_events',arguments:{cursor:'next'}});assert.equal(JSON.parse(events.result.content[0].text).records[0].row.sequence,42);console.log('Bridge transport PASS: tool exposure, authenticated per-instance discovery, ambiguity rejection and explicit selection; controlled local server, not deployed app.')}
+finally{for(const child of children)child.stdin.end();await Promise.all(children.map(child=>new Promise(r=>child.exitCode!==null?r():child.once('exit',r))));await Promise.all(servers.map(server=>new Promise(r=>server.close(r))));await fs.rm(temp,{recursive:true,force:true})}

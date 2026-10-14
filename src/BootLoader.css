@@ -1,0 +1,39 @@
+.boot-loader{--launch-backdrop:#191919;--launch-strip:#3d302f;--launch-control:#f7e8de;--launch-ink:#251f22;--launch-enter:#958794;position:fixed;inset:0;z-index:2000;display:grid;place-items:center;padding:24px;overflow:auto;background:var(--launch-backdrop);color:#f7efec;font-family:'Segoe UI','Microsoft YaHei UI','Yu Gothic UI',system-ui,sans-serif}
+.boot-loader-card{position:relative;width:min(850px,100%,calc((100svh - 168px)*1.38355));background:var(--launch-strip);box-shadow:0 2px 8px #0004}
+.boot-loader-art{width:100%;aspect-ratio:4812/3478;background:#2b3444}
+.boot-loader-image{display:block;width:100%;height:auto;user-select:none}
+.boot-loader-setup{position:relative;display:grid;grid-template-columns:minmax(145px,1fr) minmax(220px,1.4fr) minmax(90px,.52fr);align-items:center;gap:32px;min-height:114px;padding:18px 34px 18px 58px;box-sizing:border-box}
+.boot-hardware{min-width:0}
+.boot-hardware>summary{display:flex;align-items:center;justify-content:space-between;gap:16px;list-style:none;cursor:pointer;min-height:44px;padding:4px 0;font-size:14px;line-height:1.35}
+.boot-hardware>summary::-webkit-details-marker{display:none}
+.boot-status-dot{width:12px;height:12px;flex:none;border-radius:50%;background:#168ea1}.boot-status-dot.ready{background:#8dccaf}.boot-status-dot.failed{background:#f0ad72}
+.boot-selectors{display:grid;gap:8px;min-width:0}
+.boot-selectors label{display:grid;grid-template-columns:minmax(65px,.8fr) minmax(0,1.3fr);align-items:center;background:var(--launch-control);color:var(--launch-ink);border:1px solid #c7b9b0;border-radius:3px;min-height:34px}
+.boot-selectors label>span{font-size:11px;line-height:1.2;padding:3px 8px}
+.boot-selectors select{width:100%;min-width:0;min-height:34px;border:0;border-radius:3px;background:transparent;color:var(--launch-ink);padding:4px 22px 4px 4px;font:inherit;font-size:13px}
+.boot-loader-skip{min-height:64px;padding:8px 12px;border:1px solid #b1a1af;border-radius:3px;background:var(--launch-enter);color:#211a20;font:inherit;font-size:15px;cursor:pointer}
+.boot-loader-skip:hover{background:#ad9dab}
+.boot-loader :is(select,button,summary):focus-visible{outline:3px solid var(--teal,#38bdf8);outline-offset:3px}
+.boot-loader-note{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.boot-hardware-panel{position:absolute;bottom:calc(100% + 12px);left:20px;width:min(420px,calc(100% - 40px));box-sizing:border-box;max-height:min(560px,calc(100svh - 190px));overflow:auto;padding:20px;background:var(--surface-overlay,#0c1b30);color:var(--text,#e7eef7);border:1px solid var(--border-control,#264566);border-radius:8px;box-shadow:0 8px 24px #0005;z-index:2}
+.launch-hardware-settings{font-family:inherit;font-size:13px;line-height:1.5}.launch-hardware-settings h2{font-size:16px;margin:0 0 8px}.launch-hardware-settings label{display:flex;flex-direction:column;gap:6px;font-weight:600}.launch-hardware-settings select{font:inherit;width:100%;min-width:0;min-height:36px;padding:6px 10px;background:var(--surface-input,#0a1727);color:var(--text,#e7eef7);border:1px solid var(--border-control,#264566);border-radius:6px}.launch-hardware-settings p,.launch-hardware-settings small{color:var(--text-subtle,#abbdd4);overflow-wrap:anywhere}.launch-hardware-settings ul{margin:8px 0;padding-left:20px}.launch-hardware-settings summary{cursor:pointer;padding:8px 0}.launch-hardware-status{margin-bottom:12px}.launch-accelerations li{margin:8px 0}.launch-accelerations span{display:block;font-size:12px}
+@media(max-width:640px){.boot-loader{padding:12px}.boot-loader-card{width:min(100%,calc((100svh - 190px)*1.38355))}.boot-loader-setup{grid-template-columns:minmax(0,1fr) 92px;gap:12px;padding:16px;min-height:150px}.boot-selectors{grid-column:1;grid-row:1}.boot-loader-skip{grid-column:2;grid-row:1}.boot-hardware{grid-column:1/-1;grid-row:2}.boot-hardware>summary{min-height:32px;font-size:12px}.boot-hardware-panel{left:12px;width:calc(100% - 24px)}}
+.boot-loader:lang(ja){font-family:'Segoe UI','Yu Gothic UI','Meiryo',system-ui,sans-serif}.boot-loader:lang(zh-CN){font-family:'Segoe UI','Microsoft YaHei UI',system-ui,sans-serif}
+.boot-loader .boot-selectors select{background-color:var(--launch-control)!important;color:var(--launch-ink)!important;border-color:transparent!important;color-scheme:light}
+.boot-loader-setup{gap:4%;padding:3.2% 3.4% 3.2% 4.4%;min-height:114px;grid-template-columns:minmax(0,1.05fr) minmax(0,1.55fr) minmax(90px,.58fr);border:1px solid #786966;border-radius:7px;background:linear-gradient(110deg,#3d3331,#392e2d)}
+.boot-hardware>summary{font-size:15px;gap:16px}.boot-status-dot{width:14px;height:14px}
+.boot-selectors{gap:8px}.boot-selectors label,.boot-layout-row{min-height:36px;border-radius:4px;background:#f7e8de;color:#39343a;border:1px solid #c7b9b0;display:grid;grid-template-columns:minmax(0,.56fr) minmax(0,1fr);align-items:center}
+.boot-selectors label>span,.boot-layout-row>span{font-size:12px;padding:6px 8px}
+.boot-selectors select{min-height:36px;font-size:14px}.boot-layout-row{position:relative}
+.boot-loader .boot-layout-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px;min-width:0;padding:6px 10px;background:transparent!important;color:#39343a!important;border:0;border-radius:4px;font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.boot-loader .boot-layout-trigger:focus-visible,.boot-loader .boot-layout-trigger[aria-expanded=true]{outline:2px solid #22abc4;outline-offset:2px}
+.boot-layout-options{position:absolute;left:35.9%;right:0;top:calc(100% + 4px);z-index:5;background:#f7e8de;border:1px solid #c7b9b0;border-radius:4px;overflow:hidden;box-shadow:0 5px 12px #0004}
+.boot-loader .boot-layout-options button{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:36px;padding:7px 10px;border:0;border-radius:0;background:#f7e8de!important;color:#39343a!important;font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.boot-loader .boot-layout-options button[aria-selected=true]{background:#cde4db!important}.boot-layout-options button>span{color:#168273;font-weight:700;font-size:20px}.boot-loader .boot-layout-options button:hover,.boot-loader .boot-layout-options button:focus-visible{background:#d4ece8!important;outline:2px solid #22abc4;outline-offset:-2px}
+.boot-loader .boot-loader-skip{min-height:70px;font-size:16px;background:#958794!important;color:#211a20!important;border:1px solid #b1a1af;border-radius:4px}
+.boot-colour-themes{display:flex;gap:8px;margin-top:14px}.boot-colour-themes button{flex:1;padding:8px}.boot-colour-themes button[aria-pressed=true]{outline:2px solid var(--teal,#38bdf8)}
+@media(max-width:640px){.boot-loader-setup{grid-template-columns:minmax(0,1fr) 92px;padding:16px;gap:12px;min-height:150px}.boot-selectors label,.boot-layout-row{grid-template-columns:minmax(0,.7fr) minmax(0,1fr)}.boot-layout-options{left:0}.boot-selectors label>span,.boot-layout-row>span{font-size:11px}}
+.boot-layout-options.above{top:auto;bottom:calc(100% + 4px)}
+.boot-loader-setup{padding-top:1.3%;padding-bottom:1.3%}
+.studio-shell .boot-loader .boot-layout-options button[role=option]{color:#39343a!important;font-weight:400!important}
+@media(max-width:640px){.boot-loader-setup{padding:16px}}

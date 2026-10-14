@@ -1,0 +1,57 @@
+/* One two-row command surface. Variants inherit the approved shell theme. */
+.studio-shell.p1-v2-shell .canvas-stage .ocean-toolbar {
+  --command-edge: var(--border-control);
+  --command-accent: var(--teal);
+  --command-active: var(--surface-active);
+  --focus-ring:var(--command-accent);
+  --selection-surface:var(--command-active);
+  position:absolute; left:50%; top:auto; bottom:12px; transform:translateX(-50%);
+  display:flex; flex-direction:column!important; align-items:stretch; gap:5px; width:max-content; max-width:calc(100% - 24px); max-height:none;
+  padding:0; border:0; border-radius:10px; background:transparent!important; overflow:visible; box-shadow:none; backdrop-filter:none!important;
+  color:var(--text-strong); font-family:'Segoe UI',sans-serif; z-index:75;
+}
+.studio-shell.p1-v2-shell.workspace-navy .canvas-stage .ocean-toolbar { --command-edge:#116184; --command-accent:#37e1e7; --command-active:#07526a; }
+.studio-shell.p1-v2-shell.workspace-dark .canvas-stage .ocean-toolbar { --command-edge:color-mix(in srgb,var(--gold) 32%,var(--border-control)); --command-accent:var(--gold); --command-active:color-mix(in srgb,var(--gold) 12%,var(--surface-overlay)); }
+.studio-shell.p1-v2-shell.workspace-light .canvas-stage .ocean-toolbar { --command-edge:var(--border-control); --command-accent:var(--teal); --command-active:color-mix(in srgb,var(--teal) 10%,var(--surface-overlay)); }
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-command-row {
+  display:flex; align-items:center; justify-content:space-between; gap:6px; padding:6px 8px;
+  background:linear-gradient(180deg,var(--surface-toolbar),var(--surface-overlay));
+  border:1px solid var(--command-edge); border-radius:9px; box-shadow:0 6px 20px var(--shadow-overlay),inset 0 1px color-mix(in srgb,var(--command-accent) 12%,transparent);
+}
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-command-group { display:flex; align-items:center; gap:3px; padding-right:7px; border-right:1px solid var(--command-edge); }
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-command-group:last-child { padding-right:0; border-right:0; }
+.studio-shell.p1-v2-shell .ocean-toolbar :is(.canvas-command,summary) {
+  position:relative; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:5px; flex:none; width:60px; min-width:32px; height:52px; min-height:32px; padding:5px 3px;
+  font:11px/1.15 'Segoe UI',sans-serif; color:var(--text-strong); background:transparent; border:1px solid transparent; border-radius:7px; box-shadow:none; outline:none;
+}
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-command-icon { display:flex; align-items:center; justify-content:center; height:21px; width:23px; }
+.studio-shell.p1-v2-shell .ocean-toolbar :is(.canvas-command-icon,.canvas-command-caption,.canvas-tool-item-icon,.canvas-tool-item-label) { background:transparent; }
+.studio-shell.p1-v2-shell .ocean-toolbar svg { width:21px; height:21px; fill:none; stroke:currentColor; stroke-width:1.65; stroke-linecap:round; stroke-linejoin:round; }
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-command-caption { white-space:nowrap; font:10px/1.2 'Segoe UI',sans-serif; }
+.studio-shell.p1-v2-shell .ocean-toolbar summary::after { border:0; transform:rotate(45deg); width:4px; height:4px; border-right:1px solid var(--command-accent); border-bottom:1px solid var(--command-accent); bottom:auto; right:5px; top:24px; opacity:1; }
+.studio-shell.p1-v2-shell .ocean-toolbar :is(.canvas-command,summary):hover { color:var(--text-strong); background:var(--surface-hover); border-color:var(--command-edge); }
+.studio-shell.p1-v2-shell .ocean-toolbar :is(.canvas-command.active,.canvas-command[aria-pressed=true],.canvas-tool-stack.active summary,.canvas-tool-stack[open] summary) {
+  color:var(--text-strong); border-color:var(--command-accent); background:var(--command-active);
+  box-shadow:inset 0 0 7px color-mix(in srgb,var(--command-accent) 24%,transparent),0 0 9px color-mix(in srgb,var(--command-accent) 18%,transparent);
+}
+.studio-shell.p1-v2-shell.workspace-dark .ocean-toolbar :is(.canvas-command.active,.canvas-command[aria-pressed=true],.canvas-tool-stack.active summary,.canvas-tool-stack[open] summary) { color:var(--command-accent)!important; }
+.studio-shell.p1-v2-shell .ocean-toolbar :is(button,summary):focus-visible { outline:2px solid var(--command-accent); outline-offset:2px; }
+.studio-shell.p1-v2-shell .ocean-toolbar button:disabled { color:var(--disabled-text); background:transparent; border-color:transparent; box-shadow:none; opacity:1; cursor:default; }
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-tool-stack-menu { width:260px; box-sizing:border-box; background:var(--surface-overlay); color:var(--text-strong); border-color:var(--command-edge); border-radius:9px; backdrop-filter:none; box-shadow:0 8px 26px var(--shadow-overlay); padding:8px; z-index:105; }
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-tool-stack-header { color:var(--command-accent); border-color:var(--command-edge); font-size:10px; padding:6px 8px 9px; }
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-tool-stack-header span { background:transparent; }
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-tool-stack-menu button.canvas-command { width:100%; height:36px; min-width:0; flex-direction:row; gap:10px; padding:5px 8px; justify-content:flex-start; }
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-tool-item-label { font:12px/1.3 'Segoe UI',sans-serif; }
+.studio-shell.p1-v2-shell .ocean-toolbar .canvas-tool-shortcut { background:var(--surface-control); color:var(--text-subtle); border-color:var(--command-edge); height:22px; }
+.studio-shell.p1-v2-shell .ocean-toolbar.compact :is(.canvas-command,summary) { width:49px; height:46px; }
+.studio-shell.p1-v2-shell .ocean-toolbar.compact .canvas-command-row { gap:3px; padding:5px; }
+.studio-shell.p1-v2-shell .ocean-toolbar.compact .canvas-command-group { gap:2px; padding-right:4px; }
+.studio-shell.p1-v2-shell .ocean-toolbar.compact .canvas-command-caption { font-size:10px; }
+.studio-shell.p1-v2-shell .ocean-toolbar.expanded summary:is([aria-label='Graphing tools'],[aria-label='Canvas options']) { width:78px; }
+.studio-shell.p1-v2-shell .canvas-stage .ocean-toolbar:has(details[open]) { z-index:160; }
+.studio-shell.p1-v2-shell .canvas-stage:has(.ocean-toolbar) .canvas-subtools { left:50%; top:auto; bottom:166px; transform:translateX(-50%); width:min(260px,calc(100% - 24px)); max-height:calc(100% - 182px); }
+.studio-shell.p1-v2-shell .canvas-stage:has(.ocean-toolbar) .canvas-zoom-control { bottom:166px; }
+.studio-shell.p1-v2-shell .canvas-stage:has(.ocean-toolbar) .board-minimap { bottom:212px; }
+@media(prefers-reduced-motion:reduce) { .ocean-toolbar * { transition:none!important; } }
+@media(forced-colors:active) { .studio-shell.p1-v2-shell .ocean-toolbar { --command-edge:ButtonText; --command-accent:Highlight; --command-active:Canvas; } .studio-shell.p1-v2-shell .ocean-toolbar .canvas-command-row,.studio-shell.p1-v2-shell .ocean-toolbar .canvas-tool-stack-menu { background:Canvas; color:CanvasText; } }

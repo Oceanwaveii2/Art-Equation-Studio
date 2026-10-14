@@ -1,0 +1,20 @@
+<!doctype html><html><head><meta charset="UTF-8"><title>Source-safe image framing parity</title><style>
+*{box-sizing:border-box}html,body{margin:0;background:#253040;color:white;font:14px system-ui}#root{width:100vw;height:100vh}.canvas-stage{position:relative;width:100vw;height:100vh;overflow:hidden}.board-world{position:absolute;transform-origin:0 0}.fixture-frame{position:relative;background:#101116;overflow:hidden}.reference-transform{position:absolute;inset:0;transform-origin:center}.reference-transform>img{width:100%;height:100%;display:block}#controls{position:fixed;top:10px;left:10px;z-index:10;display:flex;gap:10px}#controls label{display:flex;gap:4px}
+</style></head><body><div id="root"></div><script type="module">
+import React from 'react'; import {createRoot} from 'react-dom/client';
+import {TiledImagePreview} from '/src/board/TiledImagePreview.tsx';
+import {FormatImagePreview} from '/src/board/FormatImagePreview.tsx';
+const root=createRoot(document.getElementById('root')), base='/tmp/pyramid-fixtures/';
+const pyramid=await(await fetch(base+'small.json')).json();
+const source=base+'projects/test-project/assets/originals/small.png';
+let current={renderer:'format',fit:'contain',positionX:50,positionY:50,zoom:1,angle:0,flipX:false,scale:1,width:420,height:340};
+const control=(label,key,values)=>React.createElement('label',{key},label,React.createElement('select',{'aria-label':label,value:String(current[key]),onChange:event=>renderFixture({[key]:typeof current[key]==='number'?Number(event.target.value):event.target.value})},values.map(value=>React.createElement('option',{key:value,value},String(value)))));
+function renderFixture(options={}) {
+ current={...current,...options}; const o=current, framing={fit:o.fit,positionX:o.positionX,positionY:o.positionY,zoom:o.zoom};
+ const transform=`rotate(${o.angle}deg) scale(${o.flipX?-1:1},1)`;
+ const image=o.renderer==='reference'?React.createElement('div',{className:'reference-transform',style:{transform}},React.createElement('img',{src:source,alt:'Independent CSS framing reference',style:{objectFit:o.fit,objectPosition:`${o.positionX}% ${o.positionY}%`,transform:`scale(${o.zoom})`,transformOrigin:`${o.positionX}% ${o.positionY}%`}})):o.renderer==='tiles'?React.createElement(TiledImagePreview,{pyramid,posterUrl:base+pyramid.posterRelativePath,tilesUrl:base+pyramid.tilesRelativePath,alt:'Prepared tiled fixture',viewportScale:o.scale,framing,style:{transform}}):React.createElement(FormatImagePreview,{source,previewSource:base+pyramid.posterRelativePath,extension:'png',alt:'Raster fixture',viewportScale:o.scale,framing,style:{transform}});
+ root.render(React.createElement(React.Fragment,null,React.createElement('div',{id:'controls'},control('Renderer','renderer',['format','tiles','reference']),control('Fit','fit',['contain','cover','fill']),control('Horizontal position','positionX',[0,25,50,100]),control('Vertical position','positionY',[0,50,100]),control('Image zoom','zoom',[1,2,4])),React.createElement('div',{className:'canvas-stage'},React.createElement('div',{className:'board-world',style:{transform:`translate(80px,100px) scale(${o.scale})`}},React.createElement('div',{className:'fixture-frame',style:{width:o.width,height:o.height}},image)))));
+ window.fixtureState={...o};
+}
+window.fixturePyramid=pyramid; window.renderFixture=renderFixture;renderFixture();
+</script></body></html>

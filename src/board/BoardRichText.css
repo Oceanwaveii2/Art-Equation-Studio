@@ -1,0 +1,189 @@
+/* Art Equation — Canvas Rich Text & Typography Toolbar Styling */
+
+.board-text-toolbar {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(20, 24, 32, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(80, 95, 120, 0.4);
+  border-radius: 7px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.3);
+  color: #e5e9f0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  z-index: 150;
+  user-select: none;
+  pointer-events: auto;
+  max-width: 820px;
+}
+
+.board-artwork-text-toolbar {
+  position: absolute !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(90, 115, 150, 0.5);
+}
+
+.board-text-toolbar select,
+.board-text-toolbar input[type="number"],
+.board-text-toolbar input[type="text"] {
+  height: 26px;
+  background: #11141a;
+  color: #eceff4;
+  border: 1px solid #3b4252;
+  border-radius: 4px;
+  padding: 0 6px;
+  font-size: 11px;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.board-text-toolbar select:hover,
+.board-text-toolbar input[type="number"]:hover {
+  border-color: #5e81ac;
+  background: #161a22;
+}
+
+.board-text-toolbar select:focus,
+.board-text-toolbar input[type="number"]:focus {
+  border-color: #88c0d0;
+  box-shadow: 0 0 0 1px #88c0d0;
+}
+
+.board-text-toolbar button {
+  height: 26px;
+  min-width: 26px;
+  padding: 0 6px;
+  background: transparent;
+  color: #d8dee9;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.board-text-toolbar button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.board-text-toolbar button.active {
+  background: #2e3b52;
+  border-color: #88c0d0;
+  color: #88c0d0;
+  font-weight: 600;
+}
+
+.board-text-toolbar .toolbar-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 2px;
+}
+
+.board-text-toolbar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  color: #d8dee9;
+}
+
+.board-text-toolbar input[type="color"] {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #4c566a;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.board-text-toolbar input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.board-text-toolbar input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+
+/* Extended Typography Inspector in Bottom Canvas Rail */
+.text-node-bottom-inspector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.text-node-bottom-inspector select,
+.text-node-bottom-inspector input {
+  height: 24px;
+  background: var(--surface-field, #141820);
+  color: var(--text, #eceff4);
+  border: 1px solid var(--border-subtle, #3b4252);
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 0 5px;
+}
+
+.text-node-bottom-inspector button {
+  height: 24px;
+  min-width: 24px;
+  padding: 0 6px;
+  background: transparent;
+  border: 1px solid var(--border-subtle, #3b4252);
+  border-radius: 4px;
+  color: var(--text, #eceff4);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+
+.text-node-bottom-inspector button:hover {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.08));
+}
+
+.text-node-bottom-inspector button.active {
+  background: var(--accent-subtle, #2e3b52);
+  border-color: var(--accent, #88c0d0);
+  color: var(--accent, #88c0d0);
+}
+
+/* Authentic Transparent Artwork Text Canvas Presentation */
+.studio-shell .board-node.node-artwork-text {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+}
+
+.studio-shell .board-node.node-artwork-text.selected {
+  border: 1px dashed rgba(136, 192, 208, 0.8) !important;
+  box-shadow: 0 0 0 1px rgba(136, 192, 208, 0.3) !important;
+}
+
+.studio-shell .board-node.node-artwork-text:not(.selected) > .node-drag-handle {
+  display: none !important;
+}
+
+.studio-shell .board-node.node-artwork-text > .board-rich-text {
+  height: 100% !important;
+  border-top: none !important;
+  background: transparent !important;
+}
+
+.studio-shell .board-node.node-artwork-text .board-text-editor {
+  background: transparent !important;
+  padding: 2px 4px !important;
+}

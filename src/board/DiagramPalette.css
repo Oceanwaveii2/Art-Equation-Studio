@@ -1,0 +1,16 @@
+.diagram-palette { position:fixed; z-index:1200; width:340px; max-width:calc(100vw - 24px); max-height:calc(100vh - 24px); overflow:auto; padding:14px; border:1px solid var(--border-control,#526074); border-radius:10px; background:var(--surface-overlay,#1c1f25); color:var(--text-strong,#f1eee8); box-shadow:0 12px 38px var(--shadow-overlay,#0008); font:12px/1.45 Inter,Arial,sans-serif; box-sizing:border-box; }
+.diagram-palette header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.diagram-palette h2 { margin:0; font-size:14px; font-weight:650; }
+.diagram-palette header button { display:grid; place-items:center; width:32px; height:32px; padding:0; border:1px solid var(--border-control,#526074); border-radius:5px; background:var(--surface-input,#111318); color:inherit; font-size:20px; cursor:pointer; }
+.diagram-palette-search { display:grid; gap:5px; font-weight:550; }
+.diagram-palette-search input { width:100%; height:36px; border:1px solid var(--border-control,#526074); border-radius:5px; padding:0 9px; background:var(--surface-input,#111318); color:inherit; font:inherit; box-sizing:border-box; }
+.diagram-palette-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:12px; }
+.diagram-palette-options button { display:flex; align-items:center; gap:8px; min-height:76px; padding:9px; border:1px solid var(--border-control,#526074); border-radius:6px; background:var(--surface-input,#111318); color:inherit; text-align:left; font:inherit; cursor:pointer; }
+.diagram-palette-options svg { width:34px; height:28px; flex:none; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.diagram-palette-options span { min-width:0; font-weight:600; overflow-wrap:anywhere; }
+.diagram-palette-options small { display:block; margin-top:3px; color:var(--text-subtle,#b9bbc2); font-size:10px; font-weight:400; }
+.diagram-palette button:hover:not(:disabled) { background:var(--surface-hover,#30343d); }
+.diagram-palette :is(button,input):focus-visible { outline:2px solid var(--focus-ring,#79c9ff); outline-offset:2px; }
+.diagram-palette button:disabled { opacity:.65; cursor:default; }
+.diagram-palette-hint,.diagram-palette-empty { margin:9px 0 0; color:var(--text-subtle,#b9bbc2); }
+@media (forced-colors:active) { .diagram-palette { background:Canvas; color:CanvasText; border-color:CanvasText; box-shadow:none; } .diagram-palette :is(button,input) { background:Canvas; color:CanvasText; border-color:ButtonText; } .diagram-palette :is(button,input):focus-visible { outline-color:Highlight; } .diagram-palette small,.diagram-palette-hint,.diagram-palette-empty { color:CanvasText; } }
